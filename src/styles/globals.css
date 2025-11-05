@@ -25,7 +25,8 @@ body {
 }
 
 html {
-  background: white; /* ios overscroll background */
+  background: white;
+  /* ios overscroll background */
   height: 100vh;
   height: -webkit-fill-available;
   overflow-x: hidden;
@@ -36,4 +37,17 @@ html {
 a {
   text-decoration: none;
   color: inherit;
+}
+
+.footer {
+  background-color: #fff;
+  color: #fff;
+}
+
+.footer *,
+.footer p,
+.footer h5,
+.footer span {
+
+  color: #fff;
 }

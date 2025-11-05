@@ -14,7 +14,7 @@ import { features } from 'features'
 
 const Footer = () => {
   return (
-    <Box bgcolor="background.default" py={6}>
+    <Box bgcolor="#000" py={6} className="footer">
       <Container maxWidth="lg">
         <Stack spacing={2}>
           <Stack

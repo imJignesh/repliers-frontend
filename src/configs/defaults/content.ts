@@ -6,54 +6,54 @@ const content = {
   siteLogo: { url: '/logo.svg', width: 36, height: 36 },
   siteMobileLogo: { url: '/logo.svg', width: 36, height: 36 },
   siteFooterLogo: { url: '/logo-footer.svg', width: 80, height: 100 },
-  siteSplashscreen: '/splashscreen.jpg',
-  loginSplashscreen: '/splashscreen.jpg',
-  siteName: 'DEFAULTNAME',
+  siteSplashscreen: '/precondo_main_image.webp',
+  loginSplashscreen: '/precondo_main_image.webp',
+  siteName: 'Precondo',
   siteDefaultBrokerageName: 'DEFAULT BROKERAGE NAME',
-  siteKeywords: ['DEFAULTKEY1', 'DEFAULTKEY2'],
+  siteKeywords: ['Precondo', 'Precondos for sale in Canada'],
   siteDescription:
-    'DEFAULTNAME lorem ipsum dolor sit amet, consectetur adipiscing elit DEFAULTSTATE.',
+    "Welcome to Precondo, your exclusive access to all the new and upcoming condos in Canada. Everything you'll need when it comes to properties for Sale, Rent & Preconstruction Properties!",
   siteFooterDescription:
     'Our mission is to make the MLS more valuable while remaining committed to the needs of local markets. We do this by delivering exceptional customer service and striving for continuous innovation.',
   siteFullscreenFooter: '',
   homepageHeroBlock: {
-    title: 'DEFAULTNAME',
+    title: 'FIND CONDOS IN YOUR FAVORITE AREA',
     subTitle:
-      'DEFAULTNAME serves over XX,XXX real estate professionals in DEFAULTSTATE. As a top-rated multiple listing service (MLS), we provide property information and innovative products.'
+      'Precondo serves over XX,XXX real estate professionals in DEFAULTSTATE. As a top-rated multiple listing service (MLS), we provide property information and innovative products.'
   },
 
   siteMetadata: {
     title: {
-      template: 'DEFAULTNAME > %s',
-      default: 'DEFAULTNAME' // fallback
+      template: 'Precondo > %s',
+      default: 'Precondo' // fallback
     },
     // metadataBase: new URL('https://smartmls.com/'), // canonical URL
     alternates: {
       canonical: '/'
     },
     generator: 'Next.js',
-    applicationName: 'DEFAULTNAME',
+    applicationName: 'Precondo',
     referrer: 'origin-when-cross-origin',
-    keywords: ['DEFAULTKEY1', 'DEFAULTKEY2'],
+    // keywords: ['DEFAULTKEY1', 'DEFAULTKEY2'],
     // authors: [{ name: 'John' }, { name: 'Jane' }],
-    creator: 'John Doe',
-    publisher: 'John Doe',
+    creator: 'Precondo',
+    publisher: 'Precondo',
     // formatDetection: {
     //   email: false,
     //   address: false,
     //   telephone: false
     // },
     description:
-      'DEFAULTNAME lorem ipsum dolor sit amet, consectetur adipiscing elit DEFAULTSTATE.',
+      "Welcome to Precondo, your exclusive access to all the new and upcoming condos in Canada. Everything you'll need when it comes to properties for Sale, Rent & Preconstruction Properties!",
     icons: {
       icon: '/favicon.ico'
     }
   } as Metadata,
   estimateMetadata: {
     title:
-      'DEFAULTNAME lorem ipsum dolor sit amet, consectetur adipiscing elit DEFAULTSTATE.',
+      'Precondo lorem ipsum dolor sit amet, consectetur adipiscing elit DEFAULTSTATE.',
     description:
-      'DEFAULTNAME lorem ipsum dolor sit amet, consectetur adipiscing elit DEFAULTSTATE.'
+      'Precondo lorem ipsum dolor sit amet, consectetur adipiscing elit DEFAULTSTATE.'
   } as Metadata,
   estimateResultMetadata: {
     title: '$ Property Valuation Report',

@@ -29,7 +29,7 @@ const savedSearchCard: CSSObject = {
 const config = {
   propertyCardSizes,
   savedSearchCard,
-  gridColumns: { sm: 1, md: 1, lg: 2 },
+  gridColumns: { sm: 1, md: 2, lg: 2 },
   gridSpacing: 4, // * 8px
   widgetSpacing: 4, // * 8px
   cardCarouselSpacing: 4, // * 8px

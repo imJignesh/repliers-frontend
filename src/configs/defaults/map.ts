@@ -7,7 +7,7 @@ const accessToken = process.env.NEXT_PUBLIC_MAPBOX_KEY || ''
 const config = {
   // Mapbox access token and default options
   mapboxDefaults: {
-    zoom: 4,
+    zoom: 10,
     minZoom: 4,
     maxZoom: 18,
     dragRotate: false,

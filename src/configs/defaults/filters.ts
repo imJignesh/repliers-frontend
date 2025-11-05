@@ -13,13 +13,13 @@ export type ListingStatus = (typeof listingStatuses)[number]
 export const listingTypes = [
   'allListings',
   'residential',
-  'condo',
-  'townhome',
-  'semiDetached',
-  'multiFamily',
-  'land',
-  'business',
-  'commercial'
+  'condo'
+  // 'townhome',
+  // 'semiDetached',
+  // 'multiFamily',
+  // 'land',
+  // 'business',
+  // 'commercial'
 ] as const
 
 export type ListingType = (typeof listingTypes)[number]

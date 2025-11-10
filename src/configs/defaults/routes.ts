@@ -12,7 +12,7 @@ const routes = {
   address: '/search/address',
 
   listing: '/listing', // [...id]
-  listings: '/listings',
+  listings: '/locations',
   estimate: '/estimate',
   dashboard: '/dashboard',
   favorites: '/favorites',

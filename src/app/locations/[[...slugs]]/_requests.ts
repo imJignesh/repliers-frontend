@@ -40,9 +40,9 @@ export const fetchListings = async ({
   let listPrice = null
 
   const fetchParams = {
-    area,
-    city,
-    neighborhood: hood,
+    area: city,
+    // city,
+    // neighborhood: hood,
     status: 'A',
     pageNum: page,
     resultsPerPage: searchConfig.pageSize,

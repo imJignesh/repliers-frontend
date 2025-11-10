@@ -66,7 +66,7 @@ const LocationsCatalogPage = async (props: {
     localAddress,
     location: { area, city, neighborhood: hood }
   } = parseUrlParams(slugs)
-
+  console.log({ filters, boardId, listingId, localAddress, area, city, hood })
   // render property page component if listingId is present and emulate its old url format
   if (listingId) {
     return (

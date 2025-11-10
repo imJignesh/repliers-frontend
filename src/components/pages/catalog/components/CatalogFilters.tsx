@@ -10,11 +10,16 @@ import {
   ToggleButtonGroup
 } from '@mui/material'
 
-import { type ListingStatus, type ListingType } from '@configs/filters'
+import {
+  type ListingStatus,
+  type ListingType,
+  type ListingLocation
+} from '@configs/filters'
 import {
   ListingsCounter,
   ListingTypeSelect,
-  SortModesSelect
+  SortModesSelect,
+  ListingLocationSelect
 } from '@shared/Filters'
 
 import { type ApiSortBy } from 'services/API'
@@ -32,11 +37,14 @@ const CatalogFilters = ({
   count,
   city,
   hood,
+  area,
   searchFilters
 }: {
   count: number
   city?: string
   hood?: string
+  area?: string
+  listingLocation?: string
   searchFilters: Partial<Filters>
 }) => {
   const router = useRouter()
@@ -47,7 +55,8 @@ const CatalogFilters = ({
   const { listingStatus, listingType, sortBy } = searchFilters
 
   const createFiltersArray = ({
-    type = listingType || 'allListings',
+    type = listingType || 'condos',
+
     status = listingStatus,
     sort = sortBy
   }) => {
@@ -56,13 +65,28 @@ const CatalogFilters = ({
     if (type !== 'allListings') filters.push(type)
     if (status === 'rent') filters.push('for-rent')
     if (sort !== 'createdOnDesc') filters.push('sort-' + sort)
+    // if (listingLocation !== '') filters.push('area-' + sort)
 
     return filters
   }
-
+  const listingLocation = area || 'Ontario'
+  /*************  ✨ Windsurf Command ⭐  *************/
+  /**
+   * Handle type change event
+   * @param {ListingType} value - The listing type to filter by
+   * @example handleTypeChange('allListings')
+   * @example handleTypeChange('condos')
+   */
+  /*******  dc5bcbe5-aaf7-4829-af66-cc8455f8323a  *******/
   const handleTypeChange = (value: ListingType) => {
     const filters = createFiltersArray({ type: value })
     router.push(getCatalogUrl(city, hood, filters))
+  }
+
+  const handleLocationChange = (value: ListingType) => {
+    // alert(value)
+    // const filters = createFiltersArray({ type: value })
+    router.push(getCatalogUrl(value))
   }
 
   const handleSortChange = (value: ApiSortBy) => {
@@ -87,6 +111,16 @@ const CatalogFilters = ({
 
           <Stack spacing={1} direction="row">
             {clientSide ? (
+              <ListingLocationSelect
+                size={size}
+                value={listingLocation!}
+                onChange={handleLocationChange}
+              />
+            ) : (
+              <Skeleton variant="rounded" sx={{ width: 148, height: 48 }} />
+            )}
+
+            {/* {clientSide ? (
               <ListingTypeSelect
                 size={size}
                 value={listingType!}
@@ -94,7 +128,7 @@ const CatalogFilters = ({
               />
             ) : (
               <Skeleton variant="rounded" sx={{ width: 148, height: 48 }} />
-            )}
+            )} */}
 
             {clientSide ? (
               <ToggleButtonGroup

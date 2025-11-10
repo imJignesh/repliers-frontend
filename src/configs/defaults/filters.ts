@@ -11,8 +11,8 @@ export const listingStatuses = ['active', 'sold', 'all', 'rent'] as const
 export type ListingStatus = (typeof listingStatuses)[number]
 
 export const listingTypes = [
-  'allListings',
-  'residential',
+  // 'allListings',
+  // 'residential',
   'condo'
   // 'townhome',
   // 'semiDetached',
@@ -21,8 +21,64 @@ export const listingTypes = [
   // 'business',
   // 'commercial'
 ] as const
-
+export const listingLocations = [
+  'All',
+  'Toronto',
+  'Waterloo',
+  'Wellington',
+  'York',
+  'Simcoe',
+  'Stormont',
+  'Dundas and Glengarry',
+  'Sudbury',
+  'Thunder Bay',
+  'Timiskaming',
+  'Peel',
+  'Perth',
+  'Renfrew',
+  'Peterborough',
+  'Prescott and Russell',
+  'Prince Edward County',
+  'Rainy River',
+  'Oxford',
+  'Parry Sound',
+  'Ottawa',
+  'Haliburton',
+  'Halton',
+  'Hamilton',
+  'Durham',
+  'Elgin',
+  'Essex',
+  'Hastings',
+  'Lanark',
+  'Leeds and Grenville',
+  'Lennox & Addington',
+  'Manitoulin',
+  'Middlesex',
+  'Huron',
+  'Kawartha Lakes',
+  'Kenora',
+  'Lambton',
+  'Niagara',
+  'Nipissing',
+  'Norfolk',
+  'Frontenac',
+  'Greater Sudbury',
+  'Grey County',
+  'Haldimand',
+  'Muskoka',
+  'Chatham-Kent',
+  'Cochrane',
+  'Dufferin',
+  'Algoma',
+  'Brant',
+  'Bruce',
+  'Canada',
+  'Northumberland',
+  'Brantford'
+]
 export type ListingType = (typeof listingTypes)[number]
+export type ListingLocation = (typeof listingLocations)[string]
 
 export type ListingFields = keyof Property | ApiQueryParamsAllowedFields
 

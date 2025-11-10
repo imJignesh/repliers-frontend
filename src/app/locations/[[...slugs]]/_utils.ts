@@ -64,12 +64,12 @@ export const extractLocation = (
     //   .flatMap((city: any) => city.neighborhoods || [])
     //   .find((hood: CatalogItem) => hood.name === neighborhood)
   } else {
-    return areas.reduce((acc: CatalogItem, area: ApiBoardArea) => {
-      const cityItem = area.cities.find(
-        (item: ApiBoardCity) => item.name.toLowerCase() === city.toLowerCase()
-      )
-      return cityItem || acc
-    })
+    // return areas?.reduce((acc: CatalogItem, area: ApiBoardArea) => {
+    //   const cityItem = area.cities.find(
+    //     (item: ApiBoardCity) => item.name.toLowerCase() === city.toLowerCase()
+    //   )
+    //   return cityItem || acc
+    // })
   }
 }
 

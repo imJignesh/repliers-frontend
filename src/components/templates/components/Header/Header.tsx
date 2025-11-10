@@ -51,7 +51,7 @@ const Header = () => {
 
             <ToolbarMenu sx={{ display: { xs: 'none', md: 'flex' } }} />
 
-            <ProfileMenuPill sx={{ display: { xs: 'none', md: 'block' } }} />
+            {/* <ProfileMenuPill sx={{ display: { xs: 'none', md: 'block' } }} /> */}
 
             <Box
               sx={{

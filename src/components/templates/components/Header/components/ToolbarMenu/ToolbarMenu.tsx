@@ -49,30 +49,30 @@ const ToolbarMenu = ({ sx }: { sx?: SxProps }) => {
         url: routes.dashboard,
         item: 'Market Insights'
       },
-      {
-        if: features.favorites || features.saveSearch,
-        item: ToolbarDivider
-      },
-      {
-        if: features.favorites,
-        url: routes.favorites,
-        item: FavoritesMenuItem
-      },
-      {
-        if: features.saveSearch,
-        url: routes.saveSearch,
-        item: SaveSearchMenuItem
-      },
-      {
-        if: adminRole,
-        url: routes.adminAgents,
-        item: 'Agents'
-      },
-      {
-        if: adminRole,
-        url: routes.agent,
-        item: 'Clients'
-      },
+      // {
+      //   if: features.favorites || features.saveSearch,
+      //   item: ToolbarDivider
+      // },
+      // {
+      //   if: features.favorites,
+      //   url: routes.favorites,
+      //   item: FavoritesMenuItem
+      // },
+      // {
+      //   if: features.saveSearch,
+      //   url: routes.saveSearch,
+      //   item: SaveSearchMenuItem
+      // },
+      // {
+      //   if: adminRole,
+      //   url: routes.adminAgents,
+      //   item: 'Agents'
+      // },
+      // {
+      //   if: adminRole,
+      //   url: routes.agent,
+      //   item: 'Clients'
+      // },
       ...content.toolbarMenuItems
     ]
   }, [features, adminRole, content.toolbarMenuItems])

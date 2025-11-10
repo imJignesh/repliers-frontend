@@ -101,7 +101,7 @@ const CatalogHeader = ({
             </Button>
             <Typography variant="h2">
               {current}{' '}
-              <span style={{ whiteSpace: 'nowrap' }}>Real Estate</span>
+              <span style={{ whiteSpace: 'nowrap' }}> Condos for Resale</span>
             </Typography>
           </Box>
 
@@ -121,7 +121,7 @@ const CatalogHeader = ({
           />
         </Stack>
 
-        <CatalogMap coordinates={coordinates} center={center} />
+        {/* <CatalogMap coordinates={coordinates} center={center} /> */}
       </Stack>
     </Box>
   )

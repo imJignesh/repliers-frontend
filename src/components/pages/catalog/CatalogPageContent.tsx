@@ -78,6 +78,7 @@ const CatalogPageContent = ({
             />
             <CatalogFilters
               count={count}
+              area={city}
               city={city}
               hood={hood}
               searchFilters={searchFilters}

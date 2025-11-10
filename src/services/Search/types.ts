@@ -30,7 +30,7 @@ export type SoldWithin = (typeof soldWithin)[number]
 export interface Filters {
   listingType?: ListingType
   listingStatus?: ListingStatus
-
+  listingLocation?: string
   coverImage?: string
   imageSearchItems?: any[]
 

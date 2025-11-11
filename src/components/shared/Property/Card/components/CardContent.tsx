@@ -89,7 +89,7 @@ const Content = ({ property, size }: ContentProps) => {
           justifyContent="space-between"
         >
           <Typography
-            variant={titleHeading}
+            variant={'body1'}
             color={color}
             sx={{
               textDecoration: soldProperty ? 'line-through' : ''

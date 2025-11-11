@@ -48,7 +48,7 @@ const CardTemplate = ({
               {icon}
             </Box>
             <Stack>
-              <Typography variant="h6" color="primary" sx={{ pb: 1 }}>
+              <Typography variant="body1" color="primary" sx={{ pb: 1 }}>
                 {title}
               </Typography>
               <Typography variant="body2">{description}</Typography>

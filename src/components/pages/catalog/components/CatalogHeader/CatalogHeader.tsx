@@ -99,7 +99,7 @@ const CatalogHeader = ({
             >
               Explore
             </Button>
-            <Typography variant="h2">
+            <Typography variant="h1" style={{ fontSize: '2rem' }}>
               {current}{' '}
               <span style={{ whiteSpace: 'nowrap' }}> Condos for Resale</span>
             </Typography>

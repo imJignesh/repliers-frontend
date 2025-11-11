@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "NODE_ENV=production next dev --turbo",
     "dev:inspect": "cross-env NODE_OPTIONS='--inspect' next dev",
     "clean": "rimraf .next",
     "build": "npm run clean && next build",

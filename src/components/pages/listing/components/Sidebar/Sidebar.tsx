@@ -22,7 +22,6 @@ const Sidebar = () => {
       }}
     >
       <Tabs value={value} variant="fullWidth" onChange={handleChange}>
-        <Tab label="Tour home" />
         <Tab label="Request info" />
       </Tabs>
       <Box
@@ -33,10 +32,7 @@ const Sidebar = () => {
           borderColor: 'divider'
         }}
       >
-        <Box sx={{ display: value === 0 ? 'block' : 'none' }}>
-          <TourHomeForm />
-        </Box>
-        <Box sx={{ display: value === 1 ? 'block' : 'none' }}>
+        <Box>
           <RequestInfoForm />
         </Box>
       </Box>

@@ -29,7 +29,7 @@ const DetailsContainer: React.FC<DetailsContainerProps> = ({
     >
       {title && (
         <Typography
-          variant="h4"
+          variant="h2"
           sx={{ px: { xs: 3, sm: 4 }, py: 3, bgcolor: lighten(primary, 0.95) }}
         >
           {title}

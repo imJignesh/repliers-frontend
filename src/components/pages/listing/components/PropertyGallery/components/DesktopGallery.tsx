@@ -159,7 +159,7 @@ const DesktopGallery = ({
                 <>
                   <DialogGalleryButton show={showControls} active={active} />
 
-                  <Box
+                  {/* <Box
                     sx={{
                       m: 2,
                       left: 0,
@@ -175,7 +175,7 @@ const DesktopGallery = ({
                         <AiSubmitButton image={activeImage} />
                       )}
                     </Stack>
-                  </Box>
+                  </Box> */}
                 </>
               )}
             </>

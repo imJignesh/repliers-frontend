@@ -20,7 +20,7 @@ const HomeDescription = () => {
 
   return (
     <Stack spacing={3} id="description" sx={{ mt: '-33px', pt: 4 }}>
-      <Typography variant="h4">Description</Typography>
+      <Typography variant="h2">Description</Typography>
       <Typography
         component="div"
         sx={{

@@ -120,9 +120,9 @@ const PropertyCard = React.memo(
           <CardContent size={size} property={property} />
           <TouchRipple ref={rippleRef} center={false} />
         </a>
-        {features.favorites && !sizeMap && (
+        {/* {features.favorites && !sizeMap && (
           <FavoritesButton property={property} />
-        )}
+        )} */}
       </CardContainer>
     )
   },

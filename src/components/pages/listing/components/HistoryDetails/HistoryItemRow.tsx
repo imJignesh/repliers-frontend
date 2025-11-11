@@ -25,7 +25,7 @@ const HistoryItemRow = ({
       <Typography fontWeight={500} minWidth="128px" width="35%">
         {label}
       </Typography>
-      <Typography variant="h6" minWidth="90px" width="25%">
+      <Typography variant="h3" minWidth="90px" width="25%">
         {Number(price) > 0 ? formatEnglishPrice(price) : ''}
       </Typography>
     </Stack>

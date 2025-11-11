@@ -30,7 +30,7 @@ const BasicPropertyIcons = ({ property }: { property: Property }) => {
       {Boolean(beds.count) && (
         <Stack spacing={1} direction="row" alignItems="center">
           <IcoBed size={40} />
-          <Typography variant="h5" color="text.hint">
+          <Typography variant="body1" color="text.hint">
             {beds.label}
           </Typography>
         </Stack>
@@ -38,7 +38,7 @@ const BasicPropertyIcons = ({ property }: { property: Property }) => {
       {Boolean(baths.count) && (
         <Stack spacing={1} direction="row" alignItems="center">
           <IcoBath size={38} />
-          <Typography variant="h5" color="text.hint">
+          <Typography variant="body1" color="text.hint">
             {baths.label}
           </Typography>
         </Stack>
@@ -46,7 +46,7 @@ const BasicPropertyIcons = ({ property }: { property: Property }) => {
       {Boolean(sqft.number) && (
         <Stack spacing={1} direction="row" alignItems="center">
           <IcoSquare size={32} />
-          <Typography variant="h5" color="text.hint" noWrap>
+          <Typography variant="body1" color="text.hint" noWrap>
             {sqft.label}
           </Typography>
         </Stack>
@@ -54,7 +54,7 @@ const BasicPropertyIcons = ({ property }: { property: Property }) => {
       {Boolean(lotSize.number && land(property)) && (
         <Stack spacing={1} direction="row" alignItems="center">
           <IcoSquare size={32} />
-          <Typography variant="h5" color="text.hint" noWrap>
+          <Typography variant="body1" color="text.hint" noWrap>
             {lotSize.label}
           </Typography>
         </Stack>

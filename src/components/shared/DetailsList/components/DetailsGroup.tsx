@@ -39,7 +39,7 @@ const DetailsGroup = ({
   return (
     <Box sx={{ breakInside }}>
       {Boolean(title) && (
-        <Typography component="h5" fontWeight={600} pb={1}>
+        <Typography component="h3" fontWeight={600} pb={1}>
           <ScrubbedText replace={scrubbedTitle}>
             {safeTranslate(t, title || '')}
           </ScrubbedText>

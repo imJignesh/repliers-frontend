@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react'
 
-import { Box, Container, Stack } from '@mui/material'
+import { Box, Container, Stack, Typography } from '@mui/material'
 
 import { DetailsContainer } from '@shared/Containers'
 import {
@@ -35,6 +35,8 @@ import {
   SummaryDetails
 } from './components'
 
+import { formatShortAddress } from '../../../utils/properties/formatters'
+
 const PropertyPageContent = ({
   embedded = false,
   mapType = 'interactive'
@@ -46,6 +48,7 @@ const PropertyPageContent = ({
   const { agentRole } = useUser()
   const features = useFeatures()
   const { similarProperties, property } = useProperty()
+  const { address } = property
 
   useEffect(() => {
     trackEvent('view_property_page', {
@@ -77,9 +80,12 @@ const PropertyPageContent = ({
           justifyContent="space-between"
           direction={{ xs: 'column', md: 'row' }}
         >
-          <Stack spacing={4} sx={{ flex: 1, width: '100%' }}>
-            <HomeHeaderInfo />
+          <Stack spacing={2} sx={{ flex: 1, width: '100%' }}>
+            <Typography variant="h1" style={{ fontSize: '2rem' }}>
+              {formatShortAddress(address)}
+            </Typography>
 
+            <HomeHeaderInfo />
             <DetailsContainer>
               <Stack spacing={{ xs: 4, sm: 6 }}>
                 <HomeDescription />
@@ -94,17 +100,11 @@ const PropertyPageContent = ({
                 <SummaryDetails />
               </Stack>
             </DetailsContainer>
-
             <FeaturesDetails />
-
             <AppliancesDetails />
-
             <ExteriorDetails />
-
             <RoomsDetails />
-
             <NeighborhoodDetails />
-
             <HistoryDetails />
           </Stack>
 

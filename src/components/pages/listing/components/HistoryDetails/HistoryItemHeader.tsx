@@ -69,7 +69,7 @@ const HistoryItemHeader = ({
       <Stack spacing={1}>
         <Stack spacing={1} direction="row" alignItems="center" flexWrap="wrap">
           <Typography
-            variant="h5"
+            variant="h3"
             sx={{
               color: { xs: active ? 'secondary.main' : '', md: 'common.black' }
             }}

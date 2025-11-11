@@ -13,7 +13,7 @@ const SummaryDetails = () => {
 
   return (
     <Stack spacing={4} id="details">
-      <Typography variant="h4">{t('pdp.sections.home.name')}</Typography>
+      <Typography variant="h2">{t('pdp.sections.home.name')}</Typography>
       <DetailsList mode="columns">
         {homeDetails.map((group, index) => (
           <DetailsGroup breakInside="auto" key={index} group={group} />

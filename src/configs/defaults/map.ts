@@ -35,9 +35,9 @@ const config = {
     { lat: 23.5, lng: -130.0 }
   ] as ApiLocation[],
   // proximity search
-  proximitySearchCenter: { lat: 37.0, lng: -98.5 } as ApiLocation,
+  proximitySearchCenter: { lat: 43.613131, lng: 8.18188 } as ApiLocation,
   proximitySearchLanguage: 'en',
-  proximitySearchCountry: 'US',
+  proximitySearchCountry: 'CA',
   proximitySearchLimit: 10
 }
 

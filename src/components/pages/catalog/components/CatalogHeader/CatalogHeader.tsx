@@ -80,11 +80,16 @@ const CatalogHeader = ({
   }
 
   return (
-    <Box p={{ xs: 2, sm: 3 }} borderRadius={2} bgcolor="background.default">
+    <Box>
       <Stack spacing={3} direction={{ xs: 'column', md: 'row' }}>
-        <Stack spacing={{ xs: 0, sm: 1 }} width="100%">
+        <Stack
+          spacing={{ xs: 0, sm: 1 }}
+          width="100%"
+          direction={{ xs: 'column', md: 'row' }}
+          justifyContent={'space-between'}
+        >
           <Box sx={{ clear: 'both' }}>
-            <Button
+            {/* <Button
               href={mapLink}
               target="_blank"
               endIcon={<ExploreIcon />}
@@ -98,16 +103,14 @@ const CatalogHeader = ({
               }}
             >
               Explore
-            </Button>
+            </Button> */}
             <Typography variant="h1" style={{ fontSize: '2rem' }}>
               {current}{' '}
               <span style={{ whiteSpace: 'nowrap' }}> Condos for Resale</span>
             </Typography>
           </Box>
-
           <Breadcrumbs area={area} city={city} hood={hood} />
-
-          <SeoDescription
+          {/* <SeoDescription
             count={count}
             area={area}
             city={city}
@@ -118,7 +121,7 @@ const CatalogHeader = ({
             location={location}
             onLinkFocus={handleLinkFocus}
             onLinkBlur={handleLinkBlur}
-          />
+          /> */}
         </Stack>
 
         {/* <CatalogMap coordinates={coordinates} center={center} /> */}

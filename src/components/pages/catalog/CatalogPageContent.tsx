@@ -64,18 +64,20 @@ const CatalogPageContent = ({
   return (
     <MapOptionsProvider layout="map" style="map">
       <Box minHeight="calc(100vh - 72px)">
+        <Container maxWidth="lg" sx={{ pt: { xs: 0, sm: 0 } }}>
+          <CatalogHeader
+            count={count}
+            area={area}
+            city={city}
+            hood={hood}
+            areas={areas}
+            cities={cities}
+            hoods={hoods}
+            location={location}
+          />
+        </Container>
         <Box sx={{ boxShadow: count > 0 ? 1 : 0 }}>
-          <Container maxWidth="lg" sx={{ pt: { xs: 2, sm: 3 } }}>
-            <CatalogHeader
-              count={count}
-              area={area}
-              city={city}
-              hood={hood}
-              areas={areas}
-              cities={cities}
-              hoods={hoods}
-              location={location}
-            />
+          <Container maxWidth="lg" sx={{ pt: { xs: 0, sm: 0 } }}>
             <CatalogFilters
               count={count}
               area={city}
@@ -105,9 +107,9 @@ const CatalogPageContent = ({
           )}
           <Stack spacing={2} alignItems="center" py={4}>
             <CatalogPagination page={page} count={count} />
-            {count > 0 && <Breadcrumbs city={city} hood={hood} />}
+            {/* {count > 0 && <Breadcrumbs city={city} hood={hood} />} */}
 
-            <FiltersList urlFilters={urlFilters} />
+            {/* <FiltersList urlFilters={urlFilters} /> */}
           </Stack>
         </Container>
 

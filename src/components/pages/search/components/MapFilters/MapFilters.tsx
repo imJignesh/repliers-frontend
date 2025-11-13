@@ -85,13 +85,13 @@ const MapFilters = () => {
 
       <AdvancedFiltersButton size={size} />
 
-      {features.saveSearch && (
+      {/* {features.saveSearch && (
         <DesktopOnly>
           <SaveSearchButton size={size} />
         </DesktopOnly>
-      )}
+      )} */}
 
-      {features.aiSearch && <AiSearchButton size={size} />}
+      {/* {features.aiSearch && <AiSearchButton size={size} />} */}
 
       {/* {features.aiQuality && (
             <DesktopOnly>
@@ -99,7 +99,7 @@ const MapFilters = () => {
             </DesktopOnly>
           )} */}
 
-      {features.aiSpaces && (
+      {/* {features.aiSpaces && (
         <DesktopOnly>
           <AiSpacesSelect size={size} />
         </DesktopOnly>
@@ -109,9 +109,9 @@ const MapFilters = () => {
         <DesktopOnly>
           <AiChat />
         </DesktopOnly>
-      )}
+      )} */}
       <Suspense>
-        {features.aiSearch && <AiSearchDialog />}
+        {/* {features.aiSearch && <AiSearchDialog />} */}
         <AdvancedFiltersDialog />
       </Suspense>
     </MapFiltersBar>

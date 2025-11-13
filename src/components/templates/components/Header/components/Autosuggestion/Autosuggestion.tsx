@@ -185,13 +185,14 @@ const Autosuggestion = ({
         return null
     }
   }
-
+  // console.log(router)
   // TODO: useCallback
   const renderInputElement = (params: AutocompleteRenderInputParams) => (
     <TextField
       {...params}
       variant="filled"
-      placeholder={t('Search.autosuggestPlaceholder')}
+      // placeholder={t('Search.autosuggestPlaceholder')}
+      placeholder={'Search by Address, Neighbourhood, MLS #, Schools'}
       autoComplete="off"
       slotProps={{
         input: {
@@ -345,53 +346,62 @@ const Autosuggestion = ({
   }
 
   return (
-    <Stack spacing={0} direction="row" alignItems="center" width="100%">
-      <Autocomplete
-        open={open}
-        freeSolo
-        fullWidth
-        blurOnSelect
-        autoHighlight
-        selectOnFocus
-        clearOnEscape
-        disableListWrap
-        handleHomeEndKeys
-        options={options}
-        filterSelectedOptions
-        filterOptions={(x) => x}
-        groupBy={(option) => option.type}
-        onBlur={() => setOpen(false)}
-        onFocus={() => setOpen(searchString.length >= minCharsToSuggest)}
-        onChange={(e, v) => handleChange(v)}
-        inputValue={searchString}
-        onInputChange={(_, newValue, reason) => {
-          // only update when user types
-          if (reason === 'input') {
-            setSearchString(newValue)
-            setOpen(newValue.length >= minCharsToSuggest)
-          } else if (reason === 'clear') {
-            clearOptions()
-          }
-        }}
-        getOptionLabel={getOptionLabel}
-        renderInput={renderInputElement}
-        renderOption={renderOptionElement}
-        renderGroup={({ key, group, children }) => (
-          <OptionGroup key={key} group={group}>
-            {children}
-          </OptionGroup>
+    <div
+      style={{
+        background: 'white',
+        position: 'relative',
+        width: '100%',
+        borderRadius: 8
+      }}
+    >
+      <Stack spacing={0} direction="row" alignItems="center" width="100%">
+        <Autocomplete
+          open={open}
+          freeSolo
+          fullWidth
+          blurOnSelect
+          autoHighlight
+          selectOnFocus
+          clearOnEscape
+          disableListWrap
+          handleHomeEndKeys
+          options={options}
+          filterSelectedOptions
+          filterOptions={(x) => x}
+          groupBy={(option) => option.type}
+          onBlur={() => setOpen(false)}
+          onFocus={() => setOpen(searchString.length >= minCharsToSuggest)}
+          onChange={(e, v) => handleChange(v)}
+          inputValue={searchString}
+          onInputChange={(_, newValue, reason) => {
+            // only update when user types
+            if (reason === 'input') {
+              setSearchString(newValue)
+              setOpen(newValue.length >= minCharsToSuggest)
+            } else if (reason === 'clear') {
+              clearOptions()
+            }
+          }}
+          getOptionLabel={getOptionLabel}
+          renderInput={renderInputElement}
+          renderOption={renderOptionElement}
+          renderGroup={({ key, group, children }) => (
+            <OptionGroup key={key} group={group}>
+              {children}
+            </OptionGroup>
+          )}
+        />
+        {showButton && (
+          <Button
+            variant="contained"
+            onClick={handleButtonClick}
+            sx={{ minWidth: 56 }}
+          >
+            {buttonTitle || <IcoSearch color="white" size={18} />}
+          </Button>
         )}
-      />
-      {showButton && (
-        <Button
-          variant="contained"
-          onClick={handleButtonClick}
-          sx={{ minWidth: 56 }}
-        >
-          {buttonTitle || <IcoSearch color="white" size={18} />}
-        </Button>
-      )}
-    </Stack>
+      </Stack>
+    </div>
   )
 }
 

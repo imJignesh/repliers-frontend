@@ -16,8 +16,8 @@ const BannerDescription = ({
       {title && (
         <Box
           sx={{
-            py: { xs: 4, sm: 6, md: 8 },
-            maxWidth: { xs: 'auto', md: '50%' }
+            // py: { xs: 12, sm: 12, md: 12 },
+            maxWidth: { xs: 'auto', md: '100%' }
           }}
         >
           <Typography
@@ -25,15 +25,16 @@ const BannerDescription = ({
             color="common.white"
             sx={{
               textShadow: '0 0 10px rgba(0,0,0,0.3)',
-              fontSize: { xs: '2rem', sm: '3rem' },
-              lineHeight: 1.5
+              fontSize: { xs: '1rem', sm: '2rem' },
+              lineHeight: 1.5,
+              textAlign: 'center'
             }}
           >
-            {title}
+            Search for Active & Sold Listings
           </Typography>
         </Box>
       )}
-      {subtitle && (
+      {subtitle && 11 == 113 && (
         <Box sx={{ maxWidth: { xs: 'auto', sm: '50%', md: '45%' } }}>
           <Typography
             variant="h4"

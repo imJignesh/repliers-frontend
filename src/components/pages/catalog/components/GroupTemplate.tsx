@@ -28,7 +28,7 @@ const GroupTemplate = ({
   return (
     <Container>
       <Stack width="100%" spacing={4} pb={{ xs: 4, sm: 6 }}>
-        <Typography variant="h4">{title}</Typography>
+        <Typography variant="h2">{title}</Typography>
         <Box
           sx={{
             gap: 1,

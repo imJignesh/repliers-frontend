@@ -109,7 +109,7 @@ export const listingFields: Array<ListingFields> = [
   'boardId'
 ]
 
-export type PropertyClass = 'residential' | 'condo' | 'commercial' | 'all'
+export type PropertyClass = 'condo'
 
 export const aiQuality = [
   ['Excellent', 'excellent'],

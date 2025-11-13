@@ -30,25 +30,38 @@ const ToolbarMenu = ({ sx }: { sx?: SxProps }) => {
   const toolbarConfigs = useMemo<ToolbarConfig[]>(() => {
     return [
       {
+        url: '/locations/toronto/for-sale',
+        item: 'For Sale'
+      },
+      {
+        url: '/locations/toronto/for-rent',
+        item: 'For Rent'
+      },
+      {
+        url: '/locations/toronto/new-condos-and-preconstruction',
+        item: 'Pre-Construction'
+      },
+      {
         if: features.map,
         url: routes.map,
         item: 'Map'
       },
-      {
-        if: features.listings,
-        url: routes.listings,
-        item: 'Listings'
-      },
-      {
-        if: features.estimate && !adminRole,
-        url: routes.estimate,
-        item: 'Estimate'
-      },
-      {
-        if: features.dashboard,
-        url: routes.dashboard,
-        item: 'Market Insights'
-      },
+      // {
+      //   if: features.listings,
+      //   url: routes.listings,
+      //   item: 'Listings'
+      // },
+
+      // {
+      //   if: features.estimate && !adminRole,
+      //   url: routes.estimate,
+      //   item: 'Estimate'
+      // },
+      // {
+      //   if: features.dashboard,
+      //   url: routes.dashboard,
+      //   item: 'Market Insights'
+      // },
       // {
       //   if: features.favorites || features.saveSearch,
       //   item: ToolbarDivider

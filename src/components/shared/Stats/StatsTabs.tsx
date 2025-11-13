@@ -15,9 +15,9 @@ import useClientSide from 'hooks/useClientSide'
 import { type StatsParams, StatsTabPanel } from '.'
 
 const tabs: { label: string; propertyClass: PropertyClass }[] = [
-  { label: 'Residential', propertyClass: 'residential' },
-  { label: 'Condos', propertyClass: 'condo' },
-  { label: 'All', propertyClass: 'all' }
+  // { label: 'Residential', propertyClass: 'residential' },
+  { label: 'Condos', propertyClass: 'condo' }
+  // { label: 'All', propertyClass: 'all' }
 ]
 
 type StatsTabsProps = Omit<StatsParams, 'propertyClass'> & {
@@ -42,7 +42,7 @@ export const StatsTabs = ({
 
   return (
     <Box>
-      {clientSide ? (
+      {/* {clientSide ? (
         <Tabs
           value={value}
           onChange={handleChange}
@@ -80,7 +80,7 @@ export const StatsTabs = ({
         </Tabs>
       ) : (
         <Box height={48} /> // spacer for loading
-      )}
+      )} */}
       <Box position="relative">
         {tabs.map(({ label, propertyClass }, index) => (
           <Box

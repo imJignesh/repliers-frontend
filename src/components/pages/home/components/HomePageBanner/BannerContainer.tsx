@@ -5,8 +5,11 @@ import { Box } from '@mui/material'
 const BannerContainer = ({ children }: { children: React.ReactNode }) => {
   return (
     <Box
-      minHeight={{ xs: 640, md: 'calc(100svh - 200px)' }}
+      minHeight={{ xs: 640, md: '300px' }}
       position="relative"
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
     >
       {children}
     </Box>

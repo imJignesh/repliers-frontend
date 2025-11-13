@@ -18,8 +18,7 @@ export const StatsWidgets = (
 ) => {
   const { city, name = '' } = params
   const t = useTranslations()
-  const [propertyClass, setPropertyClass] =
-    useState<PropertyClass>('residential')
+  const [propertyClass, setPropertyClass] = useState<PropertyClass>('condo')
 
   return (
     <SearchProvider>
@@ -28,22 +27,22 @@ export const StatsWidgets = (
           <Stack spacing={gridConfig.widgetSpacing}>
             <Typography
               variant="h2"
-              sx={{ mb: { xs: 0, md: -8 }, whiteSpace: 'pre-line' }}
+              sx={{ mb: { xs: 0, md: -5 }, whiteSpace: 'pre-line' }}
             >
               {t('Statistics.insightsTitle', { name })}
             </Typography>
 
             <StatsTabs city={city} onTabChange={setPropertyClass} />
-            <StatsGraph city={city} propertyClass={propertyClass} />
+            {/* <StatsGraph city={city} propertyClass={propertyClass} /> */}
 
-            <Typography
+            {/* <Typography
               align="center"
               variant="caption"
               color="secondary.main"
               sx={{ whiteSpace: 'pre-line' }}
             >
               {t('Statistics.statsDisclaimer')}
-            </Typography>
+            </Typography> */}
           </Stack>
         </Container>
       </Box>

@@ -9,12 +9,7 @@ const { siteName, siteSplashscreen } = content
 
 const BannerImage = () => {
   return (
-    <Box
-      width="100%"
-      height="100%"
-      position="absolute"
-      bgcolor="background.default"
-    >
+    <Box width="100%" height="100%" position="absolute" bgcolor="#000">
       <Image
         unoptimized
         layout="fill"
@@ -24,6 +19,7 @@ const BannerImage = () => {
         objectPosition="center"
         src={siteSplashscreen}
         alt={siteName}
+        style={{ opacity: 0.8 }}
       />
     </Box>
   )

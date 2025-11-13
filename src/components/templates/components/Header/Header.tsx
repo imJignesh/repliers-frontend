@@ -1,6 +1,14 @@
 'use client'
 
-import { AppBar, Box, Container, Stack } from '@mui/material'
+import {
+  AppBar,
+  Box,
+  Button,
+  Container,
+  Menu,
+  MenuItem,
+  Stack
+} from '@mui/material'
 
 import content from '@configs/content'
 
@@ -15,8 +23,14 @@ import {
   ToolbarMenu
 } from './components'
 
+import { listingLocations } from '@configs/filters'
+
+import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state'
+import { useRouter } from 'next/navigation'
+
 const Header = () => {
   const features = useFeatures()
+  const router = useRouter()
 
   return (
     <Box sx={{ height: { xs: 64, sm: 72 } }}>
@@ -42,17 +56,40 @@ const Header = () => {
             justifyContent="space-between"
           >
             <Logo />
-
             {features.search && (
               <AutosuggestionContainer>
                 <Autosuggestion />
               </AutosuggestionContainer>
             )}
-
             <ToolbarMenu sx={{ display: { xs: 'none', md: 'flex' } }} />
-
             {/* <ProfileMenuPill sx={{ display: { xs: 'none', md: 'block' } }} /> */}
+            <PopupState variant="popover" popupId="demo-popup-menu">
+              {(popupState) => (
+                <>
+                  <Button variant="outlined" {...bindTrigger(popupState)}>
+                    Neighbourhoods
+                  </Button>
+                  <Menu {...bindMenu(popupState)}>
+                    {listingLocations.map((location) => (
+                      <MenuItem
+                        key={location}
+                        onClick={() => {
+                          popupState.close()
+                          const path =
+                            location.toLowerCase() === 'all'
+                              ? '/locations/'
+                              : `/locations/${location.toLowerCase().replaceAll(' ', '-')}`
 
+                          router.push(path)
+                        }}
+                      >
+                        {location}
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                </>
+              )}
+            </PopupState>
             <Box
               sx={{
                 width: 64,

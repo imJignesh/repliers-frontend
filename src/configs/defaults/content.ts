@@ -3,11 +3,23 @@ import { type Metadata } from 'next'
 import { type ToolbarConfig } from '@templates/Header/components/ToolbarMenu'
 
 const content = {
-  siteLogo: { url: '/logo.svg', width: 36, height: 36 },
-  siteMobileLogo: { url: '/logo.svg', width: 36, height: 36 },
-  siteFooterLogo: { url: '/logo-footer.svg', width: 80, height: 100 },
-  siteSplashscreen: '/precondo_main_image.webp',
-  loginSplashscreen: '/precondo_main_image.webp',
+  siteLogo: {
+    url: 'https://stage25.precondo.ca/logo.svg',
+    width: 36,
+    height: 36
+  },
+  siteMobileLogo: {
+    url: 'https://stage25.precondo.ca/logo.svg',
+    width: 36,
+    height: 36
+  },
+  siteFooterLogo: {
+    url: 'https://stage25.precondo.ca/logo-footer.svg',
+    width: 80,
+    height: 100
+  },
+  siteSplashscreen: 'https://stage25.precondo.ca/precondo_main_image.webp',
+  loginSplashscreen: 'https://stage25.precondo.ca/precondo_main_image.webp',
   siteName: 'Precondo',
   siteDefaultBrokerageName: 'DEFAULT BROKERAGE NAME',
   siteKeywords: ['Precondo', 'Precondos for sale in Canada'],
@@ -46,7 +58,7 @@ const content = {
     description:
       "Welcome to Precondo, your exclusive access to all the new and upcoming condos in Canada. Everything you'll need when it comes to properties for Sale, Rent & Preconstruction Properties!",
     icons: {
-      icon: '/favicon.ico'
+      icon: 'https://stage25.precondo.ca/favicon.ico'
     }
   } as Metadata,
   estimateMetadata: {

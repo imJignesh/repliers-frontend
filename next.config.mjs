@@ -20,6 +20,9 @@ const loggingConfig =
 
 const nextConfig = {
   // Configure `pageExtensions` to include markdown and MDX files
+  basePath: '/r',
+  assetPrefix: '/r',
+
   pageExtensions: ['tsx', 'ts', 'jsx', 'js', 'mdx', 'md'],
   eslint: {
     // Warning: This allows production builds to successfully complete even if

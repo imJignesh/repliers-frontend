@@ -77,8 +77,8 @@ const Header = () => {
                           popupState.close()
                           const path =
                             location.toLowerCase() === 'all'
-                              ? '/locations/'
-                              : `/locations/${location.toLowerCase().replaceAll(' ', '-')}`
+                              ? '/r/locations/'
+                              : `/r/locations/${location.toLowerCase().replaceAll(' ', '-')}`
 
                           router.push(path)
                         }}

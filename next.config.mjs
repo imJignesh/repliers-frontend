@@ -20,7 +20,7 @@ const loggingConfig =
 
 const nextConfig = {
   // Configure `pageExtensions` to include markdown and MDX files
-  basePath: '/r',
+  // basePath: '/',
   assetPrefix: '/r',
 
   pageExtensions: ['tsx', 'ts', 'jsx', 'js', 'mdx', 'md'],

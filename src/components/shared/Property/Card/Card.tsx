@@ -60,6 +60,7 @@ const PropertyCard = React.memo(
     const { images = [], imagesScore = [], startImage } = property
     const icon = getIcon(property)
     const linkUrl = getSeoUrl(property, { startImage })
+
     const blurredGallery =
       features.blurRestrictedProperty && restricted(property) && !logged
 

@@ -40,10 +40,11 @@ export const fetchListings = async ({
   let listPrice = null
 
   const fetchParams = {
-    area: city,
-    // city,
-    // neighborhood: hood,
-    status: 'A',
+    // area: city,
+    area,
+    city,
+    neighborhood: hood,
+    // status: 'A',
     pageNum: page,
     resultsPerPage: searchConfig.pageSize,
     boardId: searchConfig.defaultBoardId,

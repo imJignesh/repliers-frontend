@@ -24,6 +24,7 @@ import {
   sold
 } from '.'
 
+
 /**
  * @description This function generates a SEO-friendly URL for a property.
  * It uses the property's address and MLS number to create a URL path.
@@ -42,6 +43,9 @@ export const getSeoUrl = (
 
   const addr = sanitizeAddress(address as Property['address'])
   // Construct the URL path, conditionally adding the hyphen between addr and mlsNumber
+
+  // if using buildingId, use it instead of mlsNumber
+
   const seoUrlPath =
     (addr ? `${addr}-${mlsNumber}` : mlsNumber) + (boardId ? `-${boardId}` : '')
 

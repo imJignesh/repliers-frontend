@@ -1,40 +1,41 @@
 const routes = {
-  home: '/r',
-  login: '/r/login',
+  home: '/',
+  login: '/login',
 
-  search: '/r/search',
-  map: '/r/search/map',
-  ai: '/r/search/map?dialog=ai', // NOTE: alias for the toolbar
-  grid: '/r/search/grid',
+  search: '/search',
+  map: '/search/map',
+  ai: '/search/map?dialog=ai', // NOTE: alias for the toolbar
+  grid: '/search/grid',
 
-  city: '/r/search/city',
-  area: '/r/search/area',
-  address: '/r/search/address',
+  city: '/search/city',
+  area: '/search/area',
+  address: '/search/address',
 
-  listing: '/r/listing', // [...id]
-  listings: '/r/locations',
-  estimate: '/r/estimate',
-  dashboard: '/r/dashboard',
-  favorites: '/r/favorites',
-  saveSearch: '/r/saved-searches',
-  imageFavorites: '/r/image-favorites',
-  recentlyViewed: '/r/recently-viewed',
-  profile: '/r/profile',
+  listing: '/listing', // [...id]
+  building: '/building', // [...id]
+  listings: '/locations',
+  // estimate: '/estimate',
+  dashboard: '/dashboard',
+  favorites: '/favorites',
+  saveSearch: '/saved-searches',
+  imageFavorites: '/image-favorites',
+  recentlyViewed: '/recently-viewed',
+  profile: '/profile',
 
   // estimates management
-  admin: '/r/admin',
-  adminAgents: '/r/admin/agents',
+  admin: '/admin',
+  adminAgents: '/admin/agents',
 
-  agent: '/r/agent',
-  agentClient: '/r/agent/client', // [...id]
+  agent: '/agent',
+  agentClient: '/agent/client', // [...id]
 
   // static pages
-  cookies: '/r/cookies-policy',
-  privacy: '/r/privacy-policy',
-  terms: '/r/terms-of-use',
+  cookies: '/cookies-policy',
+  privacy: '/privacy-policy',
+  terms: '/terms-of-use',
 
   // will be set to home or dashboard or agent
-  loginRedirect: '/r/'
+  loginRedirect: '/'
 }
 
 export type Routes = Record<keyof typeof routes, string>

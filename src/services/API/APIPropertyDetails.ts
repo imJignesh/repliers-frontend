@@ -26,10 +26,26 @@ class APIPropertyDetails extends APIBase {
       boardId,
       radius: searchConfig.similarListingsRadius,
       sortBy: 'createdOnDesc',
-      listPriceRange: '200000'
+      listPriceRange: '200000',
+
+
+    })
+    if (!mls || undefined == mls) {
+      Promise.resolve({ listings: [] });
+    }
+    return this.fetchJSON(`/listings/${mls}/similar?${searchParams}`)
+  }
+
+  fetchBuilding(boardId: number, streetName: string, streetNumber: number): Promise<Property> {
+    const searchParams = queryString.stringify({
+      boardId,
+      fields: 'address,mlsNumber,images,details,map',
+      streetName,
+      streetNumber,
+      // status: 'U',
     })
 
-    return this.fetchJSON(`/listings/${mls}/similar?${searchParams}`)
+    return this.fetchJSON(`/listings/search/?${searchParams}`)
   }
 }
 

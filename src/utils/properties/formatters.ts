@@ -11,6 +11,34 @@ import { sanitizeScrubbed, sanitizeStreetNumber } from './sanitizers'
 import { getSeoTitle, getSeoUrl } from './seo'
 import { scrubbed } from '.'
 
+
+
+export const formatBuildingAddress = (
+  address: Partial<PropertyAddress>,
+  removeScrubbed: boolean = false
+) => {
+  const {
+
+    streetNumber,
+    streetName,
+    streetSuffix,
+    streetDirection
+  } = address
+
+
+  return joinNonEmpty(
+    [
+
+      sanitizeStreetNumber(streetNumber || ''),
+      capitalize(streetName?.toLowerCase()),
+      capitalize(streetSuffix?.toLowerCase()),
+      streetDirection?.toUpperCase() || ''
+    ].map((value) => (removeScrubbed ? sanitizeScrubbed(value) : value)),
+    ' '
+  )
+}
+
+
 export const formatShortAddress = (
   address: Partial<PropertyAddress>,
   removeScrubbed: boolean = false
@@ -92,12 +120,12 @@ export const formatRawData = (raw: string | undefined) => {
   return !raw || !raw.trim()
     ? ''
     : String(raw)
-        .trim()
-        .replace(/\r/g, '')
-        .replace(/\n\n/g, '<br />')
-        .replace(/,/g, ', ')
-        .replace(/\//g, ' / ')
-        .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/\r/g, '')
+      .replace(/\n\n/g, '<br />')
+      .replace(/,/g, ', ')
+      .replace(/\//g, ' / ')
+      .replace(/\s+/g, ' ')
 }
 
 export const formatOpenHouseTimeRange = (start: string, end: string) => {
@@ -113,9 +141,8 @@ export const formatOpenHouseTimeRange = (start: string, end: string) => {
   const startTimeSuffix = dayjs(start).format('A')
   const endTimeSuffix = dayjs(end).format('A')
 
-  return `${startDate}${
-    startTime !== endTime
-      ? `${startTime}${startTimeSuffix !== endTimeSuffix ? startTimeSuffix : ''}-`
-      : ''
-  }${endTime}${endTimeSuffix}`
+  return `${startDate}${startTime !== endTime
+    ? `${startTime}${startTimeSuffix !== endTimeSuffix ? startTimeSuffix : ''}-`
+    : ''
+    }${endTime}${endTimeSuffix}`
 }

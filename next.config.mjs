@@ -1,7 +1,5 @@
 /** @type {import('next').NextConfig} */
-
 import createMDX from '@next/mdx'
-
 import createNextIntlPlugin from 'next-intl/plugin'
 
 const currentEnv = process.env.NODE_ENV
@@ -9,37 +7,32 @@ const currentEnv = process.env.NODE_ENV
 const loggingConfig =
   currentEnv === 'development'
     ? {
-        logging: {
-          fetches: {
-            fullUrl: true,
-            hmrRefreshes: false
-          }
+      logging: {
+        fetches: {
+          fullUrl: true,
         }
       }
+    }
     : {}
 
 const nextConfig = {
-  // Configure `pageExtensions` to include markdown and MDX files
-  // basePath: '/',
   assetPrefix: '/r',
-
   pageExtensions: ['tsx', 'ts', 'jsx', 'js', 'mdx', 'md'],
+
+  // Note: 'eslint' and 'typescript' ignore keys are handled differently in v16.
+  // If the build still fails, these may need to move to vercel.json or 
+  // be handled via the 'ignoreDuringBuilds' environment variable.
   eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
     ignoreDuringBuilds: true
   },
-  trailingSlash: false,
-  reactStrictMode: true,
   typescript: {
     ignoreBuildErrors: true
   },
+
+  trailingSlash: false,
+  reactStrictMode: true,
   images: {
     unoptimized: true,
-    minimumCacheTTL: 3600,
-    path: '/_next/image',
-    contentDispositionType: 'attachment',
-    disableStaticImages: false,
     remotePatterns: [
       {
         protocol: 'https',
@@ -47,13 +40,15 @@ const nextConfig = {
       }
     ]
   },
+  experimental: {
+    // This helps Turbopack understand MDX files in v16
+    mdxRs: true
+  },
   ...loggingConfig
 }
 
-const withMDX = createMDX({
-  /* Add markdown plugins here, as desired */
-})
-
+const withMDX = createMDX({})
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
+// Chain the plugins
 export default withNextIntl(withMDX(nextConfig))

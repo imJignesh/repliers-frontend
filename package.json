@@ -65,7 +65,7 @@
     "mapbox-gl": "^3.13.0",
     "mapbox-gl-draw-freehand-mode": "^2.1.0",
     "material-ui-popup-state": "^5.3.6",
-    "next": "^15.3.5",
+    "next": "^16.0.7",
     "next-intl": "^4.3.4",
     "p-throttle": "^6.2.0",
     "query-string": "^9.2.2",
@@ -78,7 +78,7 @@
   },
   "engines": {
     "node": "^v22.14.0",
-    "npm": "^11.0.0"
+    "npm": "^11.6.2"
   },
   "devDependencies": {
     "@babel/parser": "^7.28.0",

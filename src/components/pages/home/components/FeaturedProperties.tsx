@@ -10,6 +10,7 @@ import { PropertyCard, PropertyCarousel } from '@shared/Property'
 import { type ApiQueryParams, type Property } from 'services/API'
 import SearchService from 'services/Search'
 import { CarouselHeader } from '@shared/Property/Carousel/components'
+import TeamSection from './TeamSection'
 
 const FeaturedProperties = () => {
   const [featured, setFeatured] = useState<Property[]>([])
@@ -25,7 +26,7 @@ const FeaturedProperties = () => {
 
   const soldFilters: Partial<ApiQueryParams> = {
     ...filters,
-    status: 'U',
+    status: 'A',
     sortBy: 'soldDateDesc'
   }
 
@@ -71,10 +72,27 @@ const FeaturedProperties = () => {
   return (
     <Container maxWidth="lg">
       <Stack spacing={6} py={8}>
-        <PropertyCarousel title={t('justListed')} properties={showcased} />
+        <PropertyCarousel title={t('justListed')} properties={featured} />
         <PropertyCarousel title={t('recentlySold')} properties={recentlySold} />
 
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <TeamSection />
+
+        <Box sx={{ py: 2, px: 2, backgroundColor: '#f4f4f4', textAlign: 'center' }}>
+          <Typography
+            variant="h3"
+
+            sx={{
+              fontWeight: 700,
+              color: '#555',
+              textAlign: 'center',
+              maxWidth: '1200px',
+              margin: '0 auto 40px',
+            }}
+          >Featured In </Typography>
+          <img src="pc-partners.png" alt="Featured In" style={{ maxWidth: '800px', margin: '0 auto' }} />
+        </Box>
+        {/*
+       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
           <Card
             sx={{
               width: { xs: '100%', md: '100%' },
@@ -97,13 +115,13 @@ const FeaturedProperties = () => {
             </Button>
           </Card>
         </Box>
-
+*/}
         {/* <PropertyCarousel
           title={'Featured Listings in Toronto'}
           properties={featured}
         /> */}
         <Box>
-          <CarouselHeader title={'Featured Listings in Toronto'} />
+          <CarouselHeader title={'Popular Preconstructions'} />
           <br />
           {featured?.length > 0 ? (
             <Stack spacing={4} direction="row" flexWrap="wrap">

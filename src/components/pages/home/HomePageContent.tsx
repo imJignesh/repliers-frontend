@@ -11,6 +11,9 @@ import { useFeatures } from 'providers/FeaturesProvider'
 
 import { FeaturedProperties, HomePageBanner } from './components'
 import { PopularSearches } from '@pages/catalog/components'
+import TeamSection from './components/TeamSection'
+import { Typography, Button, Grid, Avatar, Card } from '@mui/material'
+
 
 const HomePageContent = () => {
   const features = useFeatures()
@@ -22,10 +25,13 @@ const HomePageContent = () => {
     <Box bgcolor="background.default">
       <HomePageBanner title={t('welcome')} subtitle={t('welcomeDescription')} />
       <FeaturedProperties />
+
+
       <PopularSearches city={'Toronto'} />
+
       {features.dashboard && <StatsWidgets {...defaultFilters} name={state} />}
       <br />
-    </Box>
+    </Box >
   )
 }
 

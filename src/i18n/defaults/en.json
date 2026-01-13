@@ -2,8 +2,8 @@
   "HomePage": {
     "welcome": "Precondo",
     "welcomeDescription": "Precondo serves over 50 real estate professionals in Toronto. As a top-rated multiple listing service (MLS), we provide property information and innovative products.",
-    "justListed": "Showcased listings",
-    "recentlySold": "Recently Sold Listings",
+    "justListed": "Featured listings",
+    "recentlySold": "Showcased   Listings",
     "trackMarket": "Track the {city} Market in Real Time"
   },
   "Estimates": {

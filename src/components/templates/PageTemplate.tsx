@@ -1,3 +1,5 @@
+'use client'
+
 import { type ReactNode, Suspense } from 'react'
 
 import { Box, Stack } from '@mui/material'

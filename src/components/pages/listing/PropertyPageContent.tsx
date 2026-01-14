@@ -103,7 +103,7 @@ const PropertyPageContent = ({
             <FeaturesDetails />
             <AppliancesDetails />
             <ExteriorDetails />
-            <RoomsDetails />
+            {/* <RoomsDetails /> */}
             <NeighborhoodDetails />
             <HistoryDetails />
           </Stack>

@@ -13,7 +13,8 @@ export const parseSlug = (params: Params, searchParams: SearchParams) => {
   const slugs = listingName.split('-')
 
   const boardId = Number(
-    (slugs.at(-1) || '').match(/^\d{1,3}$/)
+    (slugs.at(-1) || '').match(/^\d{1,3}$/) &&
+      !['line', 'road', 'rd', 'highway', 'hwy', 'county', 'route'].includes((slugs.at(-2) || '').toLowerCase())
       ? slugs.pop() || searchConfig.defaultBoardId
       : searchConfig.defaultBoardId
   )
@@ -59,7 +60,7 @@ export const parseSlug = (params: Params, searchParams: SearchParams) => {
   // The user requested: "slug will have street offsets like st, street, ave, etc, remove that from street name"
   // Assuming strict removal from the end of the slug parts.
 
-  if (slugs.length > 0) {
+  if (slugs.length > 1) {
     const lastPart = slugs[slugs.length - 1].toLowerCase()
     if (suffixList.includes(lastPart)) {
       slugs.pop()

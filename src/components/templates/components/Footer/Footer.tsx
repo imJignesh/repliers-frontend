@@ -162,7 +162,14 @@ const Footer = () => {
                         <span className="suki-menu-item-title">Privacy Policy</span>
                       </a>
                     </li>
+                    <li id="menu-item-sitemap" className="menu-item">
+                      <a href="/sitemap">
+                        <ChevronRightIcon sx={{ fontSize: 16, color: '#3889c7' }} />
+                        <span className="suki-menu-item-title">Sitemap</span>
+                      </a>
+                    </li>
                   </ul>
+
                 </Stack>
               </Box>
               <Box

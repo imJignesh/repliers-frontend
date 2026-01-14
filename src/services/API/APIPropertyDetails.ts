@@ -2,7 +2,7 @@ import queryString from 'query-string'
 
 import searchConfig from '@configs/search'
 
-import { type ApiSimilarResponse, type Property } from 'services/API'
+import { type ApiQueryResponse, type ApiSimilarResponse, type Property } from 'services/API'
 import { getListingFields } from 'services/Search'
 
 import APIBase from './APIBase'
@@ -36,7 +36,7 @@ class APIPropertyDetails extends APIBase {
     return this.fetchJSON(`/listings/${mls}/similar?${searchParams}`)
   }
 
-  fetchBuilding(boardId: number, streetName: string, streetNumber: number): Promise<Property> {
+  fetchBuilding(boardId: number, streetName: string, streetNumber: number): Promise<ApiQueryResponse> {
     const searchParams = queryString.stringify({
       boardId,
       fields: 'address,mlsNumber,images,details,map',
@@ -45,7 +45,7 @@ class APIPropertyDetails extends APIBase {
       // status: 'U',
     })
 
-    return this.fetchJSON(`/listings/search/?${searchParams}`)
+    return this.fetchJSON<ApiQueryResponse>(`/listings/search/?${searchParams}`)
   }
 }
 

@@ -17,10 +17,30 @@ class APILocations extends APIBase {
 
     async fetchAreaNeighborhoods(area: string): Promise<string[]> {
         try {
-            const slug = area.toLowerCase().replace(/\s+/g, '-')
+            const slug = area.toLowerCase().replace(/[\s\u2011]+/g, '-')
             return await this.fetchJSON<string[]>(`/area/${slug}`)
         } catch (error) {
             console.error(`[APILocations] error fetching neighborhoods for ${area}`, error)
+            return []
+        }
+    }
+
+    async fetchNeighborhoodListings(neighborhood: string): Promise<string[]> {
+        try {
+            const slug = neighborhood.toLowerCase().replace(/[\s\u2011]+/g, '-')
+            return await this.fetchJSON<string[]>(`/area/${slug}/listings`)
+        } catch (error) {
+            console.error(`[APILocations] error fetching listings for ${neighborhood}`, error)
+            return []
+        }
+    }
+
+    async fetchNeighborhoodBuildings(neighborhood: string): Promise<string[]> {
+        try {
+            const slug = neighborhood.toLowerCase().replace(/[\s\u2011]+/g, '-')
+            return await this.fetchJSON<string[]>(`/area/${slug}/buildings`)
+        } catch (error) {
+            console.error(`[APILocations] error fetching buildings for ${neighborhood}`, error)
             return []
         }
     }

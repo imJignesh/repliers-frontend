@@ -24,7 +24,11 @@ export const generateMetadata = async (props: PropertyPageProps) => {
   const { boardId, streetName, streetNumber } = parseSlug(params, searchParams)
   try {
     const property = await fetchBuilding(boardId, streetName, streetNumber)
-    return formatMetadata(property, host)
+    const p = property?.listings?.[0]
+    if (!p) {
+      return content.missingPropertyMetadata
+    }
+    return formatMetadata(p, host)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error: any) {
     return content.missingPropertyMetadata
@@ -35,19 +39,24 @@ const PropertyPage = async (props: PropertyPageProps) => {
   const searchParams = await props.searchParams
   const params = await props.params
   const { boardId, streetName, streetNumber } = parseSlug(params, searchParams)
+  const listingName = params.listingName?.[0] || ''
+
   try {
     const property = await fetchBuilding(boardId, streetName, streetNumber)
-    // console.log(property?.listings[0])
+    if (!property?.listings?.length) {
+      throw { status: 404 }
+    }
     return <BuildingPageTemplate property={property} />
   } catch (error: any) {
-    // const properties = await fetchNearbies(listingName)
-    // return (
-    //   <Property404Template
-    //     listingName={listingName}
-    //     properties={properties}
-    //     error={error}
-    //   />
-    // )
+    // Attempt to fetch nearbies for the 404 page
+    const properties = await fetchNearbies(listingName)
+    return (
+      <Property404Template
+        listingName={listingName}
+        properties={properties}
+        error={error}
+      />
+    )
   }
 }
 

@@ -15,7 +15,7 @@ const StaticPageTemplate = ({
   return (
     <PageTemplate>
       <HeaderBanner>{title}</HeaderBanner>
-      <Box bgcolor="background.default">
+      <Box bgcolor="background.default" >
         <Container
           sx={{
             py: { xs: 4, sm: 6, md: 8 },

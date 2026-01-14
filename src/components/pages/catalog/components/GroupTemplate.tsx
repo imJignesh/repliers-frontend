@@ -27,13 +27,11 @@ const GroupTemplate = ({
 
   return (
     <Container>
-      <Stack width="100%" spacing={4} pb={{ xs: 4, sm: 6 }}>
+      <Stack width="100%" spacing={0} pb={{ xs: 4, sm: 6 }}>
         <Typography variant="h2" sx={{
-          fontSize: '2.5rem',
+          fontSize: '1.8rem',
           fontWeight: 700,
-          background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
+
           mb: 2
         }}>
           {title}

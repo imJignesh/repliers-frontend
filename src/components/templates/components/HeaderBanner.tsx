@@ -9,7 +9,7 @@ type HeaderBannerProps = {
 }
 
 const HeaderBanner = ({
-  minHeight = 280,
+  minHeight = 150,
   overlayOpacity = 0.7,
   children
 }: HeaderBannerProps) => {
@@ -24,11 +24,11 @@ const HeaderBanner = ({
         position="absolute"
         width="100%"
         height="100%"
-        bgcolor="primary.light"
+        bgcolor="#0393c9"
         sx={{ '& img': { opacity: overlayOpacity } }}
       />
-      <Container maxWidth="lg" sx={{ position: 'relative' }}>
-        <Typography variant="h1" color="common.white">
+      <Container maxWidth="lg" sx={{ position: 'relative', px: 2 }}>
+        <Typography variant="h1" color="common.white" sx={{ fontSize: '2.5rem' }}>
           {children}
         </Typography>
       </Container>

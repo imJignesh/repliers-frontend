@@ -115,6 +115,8 @@ export interface PropertyDetails {
   zoningDescription: string | null
   zoning: string
   zoningType: string | null
+  numKitchens?: string
+  familyRoom?: string
 }
 
 export interface ApiLot {

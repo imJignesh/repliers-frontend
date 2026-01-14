@@ -47,6 +47,20 @@ class APIPropertyDetails extends APIBase {
 
     return this.fetchJSON<ApiQueryResponse>(`/listings/search/?${searchParams}`)
   }
+
+  fetchBuildingHistory(boardId: number, streetName: string, streetNumber: number): Promise<ApiQueryResponse> {
+    const searchParams = queryString.stringify({
+      boardId,
+      fields: 'address,mlsNumber,images,details,listPrice,soldPrice,listDate,soldDate,lastStatus,type,office,timestamps',
+      streetName,
+      streetNumber,
+      status: ['A', 'U'],
+      sortBy: 'updatedOnDesc',
+      resultsPerPage: 100
+    })
+
+    return this.fetchJSON<ApiQueryResponse>(`/listings/search/?${searchParams}`)
+  }
 }
 
 const apiPropertyDetailsInstance = new APIPropertyDetails()

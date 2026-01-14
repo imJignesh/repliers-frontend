@@ -18,11 +18,13 @@ import { useProperty } from 'providers/PropertyProvider'
 import { useUser } from 'providers/UserProvider'
 import useAnalytics from 'hooks/useAnalytics'
 
+import { type Property } from 'services/API'
 import {
   AppliancesDetails,
   ExteriorDetails,
   FeaturesDetails,
   HistoryDetails,
+  BuildingHistoryDetails,
   HomeDescription,
   HomeHeaderInfo,
   HomeMap,
@@ -42,11 +44,13 @@ import BuildingMap from './components/BuildingMap'
 const BuildingPageContent = ({
   embedded = false,
   mapType = 'interactive',
-  similarProperties = []
+  similarProperties = [],
+  history = []
 }: {
   embedded?: boolean
   mapType?: 'interactive' | 'static'
-  similarProperties?: Object[]
+  similarProperties?: Property[]
+  history?: Property[]
 }) => {
   const trackEvent = useAnalytics()
   const { agentRole } = useUser()
@@ -106,14 +110,14 @@ const BuildingPageContent = ({
             </DetailsContainer>
 
 
-            {/* <FeaturesDetails /> */}
-            {/* <AppliancesDetails /> */}
-            {/* <ExteriorDetails /> */}
-            {/* <RoomsDetails /> */}
-            {/* <NeighborhoodDetails /> */}
-
+            <FeaturesDetails />
+            <AppliancesDetails />
+            <ExteriorDetails />
+            <RoomsDetails />
+            <NeighborhoodDetails />
+            <BuildingHistoryDetails history={history} />
             <UnitCarousel properties={similarProperties} />
-            {/* <HistoryDetails /> */}
+
           </Stack>
 
           {

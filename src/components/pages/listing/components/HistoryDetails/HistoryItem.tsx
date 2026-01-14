@@ -17,11 +17,13 @@ import { HistoryItemHeader, HistoryItemProgressBar, HistoryItemRow } from '.'
 const HistoryItem = ({
   item,
   active = false,
-  last = false
+  last = false,
+  propertyOverride
 }: {
   item: HistoryItemType
   active?: boolean
   last?: boolean
+  propertyOverride?: Property
 }) => {
   const {
     type,
@@ -38,13 +40,14 @@ const HistoryItem = ({
   const startDate = listingEntryDate || listDate // use listDate as fallback, when listingEntryDate is not available
   const endDate = unavailableDate || idxUpdated
 
-  const { property } = useProperty()
+  const { property: contextProperty } = useProperty()
+  const property = propertyOverride || contextProperty
   const linkAvailable = lastStatus !== 'Ter' && !active
   const link = linkAvailable
     ? getSeoUrl({
-        ...property,
-        mlsNumber: mlsNumber.toString()
-      })
+      ...property,
+      mlsNumber: mlsNumber.toString()
+    })
     : ''
 
   const imgSrc = getCDNPath(images?.[0] ?? '', 'small')
@@ -147,10 +150,10 @@ const HistoryItem = ({
                     }}
                     {...(link
                       ? {
-                          href: link,
-                          component: 'a',
-                          target: '_blank'
-                        }
+                        href: link,
+                        component: 'a',
+                        target: '_blank'
+                      }
                       : {})}
                   >
                     <PhotoLibraryIcon />

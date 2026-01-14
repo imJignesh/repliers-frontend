@@ -110,6 +110,12 @@ export const fetchBuilding = cache(
   }
 )
 
+export const fetchBuildingHistory = cache(
+  async (boardId: number, streetName: string, streetNumber: number) => {
+    return await APIPropertyDetails.fetchBuildingHistory(boardId, streetName, streetNumber)
+  }
+)
+
 export const fetchNearbies = cache(async (listingName: string) => {
   const parsedAddress = parseSeoUrl(listingName)
   const { streetName, streetSuffix, city, boardId } = parsedAddress

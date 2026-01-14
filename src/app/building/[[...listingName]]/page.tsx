@@ -8,7 +8,7 @@ import { formatMetadata } from 'utils/properties'
 import { getProtocolHost } from 'utils/urls'
 
 import { type Params, type SearchParams } from './types'
-import { fetchNearbies, fetchProperty, parseSlug, fetchBuilding } from './utils'
+import { fetchNearbies, fetchProperty, parseSlug, fetchBuilding, fetchBuildingHistory } from './utils'
 import BuildingPageTemplate from 'components/templates/BuildingPageTemplate'
 
 type PropertyPageProps = {
@@ -42,11 +42,15 @@ const PropertyPage = async (props: PropertyPageProps) => {
   const listingName = params.listingName?.[0] || ''
 
   try {
-    const property = await fetchBuilding(boardId, streetName, streetNumber)
+    const [property, history] = await Promise.all([
+      fetchBuilding(boardId, streetName, streetNumber),
+      fetchBuildingHistory(boardId, streetName, streetNumber)
+    ])
+
     if (!property?.listings?.length) {
       throw { status: 404 }
     }
-    return <BuildingPageTemplate property={property} />
+    return <BuildingPageTemplate property={property} history={history} />
   } catch (error: any) {
     // Attempt to fetch nearbies for the 404 page
     const properties = await fetchNearbies(listingName)

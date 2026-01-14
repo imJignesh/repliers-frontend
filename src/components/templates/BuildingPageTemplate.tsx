@@ -13,7 +13,7 @@ import PropertyProvider from 'providers/PropertyProvider'
 
 import { PageTemplate } from '.'
 
-const BuildingPageTemplate = ({ property }: { property: ApiQueryResponse }) => {
+const BuildingPageTemplate = ({ property, history }: { property: ApiQueryResponse, history?: ApiQueryResponse }) => {
   const features = useFeatures()
   const noHeader = !features.pdpHeader
   const p = property?.listings?.[0]
@@ -33,7 +33,10 @@ const BuildingPageTemplate = ({ property }: { property: ApiQueryResponse }) => {
             }}
           >
 
-            <BuildingPageContent similarProperties={property?.listings} />
+            <BuildingPageContent
+              similarProperties={property?.listings}
+              history={history?.listings}
+            />
           </Box>
         </PropertyDetailsProvider>
       </PropertyProvider>}

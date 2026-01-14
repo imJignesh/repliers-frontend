@@ -112,8 +112,8 @@ const BuildingPageContent = ({
 
             <FeaturesDetails />
             <AppliancesDetails />
-            {/*<ExteriorDetails />
-            <RoomsDetails />
+            <ExteriorDetails />
+            {/*<RoomsDetails />
             <NeighborhoodDetails />*/}
             <BuildingHistoryDetails history={history} />
             <UnitCarousel properties={similarProperties} />

@@ -7,22 +7,19 @@ import { Box } from '@mui/material'
 import BuildingPageContent from '@pages/listing/BuildingPageContent'
 
 import { type ApiQueryResponse } from 'services/API'
-import { useFeatures } from 'providers/FeaturesProvider'
 import PropertyDetailsProvider from 'providers/PropertyDetailsProvider'
 import PropertyProvider from 'providers/PropertyProvider'
 
 import { PageTemplate } from '.'
 
 const BuildingPageTemplate = ({ property, history }: { property: ApiQueryResponse, history?: ApiQueryResponse }) => {
-  const features = useFeatures()
-  const noHeader = !features.pdpHeader
   const p = property?.listings?.[0]
 
   if (!p) return null
 
 
   return (
-    <PageTemplate noHeader={noHeader}>
+    <PageTemplate>
       {property?.listings?.length > 0 && <PropertyProvider property={p}>
         <PropertyDetailsProvider property={p}>
           <Box

@@ -37,6 +37,7 @@ import {
 
 import { formatBuildingAddress } from '../../../utils/properties/formatters'
 import UnitCarousel from './components/UnitCarousel'
+import BuildingMap from './components/BuildingMap'
 
 const BuildingPageContent = ({
   embedded = false,
@@ -94,10 +95,10 @@ const BuildingPageContent = ({
                 <HomeDescription />
 
                 {mapType === 'static' ? (
-                  <HomeMap type={mapType} />
+                  <BuildingMap type={mapType} />
                 ) : (
                   <MapOptionsProvider layout="map" style="hybrid">
-                    <HomeMap />
+                    <BuildingMap />
                   </MapOptionsProvider>
                 )}
                 {/* <SummaryDetails /> */}

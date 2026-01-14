@@ -33,10 +33,10 @@ const ToolbarMenu = ({ sx }: { sx?: SxProps }) => {
         url: '/locations/toronto/for-sale',
         item: 'For Sale'
       },
-      {
-        url: '/locations/toronto/for-rent',
-        item: 'For Rent'
-      },
+      // {
+      //   url: '/locations/toronto/for-rent',
+      //   item: 'For Rent'
+      // },
       {
         url: '/locations/toronto/new-condos-and-preconstruction',
         item: 'Pre-Construction'

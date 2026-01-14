@@ -70,17 +70,30 @@ const AdvancedFiltersForm = ({
 
   const fetchBucketsCounts = async () => {
     const { bounds } = position
-    if (!bounds) return
+    const hasLocation =
+      bounds ||
+      polygon ||
+      filters.city ||
+      filters.area ||
+      filters.neighborhood
+
+    if (!hasLocation) return
 
     // remove price filters from the request
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { minPrice, maxPrice, ...requestFilters } = filters
 
+    const mapParams = polygon
+      ? getMapPolygon(polygon)
+      : bounds
+        ? getMapRectangle(bounds)
+        : {}
+
     const response = await SearchService.fetch({
       ...requestFilters,
       ...dialogState,
       aggregates: 'listPrice',
-      ...(polygon ? getMapPolygon(polygon) : getMapRectangle(bounds))
+      ...mapParams
     })
     if (!response) return
 
@@ -95,7 +108,7 @@ const AdvancedFiltersForm = ({
     const response2 = await SearchService.fetch({
       ...filters,
       ...dialogState,
-      ...(polygon ? getMapPolygon(polygon) : getMapRectangle(bounds))
+      ...mapParams
     })
     if (response2) setCount(response2.count)
   }

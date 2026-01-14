@@ -15,6 +15,7 @@ import {
   type Property
 } from 'services/API'
 import type { Filters } from 'services/Search'
+import SearchProvider from 'providers/SearchProvider'
 import MapOptionsProvider from 'providers/MapOptionsProvider'
 
 import {
@@ -62,69 +63,81 @@ const CatalogPageContent = ({
   searchFilters: Partial<Filters>
 }) => {
   return (
-    <MapOptionsProvider layout="map" style="map">
-      <Box minHeight="calc(100vh - 72px)">
-        <Container maxWidth="lg" sx={{ pt: { xs: 0, sm: 0 } }}>
-          <CatalogHeader
-            count={count}
-            area={area}
-            city={city}
-            hood={hood}
-            areas={areas}
-            cities={cities}
-            hoods={hoods}
-            location={location}
-          />
-        </Container>
-        <Box sx={{ boxShadow: count > 0 ? 1 : 0 }}>
+    <SearchProvider
+      filters={
+        {
+          ...searchFilters,
+          area,
+          city,
+          neighborhood: hood
+        } as Filters
+      }
+    >
+      <MapOptionsProvider layout="map" style="map">
+        <Box minHeight="calc(100vh - 72px)">
           <Container maxWidth="lg" sx={{ pt: { xs: 0, sm: 0 } }}>
-            <CatalogFilters
+            <CatalogHeader
               count={count}
-              area={city}
+              area={area}
               city={city}
               hood={hood}
               areas={areas}
-              searchFilters={searchFilters}
+              cities={cities}
+              hoods={hoods}
+              location={location}
             />
           </Container>
-        </Box>
+          <Box sx={{ boxShadow: count > 0 ? 1 : 0 }}>
+            <Container maxWidth="lg" sx={{ pt: { xs: 0, sm: 0 } }}>
+              <CatalogFilters
+                count={count}
+                area={area}
+                city={city}
+                hood={hood}
+                areas={areas}
+                hoods={hoods}
+                searchFilters={searchFilters}
+              />
+            </Container>
+          </Box>
 
-        <Container
-          disableGutters
-          sx={{
-            ...gridColumnsMediaQueries,
-            px: gridConfig.gridSpacing,
-            pt: gridConfig.gridSpacing
-          }}
-        >
-          {listings?.length > 0 ? (
-            <Stack spacing={4} direction="row" flexWrap="wrap">
-              {listings.map((property, index) => (
-                <PropertyCard key={index} property={property} />
-              ))}
+          <Container
+            disableGutters
+            sx={{
+              ...gridColumnsMediaQueries,
+              px: gridConfig.gridSpacing,
+              pt: gridConfig.gridSpacing
+            }}
+          >
+            {listings?.length > 0 ? (
+              <Stack spacing={4} direction="row" flexWrap="wrap">
+                {listings.map((property, index) => (
+                  <PropertyCard key={index} property={property} />
+                ))}
+              </Stack>
+            ) : (
+              <EmptyCatalogListings />
+            )}
+            <Stack spacing={2} alignItems="center" py={4}>
+              <CatalogPagination page={page} count={count} />
+              {/* {count > 0 && <Breadcrumbs city={city} hood={hood} />} */}
+
+              {/* <FiltersList urlFilters={urlFilters} /> */}
             </Stack>
-          ) : (
-            <EmptyCatalogListings />
-          )}
-          <Stack spacing={2} alignItems="center" py={4}>
-            <CatalogPagination page={page} count={count} />
-            {/* {count > 0 && <Breadcrumbs city={city} hood={hood} />} */}
+          </Container>
 
-            {/* <FiltersList urlFilters={urlFilters} /> */}
-          </Stack>
-        </Container>
-
-        {/* <CitiesOfRegion /> */}
-        <HoodsOfCity
-          hoods={hoods}
-          city={city || area || ''}
-          isArea={!city && !!area}
-        />
-        {/* <PopularCities /> */}
-        {/* <PopularHoods /> */}
-        <PopularSearches city={city} hood={hood} />
-      </Box>
-    </MapOptionsProvider>
+          {/* <CitiesOfRegion /> */}
+          <HoodsOfCity
+            hoods={hoods}
+            city={city || area || ''}
+            isArea={!city && !!area}
+          />
+          {/* <PopularCities /> */}
+          {/* <PopularHoods /> */}
+          <PopularSearches city={city} hood={hood} />
+        </Box>
+      </MapOptionsProvider>
+    </SearchProvider>
   )
 }
 

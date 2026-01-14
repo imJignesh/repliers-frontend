@@ -30,10 +30,11 @@ export type SoldWithin = (typeof soldWithin)[number]
 export interface Filters {
   listingType?: ListingType
   listingStatus?: ListingStatus
-  listingLocation?: string
+  area?: string | string[]
+  city?: string | string[]
+  neighborhood?: string | string[]
   coverImage?: string
   imageSearchItems?: any[]
-
   pageNum?: number
   sortBy?: ApiSortBy
 

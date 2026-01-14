@@ -167,7 +167,7 @@ export const parseUrlFilters = (filters: string[]) => {
   const searchFilters: Partial<Filters> = {
     // defaults
     listingStatus: 'active',
-    sortBy: 'createdOnDesc'
+    sortBy: 'listPriceDesc'
   }
 
   filters.forEach((filter) => {

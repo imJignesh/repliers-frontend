@@ -48,7 +48,7 @@ const AdvancedFiltersButton = ({ size }: { size: 'medium' | 'small' }) => {
           startIcon={<IcoSettings />}
           sx={{ width: { xs: 46, sm: 140 } }}
         >
-          Advanced
+          Filters
         </Button>
       ) : (
         <Button

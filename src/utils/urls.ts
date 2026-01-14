@@ -59,9 +59,10 @@ export const updateWindowHistory = (
 export const sanitizeUrl = (url: string) =>
   encodeURIComponent(
     String(url)
-      .replaceAll('-', '‑') // replace minus with NON BREAKING HYPHEN
-      .replaceAll(' ', '-')
       .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .trim()
+      .replace(/[\s-]+/g, '-')
   )
 
 export const getCatalogUrl = (

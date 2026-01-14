@@ -11,15 +11,15 @@ export const listingStatuses = ['active', 'sold', 'all', 'rent'] as const
 export type ListingStatus = (typeof listingStatuses)[number]
 
 export const listingTypes = [
-  // 'allListings',
-  // 'residential',
-  'condo'
-  // 'townhome',
-  // 'semiDetached',
-  // 'multiFamily',
-  // 'land',
-  // 'business',
-  // 'commercial'
+  'allListings',
+  'residential',
+  'condo',
+  'townhome',
+  'semiDetached',
+  'multiFamily',
+  'land',
+  'business',
+  'commercial'
 ] as const
 export const listingLocations = [
   'All',
@@ -33,7 +33,7 @@ export const listingLocations = [
   'Burlington'
 ]
 export type ListingType = (typeof listingTypes)[number]
-export type ListingLocation = (typeof listingLocations)[string]
+export type ListingLocation = (typeof listingLocations)[number]
 
 export type ListingFields = keyof Property | ApiQueryParamsAllowedFields
 

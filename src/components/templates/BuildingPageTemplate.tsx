@@ -18,9 +18,9 @@ const BuildingPageTemplate = ({ property, history }: { property: ApiQueryRespons
   if (!p) return null
 
   return (
-    <PropertyProvider property={p}>
-      <PropertyDetailsProvider property={p}>
-        <PageTemplate>
+    <PageTemplate>
+      <PropertyProvider property={p}>
+        <PropertyDetailsProvider property={p}>
           <Box
             sx={{
               width: '100%',
@@ -33,9 +33,9 @@ const BuildingPageTemplate = ({ property, history }: { property: ApiQueryRespons
               history={history?.listings}
             />
           </Box>
-        </PageTemplate>
-      </PropertyDetailsProvider>
-    </PropertyProvider>
+        </PropertyDetailsProvider>
+      </PropertyProvider>
+    </PageTemplate>
   )
 }
 

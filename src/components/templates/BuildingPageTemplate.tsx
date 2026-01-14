@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 
 import { Box } from '@mui/material'
 
@@ -13,35 +13,28 @@ import PropertyProvider from 'providers/PropertyProvider'
 import { PageTemplate } from '.'
 
 const BuildingPageTemplate = ({ property, history }: { property: ApiQueryResponse, history?: ApiQueryResponse }) => {
-  const [mounted, setMounted] = useState(false)
   const p = property?.listings?.[0]
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   if (!p) return null
 
   return (
     <PageTemplate>
-      {mounted && (
-        <PropertyProvider property={p}>
-          <PropertyDetailsProvider property={p}>
-            <Box
-              sx={{
-                width: '100%',
-                pt: { xs: 0, sm: 2 },
-                overflow: { xs: 'hidden', md: 'visible' }
-              }}
-            >
-              <BuildingPageContent
-                similarProperties={property?.listings}
-                history={history?.listings}
-              />
-            </Box>
-          </PropertyDetailsProvider>
-        </PropertyProvider>
-      )}
+      <PropertyProvider property={p}>
+        <PropertyDetailsProvider property={p}>
+          <Box
+            sx={{
+              width: '100%',
+              pt: { xs: 0, sm: 2 },
+              overflow: { xs: 'hidden', md: 'visible' }
+            }}
+          >
+            <BuildingPageContent
+              similarProperties={property?.listings}
+              history={history?.listings}
+            />
+          </Box>
+        </PropertyDetailsProvider>
+      </PropertyProvider>
     </PageTemplate>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 
 import { Box } from '@mui/material'
 
@@ -13,29 +13,21 @@ import PropertyProvider from 'providers/PropertyProvider'
 import { PageTemplate } from '.'
 
 const PropertyPageTemplate = ({ property }: { property: Property }) => {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
   return (
     <PageTemplate>
-      {mounted && (
-        <PropertyProvider property={property}>
-          <PropertyDetailsProvider property={property}>
-            <Box
-              sx={{
-                width: '100%',
-                pt: { xs: 0, sm: 2 },
-                overflow: { xs: 'hidden', md: 'visible' }
-              }}
-            >
-              <PropertyPageContent />
-            </Box>
-          </PropertyDetailsProvider>
-        </PropertyProvider>
-      )}
+      <PropertyProvider property={property}>
+        <PropertyDetailsProvider property={property}>
+          <Box
+            sx={{
+              width: '100%',
+              pt: { xs: 0, sm: 2 },
+              overflow: { xs: 'hidden', md: 'visible' }
+            }}
+          >
+            <PropertyPageContent />
+          </Box>
+        </PropertyDetailsProvider>
+      </PropertyProvider>
     </PageTemplate>
   )
 }

@@ -34,6 +34,7 @@ const Footer = () => {
             <Stack
               py={2}
               direction="row"
+              flexWrap="wrap"
               sx={{ flex: 1 }}
               spacing={{ xs: 2, md: 4 }}
             >

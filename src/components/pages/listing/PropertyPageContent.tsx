@@ -104,7 +104,7 @@ const PropertyPageContent = ({
             <AppliancesDetails />
             <ExteriorDetails />
             {/* <RoomsDetails /> */}
-            <NeighborhoodDetails />
+            {/* <NeighborhoodDetails /> */}
             <HistoryDetails />
           </Stack>
 

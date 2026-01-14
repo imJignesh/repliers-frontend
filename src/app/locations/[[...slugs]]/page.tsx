@@ -6,7 +6,7 @@ import CatalogPageContent from '@pages/catalog'
 import { generateMetadata as generatePropertyMetadata } from 'app/listing/[[...listingName]]/page'
 import PropertyPage from 'app/listing/[[...listingName]]/page'
 
-import { type ApiBoardCity } from 'services/API'
+import { APILocations, type ApiBoardArea, type ApiBoardCity } from 'services/API'
 
 import { parseUrlFilters, parseUrlParams } from './_parsers'
 import { fetchListings, fetchLocations } from './_requests'
@@ -64,9 +64,40 @@ const LocationsCatalogPage = async (props: {
     boardId,
     listingId,
     localAddress,
-    location: { area, city, neighborhood: hood }
+    location: { area: urlArea, city: urlCity, neighborhood: urlHood }
   } = parseUrlParams(slugs)
+
+  // Fetch data needed for identification
+  const fetchAreas = await fetchLocations(urlCity, urlHood)
+  const dynamicAreasData = await APILocations.fetchAreas()
+  const formattedAreas: ApiBoardArea[] = dynamicAreasData.map((a: any) => ({
+    name: a.name,
+    cities: a.neighborhoods.map((name: string) => ({
+      name,
+      activeCount: 0,
+      location: { lat: 0, lng: 0 },
+      state: 'ON'
+    }))
+  }))
+
+  const finalAreas = formattedAreas.length ? formattedAreas : fetchAreas
+
+  // Refine location identification
+  let area = urlArea
+  let city = urlCity
+  let hood = urlHood
+
+  // If city matches an area name, it's actually an area page
+  const areaMatch = finalAreas.find(
+    (a) => a.name.toLowerCase() === city.toLowerCase()
+  )
+  if (areaMatch && !area) {
+    area = areaMatch.name
+    city = ''
+  }
+
   console.log({ filters, boardId, listingId, localAddress, area, city, hood })
+
   // render property page component if listingId is present and emulate its old url format
   if (listingId) {
     return (
@@ -76,7 +107,8 @@ const LocationsCatalogPage = async (props: {
       />
     )
   }
-  const searchFilters = parseUrlFilters(filters) // NOTE: those are just the minus separated strings from the url
+
+  const searchFilters = parseUrlFilters(filters)
   const { listings, count } = await fetchListings({
     area,
     city,
@@ -89,17 +121,33 @@ const LocationsCatalogPage = async (props: {
 
   const byCount = (a: any, b: any) => b.activeCount - a.activeCount
 
-  const areas = await fetchLocations(city, hood)
-  const currentArea = area ? areas.find((a) => a.name === area) : null
-  const currentLocation = city ? extractLocation(areas, city, hood) : undefined
-  const cities = extractCities(currentArea ? [currentArea] : areas).sort(
+  const currentArea = area ? finalAreas.find((a) => a.name === area) : null
+  const currentLocation = city
+    ? extractLocation(finalAreas, city, hood)
+    : undefined
+  const citiesList = extractCities(currentArea ? [currentArea] : finalAreas).sort(
     byCount
   )
 
+  let neighborhoods: any[] = []
+  const targetForNeighborhoods = city || area
+  if (targetForNeighborhoods) {
+    const dynamicNeighborhoods = await APILocations.fetchAreaNeighborhoods(
+      targetForNeighborhoods
+    )
+    neighborhoods = dynamicNeighborhoods.map((name) => ({
+      name,
+      activeCount: 0,
+      location: { lat: 0, lng: 0 }
+    }))
+  }
+
   const hoods =
-    city && currentLocation
-      ? (currentLocation as ApiBoardCity).neighborhoods || []
-      : []
+    neighborhoods.length
+      ? neighborhoods
+      : (city && currentLocation
+        ? (currentLocation as ApiBoardCity).neighborhoods || []
+        : (currentArea ? currentArea.cities : []))
 
   return (
     <PageTemplate>
@@ -110,9 +158,9 @@ const LocationsCatalogPage = async (props: {
         area={area}
         city={city}
         hood={hood}
-        areas={areas}
-        hoods={hoods}
-        cities={cities}
+        areas={finalAreas}
+        hoods={hoods as any}
+        cities={citiesList}
         location={currentLocation}
         urlFilters={filters}
         searchFilters={searchFilters}

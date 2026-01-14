@@ -55,21 +55,19 @@ export const extractCities = (areas: any): ApiBoardCity[] => {
 }
 
 export const extractLocation = (
-  areas: any,
+  areas: ApiBoardArea[],
   city: string,
   neighborhood?: string
 ): ApiBoardCity | ApiNeighborhood | undefined => {
   if (neighborhood) {
-    // return areas[0].cities // WARN: ERROR: BUG: there are more than one area
-    //   .flatMap((city: any) => city.neighborhoods || [])
-    //   .find((hood: CatalogItem) => hood.name === neighborhood)
+    return areas
+      .flatMap((area) => area.cities)
+      .flatMap((city) => city.neighborhoods || [])
+      .find((hood) => hood.name.toLowerCase() === neighborhood.toLowerCase())
   } else {
-    // return areas?.reduce((acc: CatalogItem, area: ApiBoardArea) => {
-    //   const cityItem = area.cities.find(
-    //     (item: ApiBoardCity) => item.name.toLowerCase() === city.toLowerCase()
-    //   )
-    //   return cityItem || acc
-    // })
+    return areas
+      .flatMap((area) => area.cities)
+      .find((item) => item.name.toLowerCase() === city.toLowerCase())
   }
 }
 
@@ -134,13 +132,13 @@ export const getCatalogTitle = (filters: string[]) => {
   const filtersString =
     countFilters.length || priceFilters.length
       ? ` with ${[
-          ...priceFilters.map((item) => {
-            const [prefix, price] = item.split('-')
-            const formattedPrice = formatEnglishPrice(parseUrlPrice(price))
-            return `Price ${prefix} ${formattedPrice}`
-          }),
-          ...countFilters.map(beautify)
-        ].join(', ')}`
+        ...priceFilters.map((item) => {
+          const [prefix, price] = item.split('-')
+          const formattedPrice = formatEnglishPrice(parseUrlPrice(price))
+          return `Price ${prefix} ${formattedPrice}`
+        }),
+        ...countFilters.map(beautify)
+      ].join(', ')}`
       : ''
 
   // extract sale type

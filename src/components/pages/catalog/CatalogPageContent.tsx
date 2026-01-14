@@ -24,7 +24,7 @@ import {
   CatalogPagination,
   // CitiesOfRegion,
   FiltersList,
-  // HoodsOfCity,
+  HoodsOfCity,
   // PopularCities,
   // PopularHoods,
   PopularSearches
@@ -83,6 +83,7 @@ const CatalogPageContent = ({
               area={city}
               city={city}
               hood={hood}
+              areas={areas}
               searchFilters={searchFilters}
             />
           </Container>
@@ -114,7 +115,11 @@ const CatalogPageContent = ({
         </Container>
 
         {/* <CitiesOfRegion /> */}
-        {/* <HoodsOfCity /> */}
+        <HoodsOfCity
+          hoods={hoods}
+          city={city || area || ''}
+          isArea={!city && !!area}
+        />
         {/* <PopularCities /> */}
         {/* <PopularHoods /> */}
         <PopularSearches city={city} hood={hood} />

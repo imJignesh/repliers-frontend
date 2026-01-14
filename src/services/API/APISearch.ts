@@ -33,12 +33,12 @@ class APISearch extends APIBase {
       {
         ...(postParamsString
           ? {
-              method: 'POST',
-              body: postParamsString
-            }
+            method: 'POST',
+            body: postParamsString
+          }
           : {
-              method: 'GET'
-            }),
+            method: 'GET'
+          }),
         ...options
       }
     )

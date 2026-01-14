@@ -72,7 +72,7 @@ export const getCatalogUrl = (
   const cityUrl = city ? `/${sanitizeUrl(city.replace('-', ' '))}` : ''
   const hoodUrl = hood ? `/${sanitizeUrl(hood)}` : ''
   const filterUrl = filters.length ? `/${filters.join('-')}` : ''
-  return `${routes.listings}${cityUrl}${filterUrl}`
+  return `${routes.listings}${cityUrl}${hoodUrl}${filterUrl}`
 }
 
 type EstimateUrlParams = {

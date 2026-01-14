@@ -8,23 +8,23 @@ import { GroupTemplate } from '.'
 
 const HoodsOfCity = ({
   hoods,
-  city
+  city,
+  isArea = false
 }: {
   hoods: ApiNeighborhood[]
   city: string
+  isArea?: boolean
 }) => {
   if (!city || !hoods.length) return null
 
-  const items = hoods
-    .filter(({ name }) => name !== city.toLowerCase())
-    .slice(0, maxChilds)
+  const items = hoods.filter(({ name }) => name !== city.toLowerCase())
 
   return (
     <GroupTemplate
-      title={`Neighborhoods of ${city}`}
+      title={`${isArea ? 'Cities' : 'Neighborhoods'} of ${city}`}
       items={items.map(({ name, activeCount }) => ({
         name: capitalize(name),
-        link: getCatalogUrl(city, name),
+        link: isArea ? getCatalogUrl(name) : getCatalogUrl(city, name),
         count: activeCount
       }))}
     />

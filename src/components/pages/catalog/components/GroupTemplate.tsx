@@ -28,7 +28,16 @@ const GroupTemplate = ({
   return (
     <Container>
       <Stack width="100%" spacing={4} pb={{ xs: 4, sm: 6 }}>
-        <Typography variant="h2">{title}</Typography>
+        <Typography variant="h2" sx={{
+          fontSize: '2.5rem',
+          fontWeight: 700,
+          background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          mb: 2
+        }}>
+          {title}
+        </Typography>
         <Box
           sx={{
             gap: 1,
@@ -37,27 +46,40 @@ const GroupTemplate = ({
             gridTemplateColumns: `repeat(${columns}, 1fr)`,
             ...(direction === 'column'
               ? {
-                  gridTemplateRows: `repeat(${rowLength}, 1fr)`,
-                  gridAutoFlow: 'column'
-                }
+                gridTemplateRows: `repeat(${rowLength}, 1fr)`,
+                gridAutoFlow: 'column'
+              }
               : {})
           }}
         >
           {items.map(({ name, link, distance = 0, count = 0 }, index) => (
-            <Typography key={index} variant="body2" noWrap>
-              <Link href={link}>
+            <Typography key={index} variant="body2" noWrap sx={{
+              transition: 'transform 0.2s',
+              '&:hover': {
+                transform: 'translateX(8px)',
+                '& a': { color: 'primary.main' }
+              }
+            }}>
+              <Link href={link} style={{ display: 'flex', alignItems: 'center', transition: 'color 0.2s', textDecoration: 'none', color: 'inherit' }}>
                 {name.replaceAll('/', ' / ')}
 
                 {count > 0 && (
                   <Chip
                     label={count}
                     size="small"
-                    sx={{ fontSize: 12, ml: 1, px: 0 }}
+                    sx={{
+                      fontSize: 10,
+                      ml: 1,
+                      height: 18,
+                      background: 'rgba(33, 150, 243, 0.1)',
+                      color: 'primary.main',
+                      fontWeight: 600
+                    }}
                   />
                 )}
 
                 {distance > 0 && (
-                  <Box component="span" sx={{ color: '#999' }}>
+                  <Box component="span" sx={{ color: '#999', fontSize: 11, ml: 0.5 }}>
                     {' '}
                     ({Number(distance).toFixed(distance <= 2 ? 1 : 0)}km)
                   </Box>

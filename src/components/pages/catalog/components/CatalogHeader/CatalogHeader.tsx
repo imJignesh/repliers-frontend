@@ -49,7 +49,7 @@ const CatalogHeader = ({
   const [center, setCenter] = useState<LngLatLike | null>(defaultCenter)
   const [coordinates, setCoordinates] = useState<Position[][] | null>(null)
 
-  const current = [defaultLocation.state, city, hood].filter(Boolean).at(-1)
+  const current = [defaultLocation.state, area, city, hood].filter(Boolean).at(-1)
 
   const mapLink = getMapUrl({ center: defaultCenter, zoom: 10 }) // WARN: temporary zoom level, calculate a new value based on bounds
 

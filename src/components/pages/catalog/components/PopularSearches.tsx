@@ -29,14 +29,22 @@ const formatLabel = (label: string) =>
     (_, num, __, suffix) => `${num}${suffix.toUpperCase()}`
   )
 
-const PopularSearches = ({ city, hood }: { city?: string; hood?: string }) => {
+const PopularSearches = ({
+  area,
+  city,
+  hood
+}: {
+  area?: string
+  city?: string
+  hood?: string
+}) => {
   const items = filters.map((filterItems) => {
-    const regionName = capitalize(hood || city || defaultLocation.state)
+    const regionName = capitalize(hood || city || area || defaultLocation.state)
     const formattedFilters = capitalize(filterItems.map(formatLabel).join(' '))
 
     return {
       name: `${formattedFilters} in ${regionName}`,
-      link: getCatalogUrl(city, hood, filterItems)
+      link: getCatalogUrl(city || area || '', hood, filterItems)
     }
   })
 

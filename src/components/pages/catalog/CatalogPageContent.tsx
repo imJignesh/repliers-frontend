@@ -127,14 +127,14 @@ const CatalogPageContent = ({
           </Container>
 
           {/* <CitiesOfRegion /> */}
-          <HoodsOfCity
+          {/* <HoodsOfCity
             hoods={hoods}
             city={city || area || ''}
             isArea={!city && !!area}
-          />
+          /> */}
           {/* <PopularCities /> */}
           {/* <PopularHoods /> */}
-          <PopularSearches city={city} hood={hood} />
+          <PopularSearches area={area} city={city} hood={hood} />
         </Box>
       </MapOptionsProvider>
     </SearchProvider>

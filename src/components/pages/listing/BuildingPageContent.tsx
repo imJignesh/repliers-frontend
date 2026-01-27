@@ -15,6 +15,7 @@ import {
 import { useFeatures } from 'providers/FeaturesProvider'
 import MapOptionsProvider from 'providers/MapOptionsProvider'
 import { useProperty } from 'providers/PropertyProvider'
+import PropertyDetailsProvider from 'providers/PropertyDetailsProvider'
 import { useUser } from 'providers/UserProvider'
 import useAnalytics from 'hooks/useAnalytics'
 
@@ -75,93 +76,95 @@ const BuildingPageContent = ({
   }
 
   return (
-    <Stack spacing={2} pb={4}>
-      <Container>
-        <BuildingGallery
-          activeCount={similarProperties.length}
-          historyCount={history.length}
-        />
-      </Container>
+    <PropertyDetailsProvider property={property}>
+      <Stack spacing={2} pb={4}>
+        <Container>
+          <BuildingGallery
+            activeCount={similarProperties.length}
+            historyCount={history.length}
+          />
+        </Container>
 
 
 
-      <Container>
-        <Stack
-          spacing={4}
-          width="100%"
-          alignItems="flex-start"
-          justifyContent="space-between"
-          direction={{ xs: 'column', md: 'row' }}
-        >
-          <Stack spacing={2} sx={{ flex: 1, width: '100%' }}>
+        <Container>
+          <Stack
+            spacing={4}
+            width="100%"
+            alignItems="flex-start"
+            justifyContent="space-between"
+            direction={{ xs: 'column', md: 'row' }}
+          >
+            <Stack spacing={2} sx={{ flex: 1, width: '100%' }}>
 
 
-            {/* <HomeHeaderInfo /> */}
-            <DetailsContainer>
-              <Stack spacing={{ xs: 4, sm: 6 }}>
-                <HomeDescription />
+              {/* <HomeHeaderInfo /> */}
+              <DetailsContainer>
+                <Stack spacing={{ xs: 4, sm: 6 }}>
+                  <HomeDescription />
 
-                {mapType === 'static' ? (
-                  <BuildingMap type={mapType} />
-                ) : (
-                  <MapOptionsProvider layout="map" style="hybrid">
-                    <BuildingMap />
-                  </MapOptionsProvider>
-                )}
-                {/* <SummaryDetails /> */}
-              </Stack>
-            </DetailsContainer>
+                  {mapType === 'static' ? (
+                    <BuildingMap type={mapType} />
+                  ) : (
+                    <MapOptionsProvider layout="map" style="hybrid">
+                      <BuildingMap />
+                    </MapOptionsProvider>
+                  )}
+                  {/* <SummaryDetails /> */}
+                </Stack>
+              </DetailsContainer>
 
-            <Box id="features" sx={{ scrollMarginTop: '100px' }}>
-              <FeaturesDetails />
-            </Box>
-            <AppliancesDetails />
-            <ExteriorDetails />
-            <RoomsDetails />
-
-            <Box id="active-listings" sx={{ scrollMarginTop: '100px' }}>
-              <UnitCarousel properties={similarProperties} />
-            </Box>
-
-            {/* <NeighborhoodDetails /> */}
-            <Box id="history" sx={{ scrollMarginTop: '100px' }}>
-              <BuildingHistoryDetails history={history} />
-            </Box>
-
-
-          </Stack>
-
-          {
-            features.pdpSidebar && !agentRole && (
-              <Box
-                sx={{
-                  top: 32 + (embedded ? 52 : 60),
-                  // 32px is the offset between content containers
-                  // 52 / 60px is the height of the NavigationBar wheither it's embedded or not
-                  minWidth: 276,
-                  flexShrink: 0, // badly formatted content from the main column tries to push the sidebar out of the screen
-                  width: { xs: '100%', md: 276 },
-                  position: { xs: 'static', md: 'sticky' },
-                  '& .MuiPaper-root': {
-                    height: 'auto'
-                  }
-                }}
-              >
-                <Sidebar />
+              <Box id="features" sx={{ scrollMarginTop: '100px' }}>
+                <FeaturesDetails />
               </Box>
-            )
-          }
+              <AppliancesDetails />
+              <ExteriorDetails />
+              <RoomsDetails />
 
-        </Stack >
+              <Box id="active-listings" sx={{ scrollMarginTop: '100px' }}>
+                <UnitCarousel properties={similarProperties} />
+              </Box>
 
-        {features.pdpGridGallery && <GalleryDialog />}
-        {features.pdpSlideshow && <SlideshowDialog />}
-        {features.pdpFullscreenGallery && <FullscreenRibbonDialog />}
-        {features.pdpFullscreenGallery && <FullscreenGalleryDialog />}
+              {/* <NeighborhoodDetails /> */}
+              <Box id="history" sx={{ scrollMarginTop: '100px' }}>
+                <BuildingHistoryDetails history={history} />
+              </Box>
 
-      </Container >
 
-    </Stack >
+            </Stack>
+
+            {
+              features.pdpSidebar && !agentRole && (
+                <Box
+                  sx={{
+                    top: 32 + (embedded ? 52 : 60),
+                    // 32px is the offset between content containers
+                    // 52 / 60px is the height of the NavigationBar wheither it's embedded or not
+                    minWidth: 276,
+                    flexShrink: 0, // badly formatted content from the main column tries to push the sidebar out of the screen
+                    width: { xs: '100%', md: 276 },
+                    position: { xs: 'static', md: 'sticky' },
+                    '& .MuiPaper-root': {
+                      height: 'auto'
+                    }
+                  }}
+                >
+                  <Sidebar />
+                </Box>
+              )
+            }
+
+          </Stack >
+
+          {features.pdpGridGallery && <GalleryDialog />}
+          {features.pdpSlideshow && <SlideshowDialog />}
+          {features.pdpFullscreenGallery && <FullscreenRibbonDialog />}
+          {features.pdpFullscreenGallery && <FullscreenGalleryDialog />}
+
+        </Container >
+
+      </Stack >
+    </PropertyDetailsProvider>
   )
 }
 

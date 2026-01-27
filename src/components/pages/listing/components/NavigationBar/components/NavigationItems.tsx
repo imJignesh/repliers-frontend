@@ -14,10 +14,12 @@ const getTopOffsetInContainer = (element: Element, container: HTMLElement) => {
 
 const NavigationItems = ({
   active,
-  onChange
+  onChange,
+  items = navigationItems
 }: {
   active: number
   onChange: (index: number) => void
+  items?: typeof navigationItems
 }) => {
   const containerRef = useRef<HTMLElement | null>(null)
   const [available, setAvailable] = useState<boolean[]>([])
@@ -25,17 +27,17 @@ const NavigationItems = ({
   const scrollToElement = useCallback((element: Element) => {
     const container = containerRef.current
     const top = container
-      ? getTopOffsetInContainer(element, container) - (52 + 32) // 52px embedded navigation bar height + padding (8*4)
-      : element.getBoundingClientRect().top + window.scrollY - (60 + 32) // 60px for the static page navigation bar
+      ? getTopOffsetInContainer(element, container) - (52 + 32)
+      : element.getBoundingClientRect().top + window.scrollY - (60 + 32)
 
-    ;(container || window).scrollTo({
-      behavior: 'smooth',
-      top
-    })
+      ; (container || window).scrollTo({
+        behavior: 'smooth',
+        top
+      })
   }, [])
 
   const handleClick = (e: React.MouseEvent, index: number) => {
-    const elementId = navigationItems[index].id
+    const elementId = items[index].id
     const anchor = document.getElementById(elementId)
     if (anchor) {
       onChange(index)
@@ -47,15 +49,15 @@ const NavigationItems = ({
   useEffect(() => {
     // fill the elements array with the flags of availability (existence)
     setAvailable(
-      navigationItems.map((item) => !!document.getElementById(item.id))
+      items.map((item) => !!document.getElementById(item.id))
     )
     // set the scrollable container reference
     containerRef.current = document.getElementById(propertyDialogContentId)
-  }, [])
+  }, [items])
 
   return (
     <Stack spacing={2} direction="row" justifyContent="center">
-      {navigationItems.map((item, index) =>
+      {items.map((item, index) =>
         available[index] ? (
           <Button
             key={index}

@@ -29,8 +29,10 @@ import {
   HomeHeaderInfo,
   HomeMap,
   NavigationBar,
+  NavigationBarBuildings,
   NeighborhoodDetails,
   PropertyGallery,
+  BuildingGallery,
   RoomsDetails,
   Sidebar,
   SimilarPropertyCarousel,
@@ -75,10 +77,13 @@ const BuildingPageContent = ({
   return (
     <Stack spacing={2} pb={4}>
       <Container>
-        <PropertyGallery />
+        <BuildingGallery
+          activeCount={similarProperties.length}
+          historyCount={history.length}
+        />
       </Container>
 
-      {/* <NavigationBar embedded={embedded} /> */}
+
 
       <Container>
         <Stack
@@ -89,9 +94,7 @@ const BuildingPageContent = ({
           direction={{ xs: 'column', md: 'row' }}
         >
           <Stack spacing={2} sx={{ flex: 1, width: '100%' }}>
-            <Typography variant="h1" style={{ fontSize: '2rem' }}>
-              {formatBuildingAddress(address)}
-            </Typography>
+
 
             {/* <HomeHeaderInfo /> */}
             <DetailsContainer>
@@ -109,14 +112,22 @@ const BuildingPageContent = ({
               </Stack>
             </DetailsContainer>
 
-
-            <FeaturesDetails />
+            <Box id="features" sx={{ scrollMarginTop: '100px' }}>
+              <FeaturesDetails />
+            </Box>
             <AppliancesDetails />
             <ExteriorDetails />
             <RoomsDetails />
-            {/*<NeighborhoodDetails />*/}
-            <BuildingHistoryDetails history={history} />
-            <UnitCarousel properties={similarProperties} />
+
+            <Box id="active-listings" sx={{ scrollMarginTop: '100px' }}>
+              <UnitCarousel properties={similarProperties} />
+            </Box>
+
+            {/* <NeighborhoodDetails /> */}
+            <Box id="history" sx={{ scrollMarginTop: '100px' }}>
+              <BuildingHistoryDetails history={history} />
+            </Box>
+
 
           </Stack>
 

@@ -11,12 +11,17 @@ import { type ApiQueryParams, type Property } from 'services/API'
 import SearchService from 'services/Search'
 import { CarouselHeader } from '@shared/Property/Carousel/components'
 import TeamSection from './TeamSection'
+import { StatsWidgets } from '@shared/Stats'
+import { useFeatures } from 'providers/FeaturesProvider'
+import defaultLocation from '@configs/location'
+
 
 const FeaturedProperties = () => {
   const [featured, setFeatured] = useState<Property[]>([])
   const [recentlySold, setRecentlySold] = useState<Property[]>([])
   const [showcased, setShowcased] = useState<Property[]>([])
   const t = useTranslations('HomePage')
+  const features = useFeatures()
 
   const filters: Partial<ApiQueryParams> = {
     class: 'condo',
@@ -68,6 +73,7 @@ const FeaturedProperties = () => {
     fetchRecentlySold()
     fetchShowcased()
   }, [])
+  const { state, defaultFilters } = defaultLocation
 
   return (
     <Container maxWidth="lg">
@@ -75,7 +81,8 @@ const FeaturedProperties = () => {
         <PropertyCarousel title={t('justListed')} properties={featured} />
         <PropertyCarousel title={t('recentlySold')} properties={recentlySold} />
 
-        <TeamSection />
+        {features.dashboard && <StatsWidgets {...defaultFilters} name={state} />}
+
 
         <Box sx={{ py: 2, px: 2, backgroundColor: '#f4f4f4', textAlign: 'center' }}>
           <Typography

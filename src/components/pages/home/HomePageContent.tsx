@@ -29,8 +29,7 @@ const HomePageContent = () => {
 
       <PopularSearches city={'Toronto'} />
 
-      {features.dashboard && <StatsWidgets {...defaultFilters} name={state} />}
-      <br />
+
     </Box >
   )
 }

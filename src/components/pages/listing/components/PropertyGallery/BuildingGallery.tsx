@@ -94,14 +94,14 @@ const BuildingGallery = ({
                         onClick={() => handleScroll('active-listings')}
                         sx={{ borderRadius: 2, textTransform: 'none', px: 3 }}
                     >
-                        For Sale ({activeCount})
+                        <span className='pr-2 d-inline-block fw-bold '>{activeCount}</span> &nbsp;For Sale
                     </Button>
                     <Button
                         variant="outlined"
                         onClick={() => handleScroll('history')}
                         sx={{ borderRadius: 2, textTransform: 'none', px: 3 }}
                     >
-                        Price History ({historyCount})
+                        <span className='pr-2 d-inline-block fw-bold '>{historyCount}</span> &nbsp;Price History
                     </Button>
                 </Stack>
 

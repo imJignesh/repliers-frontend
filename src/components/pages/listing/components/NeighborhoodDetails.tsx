@@ -3,14 +3,12 @@ import { useTranslations } from 'next-intl'
 
 import { DetailsContainer } from '@shared/Containers'
 import { DetailsChipsGroup, DetailsList } from '@shared/DetailsList'
+import { type DetailsGroupType } from 'utils/dataMapper'
 
-import { usePropertyDetails } from 'providers/PropertyDetailsProvider'
-
-const NeighborhoodDetails = () => {
-  const { neighborhood } = usePropertyDetails()
+const NeighborhoodDetails = ({ neighborhood }: { neighborhood?: DetailsGroupType[] }) => {
   const t = useTranslations()
 
-  if (!neighborhood.length) return null
+  if (!neighborhood || neighborhood.length === 0) return null
 
   return (
     <DetailsContainer

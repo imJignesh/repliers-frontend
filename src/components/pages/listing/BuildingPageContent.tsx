@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 
 import { Box, Container, Stack, Typography } from '@mui/material'
 
@@ -61,6 +61,11 @@ const BuildingPageContent = ({
   const { property } = useProperty()
   const { address } = property
 
+  const propertyDetails = useMemo(
+    () => config[property.class]?.(property) || config.default(property),
+    [property]
+  )
+
   useEffect(() => {
     trackEvent('view_building_page', {
       mls: property.mlsNumber,
@@ -120,16 +125,13 @@ const BuildingPageContent = ({
               <AppliancesDetails />
               <ExteriorDetails />
 
-              {(() => {
-                const propertyDetails = config[property.class]?.(property) || config.default(property)
-                return <RoomsDetails rooms={propertyDetails.rooms} />
-              })()}
+              <RoomsDetails rooms={propertyDetails.rooms} />
 
               <Box id="active-listings" sx={{ scrollMarginTop: '100px' }}>
                 <UnitCarousel properties={similarProperties} />
               </Box>
 
-              {/* <NeighborhoodDetails /> */}
+              <NeighborhoodDetails neighborhood={propertyDetails.neighborhood} />
               <Box id="history" sx={{ scrollMarginTop: '100px' }}>
                 <BuildingHistoryDetails history={history} />
               </Box>

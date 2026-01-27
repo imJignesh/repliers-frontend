@@ -119,7 +119,11 @@ const BuildingPageContent = ({
               </Box>
               <AppliancesDetails />
               <ExteriorDetails />
-              <RoomsDetails />
+
+              {(() => {
+                const propertyDetails = config[property.class]?.(property) || config.default(property)
+                return <RoomsDetails rooms={propertyDetails.rooms} />
+              })()}
 
               <Box id="active-listings" sx={{ scrollMarginTop: '100px' }}>
                 <UnitCarousel properties={similarProperties} />

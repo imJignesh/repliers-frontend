@@ -7,20 +7,18 @@ import { Box, Typography, Divider } from '@mui/material'
 import { DetailsContainer } from '@shared/Containers'
 import { DetailsGroup, DetailsList } from '@shared/DetailsList'
 
-import { usePropertyDetails } from 'providers/PropertyDetailsProvider'
 import { useProperty } from 'providers/PropertyProvider'
 import {
   mapperTotalBeds,
   mapperBaths,
   mapperTotalParking
 } from 'utils/dataMapper/mappers'
+import { type DetailsGroupType } from 'utils/dataMapper'
 
-const RoomsDetails = () => {
+const RoomsDetails = ({ rooms }: { rooms?: DetailsGroupType[] }) => {
   const t = useTranslations()
   const [mounted, setMounted] = useState(false)
 
-  // Hooks MUST be called unconditionally
-  const propertyDetails = usePropertyDetails()
   const { property } = useProperty()
 
   useEffect(() => {
@@ -29,23 +27,13 @@ const RoomsDetails = () => {
 
   if (!mounted) return null
 
-  // Perform checks after hooks
-  if (!propertyDetails) {
-    // console.log('RoomsDetails - No propertyDetails')
-    return null
-  }
-
-  const { rooms } = propertyDetails
-
   if (!rooms || !Array.isArray(rooms) || rooms.length === 0) {
-    // console.log('RoomsDetails - No rooms or empty array')
     return null
   }
 
   const { details } = property
 
   if (!details) {
-    // console.log('RoomsDetails - No details')
     return null
   }
 

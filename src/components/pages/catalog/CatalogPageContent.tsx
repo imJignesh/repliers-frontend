@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 
 import { Box, Container, Stack } from '@mui/material'
@@ -16,7 +18,11 @@ import {
 } from 'services/API'
 import type { Filters } from 'services/Search'
 import SearchProvider from 'providers/SearchProvider'
+import { useState, useEffect } from 'react'
 import MapOptionsProvider from 'providers/MapOptionsProvider'
+
+import MapService from 'services/Map'
+import CatalogMap from './components/CatalogMap'
 
 import {
   Breadcrumbs,
@@ -62,6 +68,21 @@ const CatalogPageContent = ({
   urlFilters: string[]
   searchFilters: Partial<Filters>
 }) => {
+  const [showMap, setShowMap] = useState(false)
+
+  useEffect(() => {
+    const stored = localStorage.getItem('repliers_catalog_map_view')
+    if (stored === 'true') {
+      setShowMap(true)
+    }
+  }, [])
+
+  const handleToggleMap = () => {
+    const newState = !showMap
+    setShowMap(newState)
+    localStorage.setItem('repliers_catalog_map_view', String(newState))
+  }
+
   return (
     <SearchProvider
       filters={
@@ -96,34 +117,93 @@ const CatalogPageContent = ({
                 hood={hood}
                 areas={areas}
                 hoods={hoods}
+
                 searchFilters={searchFilters}
+                showMap={showMap}
+                onToggleMap={handleToggleMap}
               />
             </Container>
           </Box>
 
           <Container
             disableGutters
+            maxWidth={showMap ? false : 'lg'}
             sx={{
               ...gridColumnsMediaQueries,
               px: gridConfig.gridSpacing,
-              pt: gridConfig.gridSpacing
+              pt: gridConfig.gridSpacing,
+              ...(showMap && {
+                p: 0,
+                height: 'calc(100vh - 140px)', // Approx height
+                overflow: 'hidden'
+              })
             }}
           >
-            {listings?.length > 0 ? (
-              <Stack spacing={4} direction="row" flexWrap="wrap">
-                {listings.map((property, index) => (
-                  <PropertyCard key={index} property={property} />
-                ))}
-              </Stack>
+            {showMap ? (
+              <Box sx={{ display: 'flex', height: '100%' }}>
+                <Box sx={{
+                  width: { xs: '100%', md: '50%' },
+                  height: '100%',
+                  overflowY: 'auto',
+                  p: 2,
+                  borderRight: '1px solid',
+                  borderColor: 'divider'
+                }}>
+                  {listings?.length > 0 ? (
+                    <Stack spacing={4} direction="row" flexWrap="wrap">
+                      {listings.map((property, index) => (
+                        <PropertyCard
+                          key={index}
+                          property={property}
+                          showViewOnMap={true}
+                          onViewOnMap={() => {
+                            if (property.map.latitude && property.map.longitude) {
+                              MapService.map?.flyTo({
+                                center: [Number(property.map.longitude), Number(property.map.latitude)],
+                                zoom: 16
+                              })
+                              MapService.showPopup(property.mlsNumber)
+                            }
+                          }}
+                        />
+                      ))}
+                    </Stack>
+                  ) : (
+                    <EmptyCatalogListings />
+                  )}
+                  <Stack spacing={2} alignItems="center" py={4}>
+                    <CatalogPagination page={page} count={count} />
+                  </Stack>
+                </Box>
+                <Box sx={{
+                  width: { xs: '0%', md: '50%' },
+                  display: { xs: 'none', md: 'block' },
+                  height: '100%',
+                  position: 'relative'
+                }}>
+                  <CatalogMap listings={listings} />
+                </Box>
+              </Box>
             ) : (
-              <EmptyCatalogListings />
-            )}
-            <Stack spacing={2} alignItems="center" py={4}>
-              <CatalogPagination page={page} count={count} />
-              {/* {count > 0 && <Breadcrumbs city={city} hood={hood} />} */}
+              <>
+                {listings?.length > 0 ? (
+                  <Stack spacing={4} direction="row" flexWrap="wrap">
+                    {listings.map((property, index) => (
+                      <PropertyCard key={index} property={property} />
+                    ))}
+                  </Stack>
+                ) : (
+                  <EmptyCatalogListings />
+                )}
+                <Stack spacing={2} alignItems="center" py={4}>
+                  <CatalogPagination page={page} count={count} />
+                  {/* {count > 0 && <Breadcrumbs city={city} hood={hood} />} */}
 
-              {/* <FiltersList urlFilters={urlFilters} /> */}
-            </Stack>
+                  {/* <FiltersList urlFilters={urlFilters} /> */}
+                </Stack>
+              </>
+            )}
+
           </Container>
 
           {/* <CitiesOfRegion /> */}

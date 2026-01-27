@@ -13,6 +13,8 @@ import {
   Typography
 } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import MapIcon from '@mui/icons-material/Map'
+import ListIcon from '@mui/icons-material/ViewList'
 
 import {
   type ListingStatus,
@@ -50,7 +52,9 @@ const CatalogFilters = ({
   area,
   areas = [],
   hoods = [],
-  searchFilters
+  searchFilters,
+  showMap,
+  onToggleMap
 }: {
   count: number
   city?: string
@@ -60,6 +64,8 @@ const CatalogFilters = ({
   hoods?: ApiNeighborhood[]
   listingLocation?: string
   searchFilters: Partial<Filters>
+  showMap: boolean
+  onToggleMap: () => void
 }) => {
   const dynamicCitymap: Record<string, { active: boolean; items: Record<string, { active: boolean }> }> = {}
   areas.forEach((a: ApiBoardArea) => {
@@ -299,6 +305,29 @@ const CatalogFilters = ({
                   />
 
                   <AdvancedFiltersButton size={size} />
+
+                  <ToggleButton
+                    value="map"
+                    selected={showMap}
+                    onChange={onToggleMap}
+                    size={size}
+                    sx={{
+                      height: size === 'medium' ? 48 : 40,
+                      width: size === 'medium' ? 48 : 40,
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: '8px !important',
+                      '&.Mui-selected': {
+                        bgcolor: 'primary.main',
+                        color: 'white',
+                        '&:hover': {
+                          bgcolor: 'primary.dark'
+                        }
+                      }
+                    }}
+                  >
+                    {showMap ? <ListIcon /> : <MapIcon />}
+                  </ToggleButton>
                 </>
               ) : (
                 <>

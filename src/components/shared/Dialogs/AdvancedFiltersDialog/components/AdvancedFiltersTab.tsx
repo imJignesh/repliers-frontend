@@ -2,7 +2,7 @@ import { Box, Stack, Typography } from '@mui/material'
 
 import { type Filters } from 'services/Search'
 
-import { DaysSelect, FilterButtonGroup, PricePicker, YearBuiltSelect } from '.'
+import { DaysSelect, FilterButtonGroup, PricePicker, PriceSelect, YearBuiltSelect } from '.'
 
 const bedsItems: [string, number][] = [
   ['Any', 0],
@@ -71,12 +71,22 @@ const AdvancedFiltersTab = ({
       />
       <Box>
         <Typography fontWeight={500}>Price</Typography>
-        <PricePicker
-          variant="bars"
-          buckets={priceBuckets}
-          values={[minPrice || 0, maxPrice || 0]}
-          onChange={handlePriceChange}
-        />
+        {Object.keys(priceBuckets).length > 0 ? (
+          <PricePicker
+            variant="bars"
+            buckets={priceBuckets}
+            values={[minPrice || 0, maxPrice || 0]}
+            onChange={handlePriceChange}
+          />
+        ) : (
+          <Box pt={2}>
+            <PriceSelect
+              min={minPrice}
+              max={maxPrice}
+              onChange={onChange}
+            />
+          </Box>
+        )}
       </Box>
       <DaysSelect
         status={listingStatus}

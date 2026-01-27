@@ -6,6 +6,8 @@ import TouchRippleOriginal, {
   type TouchRippleActions,
   type TouchRippleProps
 } from '@mui/material/ButtonBase/TouchRipple'
+import { IconButton } from '@mui/material'
+import LocationOnIcon from '@mui/icons-material/LocationOn'
 
 import { type PropertyCardSize } from '@configs/cards-grids'
 import { Gallery } from '@shared/Photos'
@@ -35,6 +37,8 @@ type PropertyCardProps = {
   onGalleryEnter?: () => void
   onGalleryLeave?: () => void
   onClick?: (e: React.MouseEvent) => void
+  showViewOnMap?: boolean
+  onViewOnMap?: () => void
 }
 
 const TouchRipple = TouchRippleOriginal as unknown as React.FC<
@@ -51,7 +55,9 @@ const PropertyCard = React.memo(
     onCardLeave,
     onGalleryEnter,
     onGalleryLeave,
-    onClick
+    onClick,
+    showViewOnMap,
+    onViewOnMap
   }: PropertyCardProps) => {
     const { logged } = useUser()
     const features = useFeatures()
@@ -121,6 +127,28 @@ const PropertyCard = React.memo(
           <CardContent size={size} property={property} />
           <TouchRipple ref={rippleRef} center={false} />
         </a>
+        {showViewOnMap && onViewOnMap && (
+          <IconButton
+            size="small"
+            onClick={(e: React.MouseEvent) => {
+              e.stopPropagation()
+              e.preventDefault()
+              onViewOnMap()
+            }}
+            sx={{
+              position: 'absolute',
+              top: 8,
+              right: 8, // Adjust if favorites button is there
+              zIndex: 2,
+              bgcolor: 'rgba(255, 255, 255, 0.8)',
+              '&:hover': {
+                bgcolor: 'white'
+              }
+            }}
+          >
+            <LocationOnIcon fontSize="small" />
+          </IconButton>
+        )}
         {/* {features.favorites && !sizeMap && (
           <FavoritesButton property={property} />
         )} */}

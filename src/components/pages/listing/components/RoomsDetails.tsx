@@ -1,4 +1,6 @@
-import React from 'react'
+'use client'
+
+import React, { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { Box, Typography, Divider } from '@mui/material'
 
@@ -14,23 +16,45 @@ import {
 } from 'utils/dataMapper/mappers'
 
 const RoomsDetails = () => {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return null
+
   try {
     const propertyDetails = usePropertyDetails()
     const { property } = useProperty()
     const t = useTranslations()
 
+    console.log('RoomsDetails - propertyDetails:', propertyDetails)
+    console.log('RoomsDetails - property:', property)
+
     // Safety check: ensure propertyDetails exists
-    if (!propertyDetails) return null
+    if (!propertyDetails) {
+      console.log('RoomsDetails - No propertyDetails')
+      return null
+    }
 
     const { rooms } = propertyDetails
 
+    console.log('RoomsDetails - rooms:', rooms)
+
     // Safety check: ensure rooms is an array
-    if (!rooms || !Array.isArray(rooms) || rooms.length === 0) return null
+    if (!rooms || !Array.isArray(rooms) || rooms.length === 0) {
+      console.log('RoomsDetails - No rooms or empty array')
+      return null
+    }
 
     const { details } = property
 
     // Safety check: ensure details exists
-    if (!details) return null
+    if (!details) {
+      console.log('RoomsDetails - No details')
+      return null
+    }
 
     const facts = [
       { label: 'Beds', value: mapperTotalBeds(property) },

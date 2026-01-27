@@ -120,10 +120,10 @@ const BuildingPageContent = ({
               </DetailsContainer>
 
               <Box id="features" sx={{ scrollMarginTop: '100px' }}>
-                <FeaturesDetails />
+                <FeaturesDetails features={propertyDetails.features} />
               </Box>
-              <AppliancesDetails />
-              <ExteriorDetails />
+              <AppliancesDetails appliances={propertyDetails.appliances} />
+              <ExteriorDetails exterior={propertyDetails.exterior} />
 
               <RoomsDetails rooms={propertyDetails.rooms} />
 

@@ -3,11 +3,9 @@ import { useTranslations } from 'next-intl'
 
 import { DetailsContainer } from '@shared/Containers'
 import { DetailsGroup, DetailsList } from '@shared/DetailsList'
+import { type DetailsGroupType } from 'utils/dataMapper'
 
-import { usePropertyDetails } from 'providers/PropertyDetailsProvider'
-
-const ExteriorDetails = () => {
-  const { exterior } = usePropertyDetails()
+const ExteriorDetails = ({ exterior }: { exterior?: DetailsGroupType[] }) => {
   const t = useTranslations()
 
   if (!exterior || exterior.length === 0) return null

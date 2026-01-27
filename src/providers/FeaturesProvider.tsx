@@ -5,9 +5,15 @@ import { type Features, features } from 'features'
 
 const FeaturesContext = createContext<Features | undefined>(undefined)
 
-const FeaturesProvider = ({ children }: { children: React.ReactNode }) => {
+const FeaturesProvider = ({
+  children,
+  features: propsFeatures
+}: {
+  children: React.ReactNode
+  features?: Features
+}) => {
   return (
-    <FeaturesContext.Provider value={features}>
+    <FeaturesContext.Provider value={propsFeatures || features}>
       {children}
     </FeaturesContext.Provider>
   )

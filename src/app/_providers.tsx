@@ -76,7 +76,7 @@ const Providers = ({
       [UserProvider],
       [DialogProvider],
       [SnackbarProvider],
-      [FeaturesProvider, featureOptions],
+      [FeaturesProvider, { ...featureOptions, features }],
       features.search ? [LocationsProvider, { locations }] : false,
       features.favorites ? [FavoritesProvider] : false,
       features.saveSearch ? [SaveSearchProvider] : false,

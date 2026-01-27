@@ -3,14 +3,12 @@ import { useTranslations } from 'next-intl'
 
 import { DetailsContainer } from '@shared/Containers'
 import { DetailsGroup, DetailsList } from '@shared/DetailsList'
+import { type DetailsGroupType } from 'utils/dataMapper'
 
-import { usePropertyDetails } from 'providers/PropertyDetailsProvider'
-
-const AppliancesDetails = () => {
-  const { appliances } = usePropertyDetails()
+const AppliancesDetails = ({ appliances }: { appliances?: DetailsGroupType[] }) => {
   const t = useTranslations()
 
-  if (!appliances.length) return null
+  if (!appliances || appliances.length === 0) return null
 
   return (
     <DetailsContainer title={t('pdp.sections.appliances.name')} id="appliances">

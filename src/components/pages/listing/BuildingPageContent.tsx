@@ -15,7 +15,7 @@ import {
 import { useFeatures } from 'providers/FeaturesProvider'
 import MapOptionsProvider from 'providers/MapOptionsProvider'
 import { useProperty } from 'providers/PropertyProvider'
-import PropertyDetailsProvider from 'providers/PropertyDetailsProvider'
+import PropertyDetailsProvider, { config } from 'providers/PropertyDetailsProvider'
 import { useUser } from 'providers/UserProvider'
 import useAnalytics from 'hooks/useAnalytics'
 

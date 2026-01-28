@@ -14,12 +14,15 @@ import {
   mapperTotalParking
 } from 'utils/dataMapper/mappers'
 import { type DetailsGroupType } from 'utils/dataMapper'
+import { usePropertyDetails } from 'providers/PropertyDetailsProvider'
 
 const RoomsDetails = ({ rooms }: { rooms?: DetailsGroupType[] }) => {
   const t = useTranslations()
   const [mounted, setMounted] = useState(false)
 
   const { property } = useProperty()
+  const { rooms: contextRooms } = usePropertyDetails()
+  const roomsData = rooms || contextRooms
 
   useEffect(() => {
     setMounted(true)
@@ -27,10 +30,7 @@ const RoomsDetails = ({ rooms }: { rooms?: DetailsGroupType[] }) => {
 
   if (!mounted) return null
 
-  if (!rooms || !Array.isArray(rooms) || rooms.length === 0) {
-    return null
-  }
-
+  // Ensure AT LEAST property details exist. roomsData is optional (if empty array, simply doesn't show list)
   const { details } = property
 
   if (!details) {
@@ -51,37 +51,48 @@ const RoomsDetails = ({ rooms }: { rooms?: DetailsGroupType[] }) => {
     { label: 'Year Built', value: details.yearBuilt },
   ].filter(f => f.value && f.value !== '0' && f.value !== '0 + 0' && f.value !== 'null' && f.value !== 'N')
 
+  // NOTE: If both facts are empty AND roomsData is empty, return null
+  if (facts.length === 0 && (!roomsData || roomsData.length === 0)) {
+    return null
+  }
+
   return (
     <DetailsContainer title={t('pdp.sections.rooms.name')} id="rooms">
-      <Box sx={{ mb: 4 }}>
-        <DetailsList mode="columns">
-          <DetailsGroup
-            group={{
-              title: 'Summary',
-              items: facts.map(f => ({ label: f.label, value: f.value }))
-            }}
-          />
-        </DetailsList>
-      </Box>
-
-      <Divider sx={{ mb: 4 }} />
-
-      <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>Room Dimensions</Typography>
-
-      <DetailsList>
-        {rooms.map((room, index) => {
-          if (!room || typeof room !== 'object') return null
-
-          return (
+      {facts.length > 0 && (
+        <Box sx={{ mb: 4 }}>
+          <DetailsList mode="columns">
             <DetailsGroup
-              key={room.title || `room-${index}`}
-              group={room}
-              scrubbedValue="****"
-              breakInside={rooms.length > 1 ? 'avoid' : 'auto'}
+              group={{
+                title: 'Summary',
+                items: facts.map(f => ({ label: f.label, value: f.value }))
+              }}
             />
-          )
-        })}
-      </DetailsList>
+          </DetailsList>
+        </Box>
+      )}
+
+      {facts.length > 0 && roomsData && roomsData.length > 0 && <Divider sx={{ mb: 4 }} />}
+
+      {roomsData && roomsData.length > 0 && (
+        <>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>Room Dimensions</Typography>
+
+          <DetailsList>
+            {roomsData.map((room, index) => {
+              if (!room || typeof room !== 'object') return null
+
+              return (
+                <DetailsGroup
+                  key={room.title || `room-${index}`}
+                  group={room}
+                  scrubbedValue="****"
+                  breakInside={roomsData.length > 1 ? 'avoid' : 'auto'}
+                />
+              )
+            })}
+          </DetailsList>
+        </>
+      )}
     </DetailsContainer>
   )
 }

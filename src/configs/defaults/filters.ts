@@ -82,7 +82,7 @@ export const aiQualityFeatureNames: Partial<
 
 export const defaultFilters: Filters = {
   listingStatus: 'active',
-  listingType: 'allListings',
+  listingType: 'condo',
   sortBy: 'listPriceDesc'
 }
 

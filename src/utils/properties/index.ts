@@ -24,6 +24,7 @@ import {
   type Primitive,
   toSafeNumber
 } from '../formatters'
+export { toSafeNumber }
 import { multiplySqft } from '../numbers'
 import { capitalize, keyToLabel, pluralize } from '../strings'
 

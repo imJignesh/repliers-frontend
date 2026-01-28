@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import {
   AppBar,
   Box,
@@ -23,7 +24,7 @@ import {
   ToolbarMenu
 } from './components'
 
-import { listingLocations } from '@configs/filters'
+import APILocations, { type Area } from 'services/API/APILocations'
 
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state'
 import { useRouter } from 'next/navigation'
@@ -31,6 +32,16 @@ import { useRouter } from 'next/navigation'
 const Header = () => {
   const features = useFeatures()
   const router = useRouter()
+  const [areas, setAreas] = useState<Area[]>([])
+
+  useEffect(() => {
+    APILocations.fetchAreas().then((data) => {
+      if (data && Array.isArray(data)) {
+        // Sort alphabetically if needed, but API usually handles it or we trust API order
+        setAreas(data.sort((a, b) => a.name.localeCompare(b.name)))
+      }
+    })
+  }, [])
 
   return (
     <Box sx={{ height: { xs: 64, sm: 72 } }}>
@@ -70,20 +81,16 @@ const Header = () => {
                     Neighbourhoods
                   </Button>
                   <Menu {...bindMenu(popupState)}>
-                    {listingLocations.map((location) => (
+                    {areas.map((area) => (
                       <MenuItem
-                        key={location}
+                        key={area.name}
                         onClick={() => {
                           popupState.close()
-                          const path =
-                            location.toLowerCase() === 'all'
-                              ? '/locations/'
-                              : `/locations/${location.toLowerCase().replaceAll(' ', '-')}`
-
+                          const path = `/locations/${area.name.toLowerCase().replaceAll(' ', '-')}`
                           router.push(path)
                         }}
                       >
-                        {location}
+                        {area.name}
                       </MenuItem>
                     ))}
                   </Menu>

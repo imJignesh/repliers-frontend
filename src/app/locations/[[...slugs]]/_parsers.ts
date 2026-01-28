@@ -161,12 +161,13 @@ export const parseListingType = (filters: string[]) =>
     }
     return prev
     // default listingType
-  }, 'allListings') as ListingType
+  }, 'condo') as ListingType
 
 export const parseUrlFilters = (filters: string[]) => {
   const searchFilters: Partial<Filters> = {
     // defaults
     listingStatus: 'active',
+    listingType: 'condo',
     sortBy: 'listPriceDesc'
   }
 

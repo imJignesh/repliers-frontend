@@ -1,4 +1,5 @@
 import { Stack, Typography } from '@mui/material'
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar'
 
 import IcoBath from '@icons/IcoBath'
 import IcoBed from '@icons/IcoBed'
@@ -10,7 +11,8 @@ import {
   getBedrooms,
   getLotSize,
   getSqft,
-  land
+  land,
+  toSafeNumber
 } from 'utils/properties'
 
 const BasicPropertyIcons = ({ property }: { property: Property }) => {
@@ -20,6 +22,7 @@ const BasicPropertyIcons = ({ property }: { property: Property }) => {
   const beds = getBedrooms(details)
   const baths = getBathrooms(details)
   const lotSize = getLotSize(property)
+  const parking = toSafeNumber(details?.numParkingSpaces)
 
   return (
     <Stack
@@ -40,6 +43,14 @@ const BasicPropertyIcons = ({ property }: { property: Property }) => {
           <IcoBath size={38} />
           <Typography variant="body1" color="text.hint">
             {baths.label}
+          </Typography>
+        </Stack>
+      )}
+      {Boolean(parking > 0) && (
+        <Stack spacing={1} direction="row" alignItems="center">
+          <DirectionsCarIcon sx={{ fontSize: 38, color: 'text.secondary' }} />
+          <Typography variant="body1" color="text.hint">
+            {parking}
           </Typography>
         </Stack>
       )}

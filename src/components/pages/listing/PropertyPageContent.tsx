@@ -1,8 +1,10 @@
 'use client'
 
 import React, { useEffect } from 'react'
+import NextLink from 'next/link'
 
-import { Box, Container, Stack, Typography } from '@mui/material'
+import { Box, Container, Stack, Typography, Breadcrumbs, Link } from '@mui/material'
+import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 
 import { DetailsContainer } from '@shared/Containers'
 import {
@@ -36,6 +38,7 @@ import {
 } from './components'
 
 import { formatShortAddress } from '../../../utils/properties/formatters'
+import { getCatalogUrl } from '../../../utils/urls'
 
 const PropertyPageContent = ({
   embedded = false,
@@ -81,31 +84,64 @@ const PropertyPageContent = ({
           direction={{ xs: 'column', md: 'row' }}
         >
           <Stack spacing={2} sx={{ flex: 1, width: '100%' }}>
-            <Typography variant="h1" style={{ fontSize: '2rem' }}>
+            <Typography variant="h1" style={{ fontSize: '1.7rem', margin: 0, lineHeight: 1 }}>
               {formatShortAddress(address)}
             </Typography>
+
+            <Breadcrumbs
+              separator={<NavigateNextIcon fontSize="small" />}
+              sx={{
+                mt: -1,
+                '& .MuiBreadcrumbs-li': {
+                  fontWeight: 500,
+                  fontSize: '0.95rem'
+                }
+              }}
+            >
+              {address.city && (
+                <Link
+                  component={NextLink}
+                  href={getCatalogUrl(address.city)}
+                  color="text.secondary"
+                  underline="hover"
+                >
+                  {address.city}
+                </Link>
+              )}
+              {address.neighborhood && (
+                <Link
+                  component={NextLink}
+                  href={getCatalogUrl(address.city, address.neighborhood)}
+                  color="text.primary"
+                  underline="hover"
+                >
+                  {address.neighborhood}
+                </Link>
+              )}
+            </Breadcrumbs>
 
             <HomeHeaderInfo />
             <DetailsContainer>
               <Stack spacing={{ xs: 4, sm: 6 }}>
                 <HomeDescription />
 
-                {mapType === 'static' ? (
+                {/* {mapType === 'static' ? (
                   <HomeMap type={mapType} />
                 ) : (
                   <MapOptionsProvider layout="map" style="hybrid">
                     <HomeMap />
                   </MapOptionsProvider>
-                )}
+                )} */}
                 <SummaryDetails />
               </Stack>
             </DetailsContainer>
             <FeaturesDetails />
             <AppliancesDetails />
+            <HistoryDetails />
             <ExteriorDetails />
             <RoomsDetails />
             {/* <NeighborhoodDetails /> */}
-            <HistoryDetails />
+
           </Stack>
 
           {features.pdpSidebar && !agentRole && (

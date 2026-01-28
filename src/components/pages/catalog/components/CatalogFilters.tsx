@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import {
   Box,
   Button,
@@ -10,11 +10,16 @@ import {
   Stack,
   ToggleButton,
   ToggleButtonGroup,
-  Typography
+  Typography,
+  Chip,
+  IconButton
 } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import MapIcon from '@mui/icons-material/Map'
 import ListIcon from '@mui/icons-material/ViewList'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 
 import {
   type ListingStatus,
@@ -23,7 +28,6 @@ import {
 } from '@configs/filters'
 import {
   ListingsCounter,
-  ListingTypeSelect,
   SortModesSelect
 } from '@shared/Filters'
 import { AdvancedFiltersDialog } from '@shared/Dialogs'
@@ -38,7 +42,6 @@ import useClientSide from 'hooks/useClientSide'
 import { getCatalogUrl } from 'utils/urls'
 import { capitalize } from 'utils/strings'
 import location, { citymap } from 'configs/defaults/location'
-
 
 const statusItems: Array<[ListingStatus, string]> = [
   ['active', 'For Sale'],
@@ -87,6 +90,7 @@ const CatalogFilters = ({
 
   const { filters, setFilters, addFilters } = useSearch()
   const { listingStatus, listingType, sortBy } = filters
+  // Default configurations are now handled in @configs/defaults/filters.ts
 
   const featuredRegions = [
     'Toronto',
@@ -176,12 +180,12 @@ const CatalogFilters = ({
 
     if (sort && sort !== 'listPriceDesc') urlFilters.push('sort-' + sort)
 
-    if (f.minPrice) urlFilters.push(`above-${f.minPrice}`)
-    if (f.maxPrice) urlFilters.push(`below-${f.maxPrice}`)
-    if (f.minBeds) urlFilters.push(`${f.minBeds}-bed`)
-    if (f.minBaths) urlFilters.push(`${f.minBaths}-bath`)
-    if (f.minGarageSpaces) urlFilters.push(`${f.minGarageSpaces}-garage`)
-    if (f.minParkingSpaces) urlFilters.push(`${f.minParkingSpaces}-parking`)
+    if (f.minPrice) urlFilters.push(`above - ${f.minPrice} `)
+    if (f.maxPrice) urlFilters.push(`below - ${f.maxPrice} `)
+    if (f.minBeds) urlFilters.push(`${f.minBeds} -bed`)
+    if (f.minBaths) urlFilters.push(`${f.minBaths} -bath`)
+    if (f.minGarageSpaces) urlFilters.push(`${f.minGarageSpaces} -garage`)
+    if (f.minParkingSpaces) urlFilters.push(`${f.minParkingSpaces} -parking`)
 
     return urlFilters
   }
@@ -257,12 +261,104 @@ const CatalogFilters = ({
   const getSubLocations = (region: string) => {
     // If we have neighborhoods/cities data for the current selection (Area or City)
     if ((city || area) && hoods.length > 0) {
-      return hoods.map((h) => h.name)
+      return Array.from(new Set(hoods.map((h) => h.name)))
     }
     if (!currentCitymap[region] || !currentCitymap[region].items) return []
     return Object.keys(currentCitymap[region].items).filter(
       (cityName) => currentCitymap[region].items[cityName].active
     )
+  }
+
+  // New location data fetching logic
+  interface LocationNode {
+    id: number
+    name: string
+    slug: string
+    type: string
+    url: string
+    full_path: string
+    children_count: number
+    children: LocationNode[]
+  }
+
+  const [locationTree, setLocationTree] = useState<LocationNode | null>(null)
+
+  // State for locally toggled group
+  const [activeGroupId, setActiveGroupId] = useState<number | null>(null)
+
+  // Sync activeGroupId when URL changes or data loads
+  useEffect(() => {
+    if (locationTree && locationTree.children) {
+      const activeGroup = locationTree.children.find(g => {
+        // Check exact group match
+        const isGroupMatch =
+          city?.toLowerCase() === g.name.toLowerCase() ||
+          hood?.toLowerCase() === g.name.toLowerCase() ||
+          city?.toLowerCase() === g.slug.toLowerCase() ||
+          hood?.toLowerCase() === g.slug.toLowerCase()
+
+        if (isGroupMatch) return true
+
+        // Check children match (deep search)
+        const hasChildMatch = g.children && g.children.some(child =>
+          hood?.toLowerCase() === child.name.toLowerCase() ||
+          hood?.toLowerCase() === child.slug.toLowerCase() ||
+          city?.toLowerCase() === child.name.toLowerCase() ||
+          city?.toLowerCase() === child.slug.toLowerCase()
+        )
+
+        return hasChildMatch
+      })
+
+      if (activeGroup) {
+        setActiveGroupId(activeGroup.id)
+      }
+    }
+  }, [locationTree, city, hood])
+
+
+  useEffect(() => {
+    if (selectedRegion) {
+      const slug = selectedRegion.toLowerCase().replace(/\s+/g, '-')
+      // Avoid re-fetching if we already have the correct data
+      if (locationTree && (locationTree.slug === slug || locationTree.name.toLowerCase() === selectedRegion.toLowerCase())) {
+        return
+      }
+
+      fetch(`https://app.precondo.ca/api/locations/area/${slug}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            setLocationTree(data.data)
+          } else {
+            // If fetch failed or no data, maybe we should clear locationTree or keep previous?
+            // Safest to clear if it's a different region
+            if (locationTree?.name.toLowerCase() !== selectedRegion.toLowerCase()) {
+              setLocationTree(null)
+            }
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+          setLocationTree(null)
+        })
+    } else {
+      setLocationTree(null)
+    }
+  }, [selectedRegion, locationTree])
+
+  // Scroll handler for the slider
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+
+  const handleScroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 300
+      const currentScroll = scrollContainerRef.current.scrollLeft
+      scrollContainerRef.current.scrollTo({
+        left: direction === 'left' ? currentScroll - scrollAmount : currentScroll + scrollAmount,
+        behavior: 'smooth'
+      })
+    }
   }
 
   return (
@@ -297,12 +393,6 @@ const CatalogFilters = ({
                       </ToggleButton>
                     ))}
                   </ToggleButtonGroup> */}
-
-                  <ListingTypeSelect
-                    size={size}
-                    value={listingType || 'allListings'}
-                    onChange={handleTypeChange}
-                  />
 
                   <AdvancedFiltersButton size={size} />
 
@@ -368,141 +458,217 @@ const CatalogFilters = ({
           </>
         )}
       </Stack>
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{ mb: 2 }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            gap: 1.5,
-            alignItems: 'center',
-            overflowX: 'auto',
-            flexWrap: 'nowrap',
-            flex: 1,
 
-            pb: 1.5,
-            cursor: 'grab',
-            '&:active': { cursor: 'grabbing' },
-            '&::-webkit-scrollbar': {
-              height: '6px'
-            },
-            '&::-webkit-scrollbar-track': {
-              background: 'transparent'
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background: 'rgba(0,0,0,0.1)',
-              borderRadius: '8px'
-            },
-            '&::-webkit-scrollbar-thumb:hover': {
-              background: 'rgba(33, 150, 243, 0.3)'
-            },
-            msOverflowStyle: 'auto',
-            scrollbarWidth: 'thin'
-          }}
-        >
-          {!selectedRegion ? (
-            <>
-              {sortedRegions.map((region) => (
-                <Button
-                  key={region}
-                  component={Link}
-                  href={getCatalogUrl(region, '', createFiltersArray({}))}
-                  variant="outlined"
-                  sx={{
-                    textTransform: 'none',
-                    borderRadius: '4px',
-                    px: 3,
-                    flexShrink: 0,
-                    borderColor: 'divider',
-                    color: 'text.primary',
-                    '&:hover': {
-                      borderColor: 'primary.main',
-                      bgcolor: 'rgba(33, 150, 243, 0.04)'
-                    }
-                  }}
-                >
-                  {region}
-                </Button>
-              ))}
-            </>
-          ) : (
-            <>
+      <Stack sx={{ mb: 2 }} spacing={2}>
+        {!selectedRegion ? (
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1.5,
+              alignItems: 'center',
+              overflowX: 'auto',
+              flexWrap: 'nowrap',
+              pb: 1.5,
+              cursor: 'grab',
+              '&:active': { cursor: 'grabbing' },
+              '&::-webkit-scrollbar': { height: '6px' },
+              '&::-webkit-scrollbar-track': { background: 'transparent' },
+              '&::-webkit-scrollbar-thumb': { background: 'rgba(0,0,0,0.1)', borderRadius: '8px' },
+              '&::-webkit-scrollbar-thumb:hover': { background: 'rgba(33, 150, 243, 0.3)' },
+              msOverflowStyle: 'auto',
+              scrollbarWidth: 'thin'
+            }}
+          >
+            {sortedRegions.map((region) => (
               <Button
+                key={region}
                 component={Link}
-                href={routes.listings}
+                href={getCatalogUrl(region, '', createFiltersArray({}))}
                 variant="outlined"
-                startIcon={<ArrowBackIcon />}
                 sx={{
                   textTransform: 'none',
                   borderRadius: '4px',
+                  px: 3,
                   flexShrink: 0,
-                  px: 2
-                }}
-              >
-                Regions
-              </Button>
-              <Box
-                component={Link}
-                href={city && hood ? getCatalogUrl(city, '', createFiltersArray({})) : '#'}
-                sx={{
-                  ml: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  textDecoration: 'none',
-                  color: 'primary.main',
-                  whiteSpace: 'nowrap',
-                  flexShrink: 0,
-                  cursor: (city && hood) ? 'pointer' : 'default',
+                  borderColor: 'divider',
+                  color: 'text.primary',
                   '&:hover': {
-                    '& .region-label': {
-                      textDecoration: (city && hood) ? 'underline' : 'none'
-                    }
+                    borderColor: 'primary.main',
+                    bgcolor: 'rgba(33, 150, 243, 0.04)'
                   }
                 }}
               >
-                <Typography
-                  className="region-label"
-                  variant="subtitle2"
-                  sx={{ fontWeight: 700 }}
-                >
-                  {selectedRegion}:
-                </Typography>
-              </Box>
-              {getSubLocations(selectedRegion)
-                .sort((a, b) => {
-                  if (hood?.toLowerCase() === a.toLowerCase()) return -1
-                  if (hood?.toLowerCase() === b.toLowerCase()) return 1
-                  return a.localeCompare(b)
-                })
-                .map((locationName) => (
-                  <Button
-                    key={locationName}
-                    component={Link}
-                    href={getSubLocationUrl(locationName)}
-                    variant={hood?.toLowerCase() === locationName.toLowerCase() ? 'contained' : 'outlined'}
-                    sx={{
-                      textTransform: 'none',
-                      whiteSpace: 'nowrap',
-                      flexShrink: 0,
-                      borderRadius: '4px',
-                      borderColor: 'primary.light',
-                      '&:hover': {
-                        bgcolor: 'primary.main',
-                        color: 'white'
-                      }
-                    }}
-                  >
-                    {capitalize(locationName)}
-                  </Button>
-                ))}
-            </>
-          )}
-        </Box>
+                {region}
+              </Button>
+            ))}
+          </Box>
+        ) : (
+          <Stack spacing={1}>
+            <Box
+              component={Link}
+              href={city && hood ? getCatalogUrl(city, '', createFiltersArray({})) : '#'}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                textDecoration: 'none',
+                color: 'primary.main',
+                whiteSpace: 'nowrap',
+                cursor: (city && hood) ? 'pointer' : 'default',
+                '&:hover': {
+                  '& .region-label': {
+                    textDecoration: (city && hood) ? 'underline' : 'none'
+                  }
+                }
+              }}
+            >
+              <Typography
+                className="region-label"
+                variant="subtitle2"
+                sx={{ fontWeight: 700 }}
+              >
+                Areas in {selectedRegion}:
+              </Typography>
+            </Box>
 
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <IconButton onClick={() => handleScroll('left')} size="small" sx={{ mr: 1, border: '1px solid', borderColor: 'divider' }}>
+                <ChevronLeftIcon />
+              </IconButton>
+
+              <Box
+                ref={scrollContainerRef}
+                sx={{
+                  display: 'flex',
+                  gap: 1.5,
+                  alignItems: 'center',
+                  overflowX: 'auto',
+                  flexWrap: 'nowrap',
+                  flex: 1,
+                  scrollBehavior: 'smooth',
+                  pb: 0.5,
+                  '&::-webkit-scrollbar': { display: 'none' }, // Hide scrollbar for cleaner look
+                  msOverflowStyle: 'none',
+                  scrollbarWidth: 'none'
+                }}
+              >
+                {!locationTree && getSubLocations(selectedRegion)
+                  .sort((a, b) => {
+                    if (hood?.toLowerCase() === a.toLowerCase()) return -1
+                    if (hood?.toLowerCase() === b.toLowerCase()) return 1
+                    return a.localeCompare(b)
+                  })
+                  .map((locationName) => (
+                    <Button
+                      key={locationName}
+                      component={Link}
+                      href={getSubLocationUrl(locationName)}
+                      variant={hood?.toLowerCase() === locationName.toLowerCase() ? 'contained' : 'outlined'}
+                      sx={{
+                        textTransform: 'none',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0,
+                        borderRadius: '4px',
+                        borderColor: 'primary.light',
+                        '&:hover': {
+                          bgcolor: 'primary.main',
+                          color: 'white'
+                        }
+                      }}
+                    >
+                      {capitalize(locationName)}
+                    </Button>
+                  ))}
+
+                {/* New Hierarchical Groups View */}
+                {locationTree && locationTree.children && (
+                  <>
+                    {locationTree.children.map((group) => {
+                      const isActive = activeGroupId === group.id
+                      return (
+                        <Button
+                          key={group.id}
+                          // Toggle local state only, no redirect
+                          onClick={() => setActiveGroupId(isActive ? null : group.id)}
+                          variant={isActive ? 'contained' : 'outlined'}
+                          sx={{
+                            textTransform: 'none',
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0,
+                            borderRadius: '4px', // More "toggle" like rounded shape
+                            borderColor: isActive ? 'primary.main' : 'divider',
+                            bgcolor: isActive ? 'primary.main' : 'background.paper',
+                            color: isActive ? 'white' : 'text.primary',
+                            boxShadow: isActive ? 2 : 0,
+                            '&:hover': {
+                              bgcolor: isActive ? 'primary.dark' : 'rgba(0, 0, 0, 0.04)',
+                              borderColor: isActive ? 'primary.dark' : 'text.primary',
+                            }
+                          }}
+                        >
+                          {group.name}
+                          {isActive ? (
+                            <Box component="span" sx={{ transform: 'rotate(180deg)', display: 'inline-flex', ml: 0.5 }}><KeyboardArrowDownIcon /></Box>
+                          ) : (
+                            <Box component="span" sx={{ display: 'inline-flex', ml: 0.5 }}><KeyboardArrowDownIcon /></Box>
+                          )}
+                        </Button>
+                      )
+                    })}
+                  </>
+                )}
+              </Box>
+
+              <IconButton onClick={() => handleScroll('right')} size="small" sx={{ ml: 1, border: '1px solid', borderColor: 'divider' }}>
+                <ChevronRightIcon />
+              </IconButton>
+            </Box>
+          </Stack>
+        )}
       </Stack>
+
+      {/* Active Group Neighborhoods (Chips) */}
+      {locationTree && locationTree.children && (
+        <Box sx={{ mb: 2 }}>
+          {(() => {
+            // Find active group from STATE
+            const activeGroup = locationTree.children.find(g => g.id === activeGroupId)
+
+            if (activeGroup && activeGroup.children && activeGroup.children.length > 0) {
+              return (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, p: 1, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 2 }}>
+                  {activeGroup.children.map((child) => {
+                    const isChildActive = hood?.toLowerCase() === child.name.toLowerCase() || hood?.toLowerCase() === child.slug.toLowerCase()
+                    return (
+                      <Chip
+                        key={child.id}
+                        label={child.name}
+                        clickable
+                        onClick={() => {
+                          const url = `${routes.listings}/${locationTree.slug}/${child.slug}`
+                          router.push(url)
+                        }}
+                        sx={{
+                          borderRadius: '4px',
+                          bgcolor: isChildActive ? 'primary.main' : 'white',
+                          color: isChildActive ? 'white' : 'text.primary',
+                          border: '1px solid',
+                          borderColor: isChildActive ? 'primary.main' : 'divider',
+                          '&:hover': {
+                            bgcolor: isChildActive ? 'primary.dark' : 'rgba(0, 0, 0, 0.04)',
+                            borderColor: isChildActive ? 'primary.dark' : 'primary.main',
+                          }
+                        }}
+                      />
+                    )
+                  })}
+                </Box>
+              )
+            }
+            return null
+          })()}
+        </Box>
+      )}
+
       <AdvancedFiltersDialog />
     </>
   )

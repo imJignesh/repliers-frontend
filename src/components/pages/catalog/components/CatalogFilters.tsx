@@ -176,14 +176,25 @@ const CatalogFilters = ({
         return
       }
 
-      fetch(`https://app.precondo.ca/api/locations/area/${slug}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            const locationData = data.data
-            if (data.buildings && data.buildings.data) {
-              locationData.buildings = data.buildings.data
+      Promise.all([
+        fetch(`https://app.precondo.ca/api/locations/area/${slug}`).then((res) => res.json()),
+        fetch(`https://backend.precondo.ca/api/area/${slug}/buildings`).then((res) => res.json())
+      ])
+        .then(([locationDataFull, buildingsList]) => {
+          if (locationDataFull.success) {
+            const locationData = locationDataFull.data
+
+            if (Array.isArray(buildingsList)) {
+              locationData.buildings = buildingsList.map((b: any) => ({
+                ...b,
+                address: b.fullAddress,
+                street: {
+                  number: b.streetNumber,
+                  name: b.streetName
+                }
+              }))
             }
+
             setLocationTree(locationData)
             if (onLocationTreeChange) onLocationTreeChange(locationData)
           } else {

@@ -108,13 +108,13 @@ const BuildingPageContent = ({
                 <Stack spacing={{ xs: 4, sm: 6 }}>
                   <HomeDescription />
 
-                  {mapType === 'static' ? (
+                  {/* {mapType === 'static' ? (
                     <BuildingMap type={mapType} />
                   ) : (
                     <MapOptionsProvider layout="map" style="hybrid">
                       <BuildingMap />
                     </MapOptionsProvider>
-                  )}
+                  )} */}
                   {/* <SummaryDetails /> */}
                 </Stack>
               </DetailsContainer>

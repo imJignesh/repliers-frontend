@@ -57,7 +57,10 @@ const CatalogFilters = ({
   hoods = [],
   searchFilters,
   showMap,
-  onToggleMap
+  onToggleMap,
+  viewMode,
+  setViewMode,
+  onLocationTreeChange
 }: {
   count: number
   city?: string
@@ -69,6 +72,9 @@ const CatalogFilters = ({
   searchFilters: Partial<Filters>
   showMap: boolean
   onToggleMap: () => void
+  viewMode: 'listings' | 'buildings'
+  setViewMode: (mode: 'listings' | 'buildings') => void
+  onLocationTreeChange?: (tree: any) => void
 }) => {
   const dynamicCitymap: Record<string, { active: boolean; items: Record<string, { active: boolean }> }> = {}
   areas.forEach((a: ApiBoardArea) => {
@@ -111,6 +117,8 @@ const CatalogFilters = ({
   })
 
   // Location filter state
+  const [locationTree, setLocationTree] = useState<any>(null)
+
   const [selectedRegion, setSelectedRegion] = useState<string | null>(() => {
     const areaMatch = areas.find(
       (a: ApiBoardArea) =>
@@ -158,6 +166,43 @@ const CatalogFilters = ({
       setSelectedRegion(null)
     }
   }, [city, area, areas])
+
+  useEffect(() => {
+    if (selectedRegion) {
+      const slug = selectedRegion.toLowerCase().replace(/\s+/g, '-')
+      // Avoid re-fetching if we already have the correct data
+      if (locationTree && (locationTree.slug === slug || locationTree.name.toLowerCase() === selectedRegion.toLowerCase())) {
+        if (onLocationTreeChange) onLocationTreeChange(locationTree)
+        return
+      }
+
+      fetch(`https://app.precondo.ca/api/locations/area/${slug}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            const locationData = data.data
+            if (data.buildings && data.buildings.data) {
+              locationData.buildings = data.buildings.data
+            }
+            setLocationTree(locationData)
+            if (onLocationTreeChange) onLocationTreeChange(locationData)
+          } else {
+            if (locationTree?.name.toLowerCase() !== selectedRegion.toLowerCase()) {
+              setLocationTree(null)
+              if (onLocationTreeChange) onLocationTreeChange(null)
+            }
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+          setLocationTree(null)
+          if (onLocationTreeChange) onLocationTreeChange(null)
+        })
+    } else {
+      setLocationTree(null)
+      if (onLocationTreeChange) onLocationTreeChange(null)
+    }
+  }, [selectedRegion, locationTree])
 
   const createFiltersArray = (f: Partial<Filters> = filters) => {
     const urlFilters: string[] = []
@@ -221,28 +266,14 @@ const CatalogFilters = ({
 
   const listingLocation = area || 'Ontario'
 
-  const handleTypeChange = (value: ListingType) => {
-    // This will trigger the useEffect above
-    setFilters({ ...filters, listingType: value })
-  }
 
-  const handleLocationChange = (value: ListingType) => {
-    router.push(getCatalogUrl(value))
-  }
 
   const handleSortChange = (value: ApiSortBy) => {
     // This will trigger the useEffect above
     setFilters({ ...filters, sortBy: value })
   }
 
-  // Location handlers
-  const handleRegionClick = (region: string) => {
-    setSelectedRegion(region)
-  }
 
-  const handleBack = () => {
-    setSelectedRegion(null)
-  }
 
   const getSubLocationUrl = (locationName: string) => {
     const filters = createFiltersArray({})
@@ -269,27 +300,13 @@ const CatalogFilters = ({
     )
   }
 
-  // New location data fetching logic
-  interface LocationNode {
-    id: number
-    name: string
-    slug: string
-    type: string
-    url: string
-    full_path: string
-    children_count: number
-    children: LocationNode[]
-  }
-
-  const [locationTree, setLocationTree] = useState<LocationNode | null>(null)
-
   // State for locally toggled group
   const [activeGroupId, setActiveGroupId] = useState<number | null>(null)
 
   // Sync activeGroupId when URL changes or data loads
   useEffect(() => {
     if (locationTree && locationTree.children) {
-      const activeGroup = locationTree.children.find(g => {
+      const activeGroup = locationTree.children.find((g: any) => {
         // Check exact group match
         const isGroupMatch =
           city?.toLowerCase() === g.name.toLowerCase() ||
@@ -300,7 +317,7 @@ const CatalogFilters = ({
         if (isGroupMatch) return true
 
         // Check children match (deep search)
-        const hasChildMatch = g.children && g.children.some(child =>
+        const hasChildMatch = g.children && g.children.some((child: any) =>
           hood?.toLowerCase() === child.name.toLowerCase() ||
           hood?.toLowerCase() === child.slug.toLowerCase() ||
           city?.toLowerCase() === child.name.toLowerCase() ||
@@ -317,35 +334,7 @@ const CatalogFilters = ({
   }, [locationTree, city, hood])
 
 
-  useEffect(() => {
-    if (selectedRegion) {
-      const slug = selectedRegion.toLowerCase().replace(/\s+/g, '-')
-      // Avoid re-fetching if we already have the correct data
-      if (locationTree && (locationTree.slug === slug || locationTree.name.toLowerCase() === selectedRegion.toLowerCase())) {
-        return
-      }
 
-      fetch(`https://app.precondo.ca/api/locations/area/${slug}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            setLocationTree(data.data)
-          } else {
-            // If fetch failed or no data, maybe we should clear locationTree or keep previous?
-            // Safest to clear if it's a different region
-            if (locationTree?.name.toLowerCase() !== selectedRegion.toLowerCase()) {
-              setLocationTree(null)
-            }
-          }
-        })
-        .catch((err) => {
-          console.error(err)
-          setLocationTree(null)
-        })
-    } else {
-      setLocationTree(null)
-    }
-  }, [selectedRegion, locationTree])
 
   // Scroll handler for the slider
   const scrollContainerRef = useRef<HTMLDivElement>(null)
@@ -394,7 +383,18 @@ const CatalogFilters = ({
                     ))}
                   </ToggleButtonGroup> */}
 
-                  <AdvancedFiltersButton size={size} />
+                  <ToggleButtonGroup
+                    exclusive
+                    value={viewMode}
+                    onChange={(_, value) => value && setViewMode(value)}
+                    size="small"
+                    sx={{ mr: 1, '& .MuiToggleButton-root': { px: 2, height: 40 } }}
+                  >
+                    <ToggleButton value="listings">Listings</ToggleButton>
+                    <ToggleButton value="buildings">Buildings</ToggleButton>
+                  </ToggleButtonGroup>
+
+                  <AdvancedFiltersButton size={size} sx={{ height: 40 }} />
 
                   <ToggleButton
                     value="map"
@@ -402,8 +402,8 @@ const CatalogFilters = ({
                     onChange={onToggleMap}
                     size={size}
                     sx={{
-                      height: size === 'medium' ? 48 : 40,
-                      width: size === 'medium' ? 48 : 40,
+                      height: 40,
+                      width: 40,
                       border: '1px solid',
                       borderColor: 'divider',
                       borderRadius: '8px !important',
@@ -421,7 +421,7 @@ const CatalogFilters = ({
                 </>
               ) : (
                 <>
-                  <Skeleton variant="rounded" sx={{ width: 257, height: 48 }} />
+                  <Skeleton variant="rounded" sx={{ width: 257, height: 40 }} />
 
                 </>
               )}
@@ -441,7 +441,8 @@ const CatalogFilters = ({
                 display: 'flex',
                 justifyContent: 'flex-end',
                 alignItems: 'center',
-                p: 1.5,
+                height: 40,
+                px: 2,
                 borderRadius: '8px',
                 bgcolor: 'background.paper',
                 border: '1px solid',
@@ -582,7 +583,7 @@ const CatalogFilters = ({
                 {/* New Hierarchical Groups View */}
                 {locationTree && locationTree.children && (
                   <>
-                    {locationTree.children.map((group) => {
+                    {locationTree.children.map((group: any) => {
                       const isActive = activeGroupId === group.id
                       return (
                         <Button
@@ -631,12 +632,12 @@ const CatalogFilters = ({
         <Box sx={{ mb: 2 }}>
           {(() => {
             // Find active group from STATE
-            const activeGroup = locationTree.children.find(g => g.id === activeGroupId)
+            const activeGroup = locationTree.children.find((g: any) => g.id === activeGroupId)
 
             if (activeGroup && activeGroup.children && activeGroup.children.length > 0) {
               return (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, p: 1, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 2 }}>
-                  {activeGroup.children.map((child) => {
+                  {activeGroup.children.map((child: any) => {
                     const isChildActive = hood?.toLowerCase() === child.name.toLowerCase() || hood?.toLowerCase() === child.slug.toLowerCase()
                     return (
                       <Chip

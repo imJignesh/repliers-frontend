@@ -2,7 +2,9 @@
 
 import React from 'react'
 
-import { Box, Container, Stack } from '@mui/material'
+import { Box, Container, Stack, Card, CardContent, Typography, CardActionArea } from '@mui/material'
+import Link from 'next/link'
+import APILocations from 'services/API/APILocations'
 
 import gridConfig from '@configs/cards-grids'
 // TODO: fix constants import from @pages alias
@@ -69,6 +71,10 @@ const CatalogPageContent = ({
   searchFilters: Partial<Filters>
 }) => {
   const [showMap, setShowMap] = useState(false)
+  const [viewMode, setViewMode] = useState<'listings' | 'buildings'>('listings')
+  const [locationTree, setLocationTree] = useState<any>(null)
+
+
 
   useEffect(() => {
     const stored = localStorage.getItem('repliers_catalog_map_view')
@@ -82,6 +88,8 @@ const CatalogPageContent = ({
     setShowMap(newState)
     localStorage.setItem('repliers_catalog_map_view', String(newState))
   }
+
+  const buildings = locationTree?.buildings || []
 
   return (
     <SearchProvider
@@ -121,6 +129,9 @@ const CatalogPageContent = ({
                 searchFilters={searchFilters}
                 showMap={showMap}
                 onToggleMap={handleToggleMap}
+                viewMode={viewMode}
+                setViewMode={setViewMode}
+                onLocationTreeChange={setLocationTree}
               />
             </Container>
           </Box>
@@ -149,31 +160,72 @@ const CatalogPageContent = ({
                   borderRight: '1px solid',
                   borderColor: 'divider'
                 }}>
-                  {listings?.length > 0 ? (
-                    <Stack spacing={4} direction="row" flexWrap="wrap">
-                      {listings.map((property, index) => (
-                        <PropertyCard
-                          key={index}
-                          property={property}
-                          showViewOnMap={true}
-                          onViewOnMap={() => {
-                            if (property.map.latitude && property.map.longitude) {
-                              MapService.map?.flyTo({
-                                center: [Number(property.map.longitude), Number(property.map.latitude)],
-                                zoom: 16
-                              })
-                              MapService.showPopup(property.mlsNumber)
-                            }
-                          }}
-                        />
-                      ))}
-                    </Stack>
+                  {viewMode === 'listings' ? (
+                    listings?.length > 0 ? (
+                      <Stack spacing={4} direction="row" flexWrap="wrap">
+                        {listings.map((property, index) => (
+                          <PropertyCard
+                            key={index}
+                            property={property}
+                            showViewOnMap={true}
+                            onViewOnMap={() => {
+                              if (property.map.latitude && property.map.longitude) {
+                                MapService.map?.flyTo({
+                                  center: [Number(property.map.longitude), Number(property.map.latitude)],
+                                  zoom: 16
+                                })
+                                MapService.showPopup(property.mlsNumber)
+                              }
+                            }}
+                          />
+                        ))}
+                      </Stack>
+                    ) : (
+                      <EmptyCatalogListings />
+                    )
                   ) : (
-                    <EmptyCatalogListings />
+                    <Stack spacing={4} direction="row" flexWrap="wrap">
+
+                      {buildings.map((building: any, index: number) => {
+                        const name = typeof building === 'string' ? building : building.name
+                        const address = typeof building === 'string' ? '' : building.address
+                        const slug =
+                          (building.street.number + '-' + building.street.name.toLowerCase().replaceAll(' ', '-'))
+
+                        return (
+                          <Card
+                            key={index}
+                            sx={{
+                              width: gridConfig.propertyCardSizes.normal.width,
+                              borderRadius: 2,
+                              boxShadow: 1
+                            }}
+                          >
+                            <CardActionArea component={Link} href={`/building/${slug}`}>
+                              <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                                <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem', mb: 0.5 }}>
+                                  {name}
+                                </Typography>
+                                {address && (
+                                  <Typography variant="body2" color="text.secondary">
+                                    {address}
+                                  </Typography>
+                                )}
+                              </CardContent>
+                            </CardActionArea>
+                          </Card>
+                        )
+                      })}
+                      {buildings.length === 0 && (
+                        <Box width="100%" textAlign="center" py={4}><Typography>No buildings found.</Typography></Box>
+                      )}
+                    </Stack>
                   )}
-                  <Stack spacing={2} alignItems="center" py={4}>
-                    <CatalogPagination page={page} count={count} />
-                  </Stack>
+                  {viewMode === 'listings' && (
+                    <Stack spacing={2} alignItems="center" py={4}>
+                      <CatalogPagination page={page} count={count} />
+                    </Stack>
+                  )}
                 </Box>
                 <Box sx={{
                   width: { xs: '0%', md: '50%' },
@@ -186,21 +238,58 @@ const CatalogPageContent = ({
               </Box>
             ) : (
               <>
-                {listings?.length > 0 ? (
-                  <Stack spacing={4} direction="row" flexWrap="wrap">
-                    {listings.map((property, index) => (
-                      <PropertyCard key={index} property={property} />
-                    ))}
-                  </Stack>
+                {viewMode === 'listings' ? (
+                  listings?.length > 0 ? (
+                    <Stack spacing={4} direction="row" flexWrap="wrap">
+                      {listings.map((property, index) => (
+                        <PropertyCard key={index} property={property} />
+                      ))}
+                    </Stack>
+                  ) : (
+                    <EmptyCatalogListings />
+                  )
                 ) : (
-                  <EmptyCatalogListings />
+                  <Stack spacing={4} direction="row" flexWrap="wrap">
+                    {buildings.map((building: any, index: number) => {
+                      const name = typeof building === 'string' ? building : building.name
+                      const address = typeof building === 'string' ? '' : building.address
+                      const slug =
+                        (building.street.number + '-' + building.street.name.toLowerCase().replaceAll(' ', '-'))
+                      return (
+                        <Card
+                          key={index}
+                          sx={{
+                            width: gridConfig.propertyCardSizes.normal.width,
+                            borderRadius: 2,
+                            boxShadow: 1
+                          }}
+                        >
+                          <CardActionArea component={Link} href={`/building/${slug}`}>
+                            <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                              <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem', mb: 0.5 }}>
+                                {name}
+                              </Typography>
+                              {address && (
+                                <Typography variant="body2" color="text.secondary">
+                                  {address}
+                                </Typography>
+                              )}
+                            </CardContent>
+                          </CardActionArea>
+                        </Card>
+                      )
+                    })}
+                    {buildings.length === 0 && (
+                      <Box width="100%" textAlign="center" py={4}><Typography>No buildings found.</Typography></Box>
+                    )}
+                  </Stack>
                 )}
-                <Stack spacing={2} alignItems="center" py={4}>
-                  <CatalogPagination page={page} count={count} />
-                  {/* {count > 0 && <Breadcrumbs city={city} hood={hood} />} */}
 
-                  {/* <FiltersList urlFilters={urlFilters} /> */}
-                </Stack>
+                {viewMode === 'listings' && (
+                  <Stack spacing={2} alignItems="center" py={4}>
+                    <CatalogPagination page={page} count={count} />
+                  </Stack>
+                )}
               </>
             )}
 

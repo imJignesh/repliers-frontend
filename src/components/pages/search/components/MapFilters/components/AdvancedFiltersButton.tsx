@@ -9,7 +9,7 @@ import { useSearch } from 'providers/SearchProvider'
 import useClientSide from 'hooks/useClientSide'
 import { countAdvancedFilters } from 'utils/filters'
 
-const AdvancedFiltersButton = ({ size }: { size: 'medium' | 'small' }) => {
+const AdvancedFiltersButton = ({ size, sx }: { size: 'medium' | 'small'; sx?: any }) => {
   const clientSide = useClientSide()
   const { showDialog } = useDialog('filters')
   const { filters } = useSearch()
@@ -26,7 +26,8 @@ const AdvancedFiltersButton = ({ size }: { size: 'medium' | 'small' }) => {
         variant="rounded"
         sx={{
           width: { xs: 46, sm: 140 },
-          height: { xs: 38, sm: 48 }
+          height: { xs: 38, sm: 48 },
+          ...sx
         }}
       />
     )
@@ -46,7 +47,7 @@ const AdvancedFiltersButton = ({ size }: { size: 'medium' | 'small' }) => {
           variant="outlined"
           onClick={showDialog}
           startIcon={<IcoSettings />}
-          sx={{ width: { xs: 46, sm: 140 } }}
+          sx={{ width: { xs: 46, sm: 140 }, ...sx }}
         >
           Filters
         </Button>
@@ -55,7 +56,7 @@ const AdvancedFiltersButton = ({ size }: { size: 'medium' | 'small' }) => {
           size="small"
           variant="outlined"
           onClick={showDialog}
-          sx={{ display: { xs: 'block', sm: 'none' }, minWidth: 32, px: 1.5 }}
+          sx={{ display: { xs: 'block', sm: 'none' }, minWidth: 32, px: 1.5, ...sx }}
         >
           <IcoSettings />
         </Button>

@@ -1,15 +1,18 @@
 import React from 'react'
+import dayjs from 'dayjs'
+import { useTranslations } from 'next-intl'
 
 import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary'
 import { Box, IconButton, Stack, Typography } from '@mui/material'
 
 import {
+  type Property,
   type HistoryItemType,
   type ListingLastStatus,
   listingLastStatusMapping
 } from 'services/API'
 import { useProperty } from 'providers/PropertyProvider'
-import { getSeoUrl } from 'utils/properties'
+import { getSeoUrl, createPropertyI18nUtils } from 'utils/properties'
 import { getCDNPath } from 'utils/urls'
 
 import { HistoryItemHeader, HistoryItemProgressBar, HistoryItemRow } from '.'
@@ -18,12 +21,14 @@ const HistoryItem = ({
   item,
   active = false,
   last = false,
-  propertyOverride
+  propertyOverride,
+  blurred = false
 }: {
   item: HistoryItemType
   active?: boolean
   last?: boolean
   propertyOverride?: Property
+  blurred?: boolean
 }) => {
   const {
     type,
@@ -55,12 +60,29 @@ const HistoryItem = ({
   const startLabel = `Listed For ${type}`
   const endLabel = listingLastStatusMapping[lastStatus as ListingLastStatus]
 
+  const t = useTranslations()
+  const { getDaysSinceListed } = createPropertyI18nUtils(t)
+
+  let daysOnMarket = 0
+  if (active) {
+    daysOnMarket = getDaysSinceListed(property).count
+  } else {
+    const start = dayjs(startDate)
+    const end = endDate ? dayjs(endDate) : dayjs()
+    if (start.isValid() && end.isValid()) {
+      daysOnMarket = end.diff(start, 'day')
+    }
+  }
+  if (isNaN(daysOnMarket)) daysOnMarket = 0
+  if (daysOnMarket === 0) daysOnMarket = 1
+  const daysOnMarketLabel = t('property.daysOnMarket', { count: daysOnMarket })
+
   return (
     <Box>
-      <Stack spacing={4} direction="row" justifyContent="stretch">
+      <Stack spacing={2} direction="row" justifyContent="stretch">
         <HistoryItemProgressBar last={last} active={active} />
 
-        <Stack spacing={2} flex={1}>
+        <Stack spacing={1} flex={1}>
           <HistoryItemHeader
             link={link}
             active={active}
@@ -79,7 +101,7 @@ const HistoryItem = ({
               key={mlsNumber}
               sx={{
                 p: 2,
-                pl: { xs: 2, lg: 4 },
+                pl: { xs: 2, lg: 2 },
                 flex: 1,
                 borderRadius: 2,
                 bgcolor: 'background.default'
@@ -94,6 +116,56 @@ const HistoryItem = ({
                 }}
                 justifyContent="space-between"
               >
+                <Stack
+                  spacing={{ xs: 1, sm: 2, lg: 2 }}
+                  direction={{ xs: 'column', sm: 'row' }}
+                  alignItems={{ xs: 'flex-end', sm: 'center' }}
+                >      <IconButton
+                  sx={{
+                    width: '60px',
+                    height: '60px',
+                    borderRadius: 2,
+                    bgcolor: 'divider',
+                    color: 'common.white',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundImage: `url(${imgSrc})`,
+                    ...(!link ? { cursor: 'default' } : {})
+                  }}
+                  {...(link
+                    ? {
+                      href: link,
+                      component: 'a',
+                      target: '_blank'
+                    }
+                    : {})}
+                >
+                    <PhotoLibraryIcon />
+                  </IconButton>
+                  <Stack direction="column" spacing={0} alignItems="flex-start"
+                    sx={{
+                      minWidth: '180px'
+                    }}>
+                    <Typography
+                      variant="body2"
+                      color="text.primary"
+                      textAlign="left"
+                      fontWeight="bold"
+                    >
+                      {daysOnMarketLabel}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="text.hint"
+                      textAlign="left"
+                      maxWidth="80px"
+                    >
+                      MLS® # {mlsNumber}
+                    </Typography>
+                  </Stack>
+
+
+                </Stack>
                 <Stack
                   spacing={2}
                   direction="row"
@@ -111,6 +183,7 @@ const HistoryItem = ({
                         date={endDate}
                         label={endLabel}
                         price={soldPrice}
+                        blurred={blurred}
                       />
                     )}
 
@@ -118,47 +191,12 @@ const HistoryItem = ({
                       date={startDate!}
                       label={startLabel}
                       price={listPrice}
+                      blurred={blurred}
                     />
                   </Stack>
                 </Stack>
 
-                <Stack
-                  spacing={{ xs: 1, sm: 2, lg: 4 }}
-                  direction={{ xs: 'column', sm: 'row' }}
-                  alignItems={{ xs: 'flex-end', sm: 'center' }}
-                >
-                  <Typography
-                    variant="body2"
-                    color="text.hint"
-                    textAlign="right"
-                    maxWidth="80px"
-                  >
-                    MLS® # {mlsNumber}
-                  </Typography>
 
-                  <IconButton
-                    sx={{
-                      width: '80px',
-                      height: '50px',
-                      borderRadius: 2,
-                      bgcolor: 'divider',
-                      color: 'common.white',
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                      backgroundImage: `url(${imgSrc})`,
-                      ...(!link ? { cursor: 'default' } : {})
-                    }}
-                    {...(link
-                      ? {
-                        href: link,
-                        component: 'a',
-                        target: '_blank'
-                      }
-                      : {})}
-                  >
-                    <PhotoLibraryIcon />
-                  </IconButton>
-                </Stack>
               </Stack>
             </Box>
           </Stack>

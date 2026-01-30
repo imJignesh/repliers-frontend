@@ -1,9 +1,12 @@
 'use client'
 
 import React from 'react'
+import Link from 'next/link'
 import { Stack, Typography, Box, Alert } from '@mui/material'
 import { DetailsContainer } from '@shared/Containers'
 import { type Property, type HistoryItemType } from 'services/API'
+import { useUser } from 'providers/UserProvider'
+import routes from '@configs/routes'
 import { scrubbed, active as isActive } from 'utils/properties'
 import { HistoryItem } from '.'
 
@@ -40,29 +43,68 @@ const BuildingHistoryDetails = ({ history = [] }: { history?: Property[] }) => {
         return dateA - dateB
     })
 
+    const { logged } = useUser()
+
+    const groups = React.useMemo(() => {
+        const grouped: Record<string, { label: string, items: typeof sortedHistory, listed: number, sold: number }> = {}
+
+        sortedHistory.forEach(item => {
+            const d = new Date(item.timestamps?.listingUpdated || item.listDate)
+            if (isNaN(d.getTime())) return
+
+            const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+            const label = d.toLocaleString('default', { month: 'short', year: 'numeric' })
+
+            if (!grouped[key]) {
+                grouped[key] = { label, items: [], listed: 0, sold: 0 }
+            }
+
+            grouped[key].items.push(item)
+            grouped[key].listed++
+            if (item.lastStatus === 'Sld') grouped[key].sold++
+        })
+
+        return Object.keys(grouped).sort().reverse().map(k => grouped[k])
+    }, [sortedHistory])
+
     return (
         <DetailsContainer title="Building Sales History" id="history">
             <Stack spacing={4}>
-                {sortedHistory.map((item, index) => {
-                    const last = index === sortedHistory.length - 1 && scrubbedCount === 0
-                    const active = isActive(item)
 
-                    return (
-                        <Box key={item.mlsNumber}>
-                            <Typography variant="subtitle2" sx={{ ml: 6, mb: 1, fontWeight: 'bold' }}>
-                                Unit {item.address?.unitNumber || 'N/A'} - {item.address?.streetNumber} {item.address?.streetName}
-                            </Typography>
-                            <HistoryItem
-                                item={getListingData(item)}
-                                last={last}
-                                active={active}
-                                propertyOverride={item}
-                            />
-                        </Box>
-                    )
-                })}
+                {!logged && (
+                    <Alert severity="info" sx={{ mb: 4, borderRadius: 2, '& .MuiAlert-message': { width: '100%' } }}>
+                        <Typography variant="body2">
+                            Real estate boards require you to be signed in to access price history. <Link href={'/register'} style={{ fontWeight: 'bold', color: 'inherit', textDecoration: 'underline' }}>Sign up</Link> or <Link href={routes.login} style={{ fontWeight: 'bold', color: 'inherit', textDecoration: 'underline' }}>Log in</Link>
+                        </Typography>
+                    </Alert>
+                )}
+                {groups.map((group) => (
+                    <Box key={group.label}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2, ml: 0, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.95rem' }}>
+                            {group.label} — {group.listed} Listed | {group.sold} Sold
+                        </Typography>
+                        <Stack spacing={2}>
+                            {group.items.map((item, index) => {
+                                const active = isActive(item)
+                                return (
+                                    <Box key={item.mlsNumber}>
 
-                {scrubbedCount > 0 && (
+                                        <HistoryItem
+                                            item={getListingData(item)}
+                                            last={index === group.items.length - 1}
+                                            active={active}
+                                            propertyOverride={item}
+                                            blurred={!logged}
+                                        />
+                                    </Box>
+                                )
+                            })}
+                        </Stack>
+                    </Box>
+                ))}
+
+
+                {logged && scrubbedCount > 0 && (
                     <Box sx={{ ml: 6 }}>
                         <Alert severity="info" variant="outlined" sx={{ borderRadius: 2 }}>
                             There are <strong>{scrubbedCount}</strong> additional historical records in this building that are restricted or have suppressed details.

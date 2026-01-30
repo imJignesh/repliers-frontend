@@ -117,7 +117,7 @@ const LocationsCatalogPage = async (props: {
     page
   })
 
-  if ((city || hood || page > 1) && !listings.length) return <Page404Template />
+  if (page > 1 && !listings.length) return <Page404Template />
 
   const byCount = (a: any, b: any) => b.activeCount - a.activeCount
 

@@ -41,23 +41,9 @@ const HistoryItemHeader = ({
   const scrubbedDate = scrubbed(startDate) || scrubbed(endDate)
   const { brokerageName } = office || {}
 
-  const showDaysOnMarket = soldActive ? false : !scrubbedDate
   const listingStatus = soldActive
     ? getLastStatus(property)
-    : active
-      ? 'Active'
-      : null
-
-  let daysOnMarket = active
-    ? getDaysSinceListed(property).count
-    : endDate
-      ? dayjs(endDate).diff(dayjs(startDate), 'day')
-      : dayjs().diff(dayjs(startDate), 'day')
-
-  if (daysOnMarket === 0) daysOnMarket = 1 // show at least one day
-
-  // Use ICU Message Format for pluralization
-  const daysOnMarketLabel = t('property.daysOnMarket', { count: daysOnMarket })
+    : null
 
   return (
     <Stack
@@ -66,51 +52,22 @@ const HistoryItemHeader = ({
       alignItems="flex-end"
       justifyContent="space-between"
     >
-      <Stack spacing={1}>
+      {/* <Stack spacing={1}>
         <Stack spacing={1} direction="row" alignItems="center" flexWrap="wrap">
           <Typography
-            variant="h3"
+            variant="subtitle1"
+            fontWeight="bold"
             sx={{
               color: { xs: active ? 'secondary.main' : '', md: 'common.black' }
             }}
           >
             {listingStatus || <ScrubbedDate value={startDate} />}
           </Typography>
-          {showDaysOnMarket && (
-            <Typography color="text.hint" variant="body2">
-              ({daysOnMarketLabel})
-            </Typography>
-          )}
+
         </Stack>
-        {brokerageName && (
-          <Typography variant="body2" fontWeight={600} color="primary.main">
-            <ScrubbedText replace="Brokerage Name">
-              {brokerageName}
-            </ScrubbedText>
-          </Typography>
-        )}
-      </Stack>
-      {active ? (
-        <Typography
-          minWidth={104}
-          color="text.hint"
-          textAlign="right"
-          px={{ xs: 0, sm: 2 }}
-        >
-          Viewing now
-        </Typography>
-      ) : link ? (
-        <Typography variant="h6" color="primary">
-          <Button
-            href={link}
-            target="_blank"
-            endIcon={<OpenInNewIcon />}
-            sx={{ my: -1, mr: { xs: -2, sm: 0 }, height: '38px' }}
-          >
-            View
-          </Button>
-        </Typography>
-      ) : null}
+
+      </Stack> */}
+
     </Stack>
   )
 }

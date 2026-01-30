@@ -170,19 +170,25 @@ const CatalogFilters = ({
   useEffect(() => {
     if (selectedRegion) {
       const slug = selectedRegion.toLowerCase().replace(/\s+/g, '-')
+      const buildingsSlug = hood ? hood.toLowerCase().replace(/\s+/g, '-') : slug
+
       // Avoid re-fetching if we already have the correct data
-      if (locationTree && (locationTree.slug === slug || locationTree.name.toLowerCase() === selectedRegion.toLowerCase())) {
+      if (locationTree &&
+        (locationTree.slug === slug || locationTree.name.toLowerCase() === selectedRegion.toLowerCase()) &&
+        locationTree.buildingsSlug === buildingsSlug
+      ) {
         if (onLocationTreeChange) onLocationTreeChange(locationTree)
         return
       }
 
       Promise.all([
         fetch(`https://app.precondo.ca/api/locations/area/${slug}`).then((res) => res.json()),
-        fetch(`https://backend.precondo.ca/api/area/${slug}/buildings`).then((res) => res.json())
+        fetch(`https://backend.precondo.ca/api/area/${buildingsSlug}/buildings`).then((res) => res.json())
       ])
         .then(([locationDataFull, buildingsList]) => {
           if (locationDataFull.success) {
             const locationData = locationDataFull.data
+            locationData.buildingsSlug = buildingsSlug
 
             if (Array.isArray(buildingsList)) {
               locationData.buildings = buildingsList.map((b: any) => ({

@@ -1,3 +1,4 @@
+export { default as EmptyBuildings } from './EmptyBuildings'
 export { default as EmptyCatalogListings } from './EmptyCatalogListings'
 export { default as EmptyFavorites } from './EmptyFavorites'
 export { default as EmptyImageFavorites } from './EmptyImageFavorites'

@@ -17,22 +17,25 @@ const HistoryItemProgressBar = ({
     >
       <Box
         sx={{
-          mt: '6px',
+          mt: '55px',
           width: '13px',
           height: '13px',
           borderRadius: 4,
-          bgcolor: active ? 'secondary.main' : 'primary.main'
+          bgcolor: active ? 'secondary.main' : 'primary.main',
+          zIndex: 2,
+          position: 'relative'
         }}
       />
       {!last && (
         <Box
           sx={{
             position: 'absolute',
-            top: '19px',
+            top: '53px',
             left: '6px',
             width: '1px',
             height: 'calc(100% + 16px)',
-            bgcolor: 'divider'
+            bgcolor: 'divider',
+            zIndex: 1
           }}
         />
       )}

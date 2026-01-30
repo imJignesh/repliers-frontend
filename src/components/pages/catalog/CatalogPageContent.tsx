@@ -4,12 +4,13 @@ import React from 'react'
 
 import { Box, Container, Stack, Card, CardContent, Typography, CardActionArea } from '@mui/material'
 import Link from 'next/link'
+import ApartmentIcon from '@mui/icons-material/Apartment'
 import APILocations from 'services/API/APILocations'
 
 import gridConfig from '@configs/cards-grids'
 // TODO: fix constants import from @pages alias
 import { gridColumnsMediaQueries } from '@pages/search/components/MapRoot/constants'
-import { EmptyCatalogListings } from '@shared/EmptyStates'
+import { EmptyCatalogListings, EmptyBuildings } from '@shared/EmptyStates'
 import { PropertyCard } from '@shared/Property'
 
 import {
@@ -198,11 +199,16 @@ const CatalogPageContent = ({
                             sx={{
                               width: gridConfig.propertyCardSizes.normal.width,
                               borderRadius: 2,
-                              boxShadow: 1
+                              boxShadow: 1,
+                              display: 'flex',
+                              overflow: 'hidden'
                             }}
                           >
-                            <CardActionArea component={Link} href={`/building/${slug}`}>
-                              <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                            <CardActionArea component={Link} href={`/building/${slug}`} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'stretch', width: '100%' }}>
+                              <Box sx={{ width: 80, bgcolor: 'grey.100', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <ApartmentIcon sx={{ color: 'text.secondary', fontSize: 32 }} />
+                              </Box>
+                              <CardContent sx={{ flex: 1, p: 2, '&:last-child': { pb: 2 } }}>
                                 <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem', mb: 0.5 }}>
                                   {name}
                                 </Typography>
@@ -217,7 +223,7 @@ const CatalogPageContent = ({
                         )
                       })}
                       {buildings.length === 0 && (
-                        <Box width="100%" textAlign="center" py={4}><Typography>No buildings found.</Typography></Box>
+                        <EmptyBuildings />
                       )}
                     </Stack>
                   )}
@@ -261,11 +267,16 @@ const CatalogPageContent = ({
                           sx={{
                             width: gridConfig.propertyCardSizes.normal.width,
                             borderRadius: 2,
-                            boxShadow: 1
+                            boxShadow: 1,
+                            display: 'flex',
+                            overflow: 'hidden'
                           }}
                         >
-                          <CardActionArea component={Link} href={`/building/${slug}`}>
-                            <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                          <CardActionArea component={Link} href={`/building/${slug}`} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'stretch', width: '100%' }}>
+                            <Box sx={{ width: 80, bgcolor: 'grey.100', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                              <ApartmentIcon sx={{ color: 'text.secondary', fontSize: 32 }} />
+                            </Box>
+                            <CardContent sx={{ flex: 1, p: 2, '&:last-child': { pb: 2 } }}>
                               <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem', mb: 0.5 }}>
                                 {name}
                               </Typography>
@@ -280,7 +291,7 @@ const CatalogPageContent = ({
                       )
                     })}
                     {buildings.length === 0 && (
-                      <Box width="100%" textAlign="center" py={4}><Typography>No buildings found.</Typography></Box>
+                      <EmptyBuildings />
                     )}
                   </Stack>
                 )}
@@ -303,7 +314,9 @@ const CatalogPageContent = ({
           /> */}
           {/* <PopularCities /> */}
           {/* <PopularHoods /> */}
-          <PopularSearches area={area} city={city} hood={hood} />
+          <Box sx={{ mt: 4 }}>
+            <PopularSearches area={area} city={city} hood={hood} />
+          </Box>
         </Box>
       </MapOptionsProvider>
     </SearchProvider>

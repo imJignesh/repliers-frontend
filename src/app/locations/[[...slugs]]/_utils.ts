@@ -54,16 +54,20 @@ export const extractCities = (areas: any): ApiBoardCity[] => {
   )
 }
 
+const normalize = (str: string) =>
+  str.toLowerCase().replace(/[^a-z0-9]/g, '')
+
 export const extractLocation = (
   areas: ApiBoardArea[],
   city: string,
   neighborhood?: string
 ): ApiBoardCity | ApiNeighborhood | undefined => {
   if (neighborhood) {
+    const target = normalize(neighborhood)
     return areas
       .flatMap((area) => area.cities)
       .flatMap((city) => city.neighborhoods || [])
-      .find((hood) => hood.name.toLowerCase() === neighborhood.toLowerCase())
+      .find((hood) => normalize(hood.name) === target)
   } else {
     return areas
       .flatMap((area) => area.cities)

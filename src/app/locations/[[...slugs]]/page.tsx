@@ -68,7 +68,8 @@ const LocationsCatalogPage = async (props: {
   } = parseUrlParams(slugs)
 
   // Fetch data needed for identification
-  const fetchAreas = await fetchLocations(urlCity, urlHood)
+  // Pass empty neighborhood to fetch all neighborhoods in the city for loose matching later
+  const fetchAreas = await fetchLocations(urlCity, '')
   const dynamicAreasData = await APILocations.fetchAreas()
   const formattedAreas: ApiBoardArea[] = dynamicAreasData.map((a: any) => ({
     name: a.name,
@@ -94,6 +95,14 @@ const LocationsCatalogPage = async (props: {
   if (areaMatch && !area) {
     area = areaMatch.name
     city = ''
+  }
+
+  // extract the correct neighborhood name from the list of areas
+  if (hood && city) {
+    const location = extractLocation(finalAreas, city, hood)
+    if (location && 'name' in location) {
+      hood = location.name
+    }
   }
 
   console.log({ filters, boardId, listingId, localAddress, area, city, hood })

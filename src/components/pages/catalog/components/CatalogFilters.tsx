@@ -48,6 +48,25 @@ const statusItems: Array<[ListingStatus, string]> = [
   ['rent', 'For Rent']
 ]
 
+// Helper for fuzzy matching
+const normalize = (str?: string) => str ? str.toLowerCase().replace(/[^a-z0-9]/g, '') : ''
+
+// Helper for bucketed counts
+const formatCount = (n: number) => {
+  if (n >= 3500) return '3k+'
+  if (n >= 3000) return '2.5k+'
+  if (n >= 2500) return '2k+'
+  if (n >= 2000) return '1.5k+'
+  if (n >= 1500) return '1k+'
+  if (n >= 1000) return '500+'
+  if (n >= 500) return '100+'
+  if (n >= 100) return '50+'
+  if (n >= 50) return '25+'
+  if (n >= 25) return '10+'
+  if (n >= 10) return '5+'
+  return '<5'
+}
+
 const CatalogFilters = ({
   count,
   city,
@@ -309,7 +328,7 @@ const CatalogFilters = ({
   const getSubLocations = (region: string) => {
     // If we have neighborhoods/cities data for the current selection (Area or City)
     if ((city || area) && hoods.length > 0) {
-      return Array.from(new Set(hoods.map((h) => h.name)))
+      return Array.from(new Set(hoods.filter((h) => h.activeCount > 0).map((h) => h.name)))
     }
     if (!currentCitymap[region] || !currentCitymap[region].items) return []
     return Object.keys(currentCitymap[region].items).filter(
@@ -324,21 +343,21 @@ const CatalogFilters = ({
   useEffect(() => {
     if (locationTree && locationTree.children) {
       const activeGroup = locationTree.children.find((g: any) => {
-        // Check exact group match
+        // Check fuzzy group match
         const isGroupMatch =
-          city?.toLowerCase() === g.name.toLowerCase() ||
-          hood?.toLowerCase() === g.name.toLowerCase() ||
-          city?.toLowerCase() === g.slug.toLowerCase() ||
-          hood?.toLowerCase() === g.slug.toLowerCase()
+          normalize(city) === normalize(g.name) ||
+          normalize(hood) === normalize(g.name) ||
+          normalize(city) === normalize(g.slug) ||
+          normalize(hood) === normalize(g.slug)
 
         if (isGroupMatch) return true
 
         // Check children match (deep search)
         const hasChildMatch = g.children && g.children.some((child: any) =>
-          hood?.toLowerCase() === child.name.toLowerCase() ||
-          hood?.toLowerCase() === child.slug.toLowerCase() ||
-          city?.toLowerCase() === child.name.toLowerCase() ||
-          city?.toLowerCase() === child.slug.toLowerCase()
+          normalize(hood) === normalize(child.name) ||
+          normalize(hood) === normalize(child.slug) ||
+          normalize(city) === normalize(child.name) ||
+          normalize(city) === normalize(child.slug)
         )
 
         return hasChildMatch
@@ -549,7 +568,7 @@ const CatalogFilters = ({
             </Box>
 
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <IconButton onClick={() => handleScroll('left')} size="small" sx={{ mr: 1, border: '1px solid', borderColor: 'divider' }}>
+              <IconButton onClick={() => handleScroll('left')} size="small" sx={{ p: 0, mr: 1, border: '1px solid', borderColor: 'divider' }}>
                 <ChevronLeftIcon />
               </IconButton>
 
@@ -557,7 +576,7 @@ const CatalogFilters = ({
                 ref={scrollContainerRef}
                 sx={{
                   display: 'flex',
-                  gap: 1.5,
+                  gap: 1,
                   alignItems: 'center',
                   overflowX: 'auto',
                   flexWrap: 'nowrap',
@@ -582,6 +601,7 @@ const CatalogFilters = ({
                       href={getSubLocationUrl(locationName)}
                       variant={hood?.toLowerCase() === locationName.toLowerCase() ? 'contained' : 'outlined'}
                       sx={{
+                        padding: 0,
                         textTransform: 'none',
                         whiteSpace: 'nowrap',
                         flexShrink: 0,
@@ -600,7 +620,7 @@ const CatalogFilters = ({
                 {/* New Hierarchical Groups View */}
                 {locationTree && locationTree.children && (
                   <>
-                    {locationTree.children.map((group: any) => {
+                    {locationTree.children.filter((group: any) => group.listing_count > 0).map((group: any) => {
                       const isActive = activeGroupId === group.id
                       return (
                         <Button
@@ -612,6 +632,7 @@ const CatalogFilters = ({
                             textTransform: 'none',
                             whiteSpace: 'nowrap',
                             flexShrink: 0,
+                            padding: '0 5px 0 10px',
                             borderRadius: '4px', // More "toggle" like rounded shape
                             borderColor: isActive ? 'primary.main' : 'divider',
                             bgcolor: isActive ? 'primary.main' : 'background.paper',
@@ -624,6 +645,22 @@ const CatalogFilters = ({
                           }}
                         >
                           {group.name}
+                          <Box
+                            component="span"
+                            sx={{
+                              ml: 1,
+                              px: 0.75,
+                              py: 0.25,
+                              borderRadius: '12px',
+                              fontSize: '0.75rem',
+                              lineHeight: 1,
+                              fontWeight: 600,
+                              bgcolor: isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.06)',
+                              color: isActive ? 'inherit' : 'text.secondary'
+                            }}
+                          >
+                            {formatCount(group.listing_count)}
+                          </Box>
                           {isActive ? (
                             <Box component="span" sx={{ transform: 'rotate(180deg)', display: 'inline-flex', ml: 0.5 }}><KeyboardArrowDownIcon /></Box>
                           ) : (
@@ -654,12 +691,31 @@ const CatalogFilters = ({
             if (activeGroup && activeGroup.children && activeGroup.children.length > 0) {
               return (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, p: 1, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 2 }}>
-                  {activeGroup.children.map((child: any) => {
-                    const isChildActive = hood?.toLowerCase() === child.name.toLowerCase() || hood?.toLowerCase() === child.slug.toLowerCase()
+                  {activeGroup.children.filter((child: any) => child.listing_count > 0).map((child: any) => {
+                    const isChildActive = normalize(hood) === normalize(child.name) || normalize(hood) === normalize(child.slug)
                     return (
                       <Chip
                         key={child.id}
-                        label={child.name}
+                        label={
+                          <Stack direction="row" alignItems="center" gap={0.5}>
+                            <span>{child.name}</span>
+                            <Box
+                              component="span"
+                              sx={{
+                                px: 0.6,
+                                py: 0.2,
+                                borderRadius: '10px',
+                                fontSize: '0.7rem',
+                                lineHeight: 1,
+                                fontWeight: 600,
+                                bgcolor: isChildActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.06)',
+                                color: isChildActive ? 'inherit' : 'text.secondary'
+                              }}
+                            >
+                              {formatCount(child.listing_count)}
+                            </Box>
+                          </Stack>
+                        }
                         clickable
                         onClick={() => {
                           const url = `${routes.listings}/${locationTree.slug}/${child.slug}`

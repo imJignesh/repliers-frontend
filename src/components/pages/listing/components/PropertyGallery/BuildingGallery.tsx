@@ -21,7 +21,7 @@ const BuildingGallery = ({
     const { property } = useProperty()
     const { images } = property
     const building = (property as any).building
-
+    console.log(building)
     const activeImage = images?.[0]
     const activeImageUrl = building?.cover_photo_url || (activeImage ? getCDNPath(activeImage, 'large') : null)
 

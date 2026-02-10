@@ -5,10 +5,10 @@ import Link from 'next/link'
 import { Stack, Typography, Box, Alert } from '@mui/material'
 import { DetailsContainer } from '@shared/Containers'
 import { type Property, type HistoryItemType } from 'services/API'
-import { useUser } from 'providers/UserProvider'
 import routes from '@configs/routes'
 import { scrubbed, active as isActive } from 'utils/properties'
 import { HistoryItem } from '.'
+import { useAuthenticated } from 'hooks/useAuthenticated'
 
 // Helper to convert Property to HistoryItemType
 const getListingData = (property: Property): HistoryItemType => ({
@@ -43,7 +43,7 @@ const BuildingHistoryDetails = ({ history = [] }: { history?: Property[] }) => {
         return dateA - dateB
     })
 
-    const { logged } = useUser()
+    const authenticated = useAuthenticated()
 
     const groups = React.useMemo(() => {
         const grouped: Record<string, { label: string, items: typeof sortedHistory, listed: number, sold: number }> = {}
@@ -71,7 +71,7 @@ const BuildingHistoryDetails = ({ history = [] }: { history?: Property[] }) => {
         <DetailsContainer title="Building Sales History" id="history">
             <Stack spacing={4}>
 
-                {!logged && (
+                {!authenticated && (
                     <Alert severity="info" sx={{ mb: 4, borderRadius: 2, '& .MuiAlert-message': { width: '100%' } }}>
                         <Typography variant="body2">
                             Real estate boards require you to be signed in to access price history. <Link href={'/register'} style={{ fontWeight: 'bold', color: 'inherit', textDecoration: 'underline' }}>Sign up</Link> or <Link href={routes.login} style={{ fontWeight: 'bold', color: 'inherit', textDecoration: 'underline' }}>Log in</Link>
@@ -94,7 +94,7 @@ const BuildingHistoryDetails = ({ history = [] }: { history?: Property[] }) => {
                                             last={index === group.items.length - 1}
                                             active={active}
                                             propertyOverride={item}
-                                            blurred={!logged}
+                                            blurred={!authenticated}
                                         />
                                     </Box>
                                 )
@@ -104,7 +104,7 @@ const BuildingHistoryDetails = ({ history = [] }: { history?: Property[] }) => {
                 ))}
 
 
-                {logged && scrubbedCount > 0 && (
+                {authenticated && scrubbedCount > 0 && (
                     <Box sx={{ ml: 6 }}>
                         <Alert severity="info" variant="outlined" sx={{ borderRadius: 2 }}>
                             There are <strong>{scrubbedCount}</strong> additional historical records in this building that are restricted or have suppressed details.

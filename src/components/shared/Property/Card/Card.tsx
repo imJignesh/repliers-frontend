@@ -24,6 +24,7 @@ import {
   restricted,
   sold
 } from 'utils/properties'
+import { useAuthenticated } from 'hooks/useAuthenticated'
 
 import { CardContainer, CardContent, FavoritesButton, Tags } from './components'
 
@@ -59,7 +60,7 @@ const PropertyCard = React.memo(
     showViewOnMap,
     onViewOnMap
   }: PropertyCardProps) => {
-    const { logged } = useUser()
+    const authenticated = useAuthenticated()
     const features = useFeatures()
     const rippleRef = useRef<TouchRippleActions | null>(null)
 
@@ -68,7 +69,7 @@ const PropertyCard = React.memo(
     const linkUrl = getSeoUrl(property, { startImage })
 
     const blurredGallery =
-      features.blurRestrictedProperty && restricted(property) && !logged
+      features.blurRestrictedProperty && restricted(property) && !authenticated
 
     const tags: PropertyTag[] = []
 

@@ -30,7 +30,7 @@ type ContentProps = {
 }
 
 const Content = ({ property, size }: ContentProps) => {
-  const { logged } = useUser()
+  const { logged, authenticated } = useUser()
   const t = useTranslations()
   const { getDaysSinceListed } = createPropertyI18nUtils(t)
 
@@ -48,7 +48,7 @@ const Content = ({ property, size }: ContentProps) => {
   const soldProperty = sold(property)
   const contentFontSize = toRem(sizeMap ? 11 : sizeDrawer ? 18 : 14)
   const contentLineHeight = toRem(sizeMap ? 18 : sizeDrawer ? 28 : 20)
-  const restrictedProperty = restricted(property) && !logged
+  const restrictedProperty = restricted(property) && !authenticated
 
   const color = sizeDrawer ? '#FFFFFF' : 'text.primary'
   const secondaryColor = sizeDrawer ? '#FFFFFF' : 'text.medium'
@@ -64,14 +64,14 @@ const Content = ({ property, size }: ContentProps) => {
         p: sizeMap ? 1 : 2,
         ...(sizeDrawer
           ? {
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              position: 'absolute',
-              background:
-                'linear-gradient(180deg, #0001 0%, #0001 50%, #000A 100%)'
-            }
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            position: 'absolute',
+            background:
+              'linear-gradient(180deg, #0001 0%, #0001 50%, #000A 100%)'
+          }
           : {})
       }}
     >

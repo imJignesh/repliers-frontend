@@ -10,6 +10,8 @@ import React, {
 } from 'react'
 import { jwtDecode, type JwtPayload } from 'jwt-decode'
 
+import Cookies from 'js-cookie'
+
 import storageConfig from '@configs/storage'
 
 import {
@@ -69,6 +71,7 @@ export type UserProfile = Pick<
 
 type UserContextType = {
   logged: boolean
+  authenticated: boolean
   loading: boolean
   profile: UserProfile
   role: UserRole
@@ -133,6 +136,7 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
     localProfile ? JSON.parse(localProfile) : {}
   )
   const [loading, setLoading] = useState(false)
+  const [authenticated, setAuthenticated] = useState(Cookies.get('rauthenticated') === 'true')
   // eslint-disable-next-line no-undef
   const refreshTimeout = useRef<NodeJS.Timeout | null>(null)
   const token = getTokenSync()
@@ -254,6 +258,15 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  const checkAuthenticated = () => {
+    setAuthenticated(Cookies.get('authenticated') === 'true')
+  }
+
+  useEffect(() => {
+    const interval = setInterval(checkAuthenticated, 2000) // Check periodically for cookie changes
+    return () => clearInterval(interval)
+  }, [])
+
   const refresh = () => {
     if (refreshTimeout.current) {
       clearTimeout(refreshTimeout.current)
@@ -288,6 +301,7 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
         adminRole: profile.role === 'admin',
         loading,
         logged,
+        authenticated: logged || authenticated,
         login,
         logout,
         update,
@@ -296,7 +310,7 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
         loginWithToken,
         requestOtpLogin
       }) as UserContextType,
-    [profile, logged, loading]
+    [profile, logged, loading, authenticated]
   )
 
   return (

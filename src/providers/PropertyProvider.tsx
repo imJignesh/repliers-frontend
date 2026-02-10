@@ -12,9 +12,9 @@ import React, {
 import { APIPropertyDetails } from 'services/API'
 import { type Property } from 'services/API'
 import { restricted, sold } from 'utils/properties'
+import { useAuthenticated } from 'hooks/useAuthenticated'
 
 import { useFeatures } from './FeaturesProvider'
-import { useUser } from './UserProvider'
 
 type PropertyContextProps = {
   community?: string
@@ -34,12 +34,12 @@ const PropertyProvider = ({
   children: React.ReactNode
   property: Property
 }) => {
-  const { logged } = useUser()
+  const authenticated = useAuthenticated()
   const features = useFeatures()
   const { mlsNumber, boardId, comparables } = property
   const soldProperty = sold(property)
   const blurred =
-    features.blurRestrictedProperty && restricted(property) && !logged
+    features.blurRestrictedProperty && restricted(property) && !authenticated
 
   const [similarProperties, setSimilarProperties] = useState<Property[]>(
     soldProperty && comparables?.length ? comparables : []

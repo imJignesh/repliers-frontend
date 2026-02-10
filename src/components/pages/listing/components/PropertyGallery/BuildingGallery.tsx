@@ -1,9 +1,11 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import Image from 'next/legacy/image'
 
-import { Box, Stack, Typography, Button } from '@mui/material'
+import { Box, Stack, Typography, Button, Collapse } from '@mui/material'
+import AddIcon from '@mui/icons-material/Add'
+import RemoveIcon from '@mui/icons-material/Remove'
 
 import { ImagePlaceholder } from 'components/atoms'
 import { useProperty } from 'providers/PropertyProvider'
@@ -18,10 +20,11 @@ const BuildingGallery = ({
     activeCount?: number
     historyCount?: number
 }) => {
+    const [showAllAddresses, setShowAllAddresses] = useState(false)
     const { property } = useProperty()
     const { images } = property
     const building = (property as any).building
-    console.log(building)
+
     const activeImage = images?.[0]
     const activeImageUrl = building?.cover_photo_url || (activeImage ? getCDNPath(activeImage, 'large') : null)
 
@@ -82,7 +85,33 @@ const BuildingGallery = ({
                 <Box>
                     <Typography variant="h1" style={{ fontSize: '2rem', lineHeight: 1.2 }}>
                         {formatBuildingAddress(property.address)}
+                        {building?.secondary_addresses?.length > 0 && (
+                            <Button
+                                size="small"
+                                onClick={() => setShowAllAddresses(!showAllAddresses)}
+                                startIcon={showAllAddresses ? <RemoveIcon /> : <AddIcon />}
+                                sx={{
+                                    ml: 1,
+                                    textTransform: 'none',
+                                    verticalAlign: 'middle',
+                                    fontWeight: 'bold'
+                                }}
+                            >
+                                {showAllAddresses ? 'hide' : `${building.secondary_addresses.length} more`}
+                            </Button>
+                        )}
                     </Typography>
+
+                    <Collapse in={showAllAddresses}>
+                        <Stack spacing={0.5} mt={1} mb={2}>
+                            {building?.secondary_addresses?.map((addr: string, idx: number) => (
+                                <Typography key={idx} variant="body1" color="text.secondary">
+                                    • {addr}
+                                </Typography>
+                            ))}
+                        </Stack>
+                    </Collapse>
+
                     <Box mt={1}>
                         <FullAddressInfo property={property} />
                     </Box>

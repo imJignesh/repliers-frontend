@@ -535,6 +535,7 @@ export interface ApiQueryResponse {
   }
   listings: Property[]
   aggregates?: ApiAggregates
+  building?: any
 }
 
 export interface ApiV2QueryResponse {

@@ -17,6 +17,11 @@ const BuildingPageTemplate = ({ property, history }: { property: ApiQueryRespons
 
   if (!p) return null
 
+  // Attach building metadata to the listing object so it's available via useProperty()
+  if (property.building) {
+    (p as any).building = property.building
+  }
+
   return (
     <PageTemplate>
       <PropertyProvider property={p}>

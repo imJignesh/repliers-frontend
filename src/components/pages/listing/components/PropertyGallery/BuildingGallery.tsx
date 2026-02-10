@@ -20,9 +20,10 @@ const BuildingGallery = ({
 }) => {
     const { property } = useProperty()
     const { images } = property
+    const building = (property as any).building
 
     const activeImage = images?.[0]
-    const activeImageUrl = activeImage ? getCDNPath(activeImage, 'large') : null
+    const activeImageUrl = building?.cover_photo_url || (activeImage ? getCDNPath(activeImage, 'large') : null)
 
     const handleScroll = (id: string) => {
         const element = document.getElementById(id)

@@ -45,7 +45,7 @@ class APIPropertyDetails extends APIBase {
       // status: 'U',
     })
 
-    return this.fetchJSON<ApiQueryResponse>(`/listings/search/?${searchParams}`)
+    return this.fetchJSON<ApiQueryResponse>(`/listings/building?${searchParams}`)
   }
 
   fetchBuildingHistory(boardId: number, streetName: string, streetNumber: number): Promise<ApiQueryResponse> {
@@ -59,7 +59,7 @@ class APIPropertyDetails extends APIBase {
       resultsPerPage: 100
     })
 
-    return this.fetchJSON<ApiQueryResponse>(`/listings/search/?${searchParams}`)
+    return this.fetchJSON<ApiQueryResponse>(`/listings/building?${searchParams}`)
   }
 }
 

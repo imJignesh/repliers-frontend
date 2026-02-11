@@ -15,10 +15,12 @@ const Sidebar = () => {
 
   return clientSide ? (
     <Paper
+      id="contact-section"
       sx={{
         border: 1,
         borderColor: 'divider',
-        boxShadow: { xs: 0, md: 1 }
+        boxShadow: { xs: 0, md: 1 },
+        scrollMarginTop: '100px'
       }}
     >
       <Tabs value={value} variant="fullWidth" onChange={handleChange}>

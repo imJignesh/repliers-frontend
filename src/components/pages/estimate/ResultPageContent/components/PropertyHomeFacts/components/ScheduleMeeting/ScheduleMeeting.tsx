@@ -82,7 +82,7 @@ const ScheduleMeeting = () => {
       time: time.format(i18nConfig.timeFormat)
     })
       .then(() => {
-        showSnackbar('Message has been sent', 'success')
+        showSnackbar('You can view all prices and sales history now.', 'success')
       })
       .catch((e) => showSnackbar((e as ErrorCause)?.cause?.message, 'error'))
       .finally(() => {

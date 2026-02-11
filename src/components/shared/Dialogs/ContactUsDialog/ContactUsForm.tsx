@@ -102,7 +102,7 @@ const ContactUsForm = ({
         await requestInfo(values, mlsNumber)
       }
       setValues(getFormData())
-      showSnackbar('Message has been sent', 'success')
+      showSnackbar('You can view all prices and sales history now.', 'success')
       setTouched(false)
       onSend?.()
     } catch (e) {

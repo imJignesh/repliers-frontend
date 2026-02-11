@@ -34,7 +34,8 @@ class APIBase {
     try {
       const response = await fetch(this.getAbsoluteUrl(request), {
         ...options,
-        headers
+        headers,
+        credentials: 'include'
       })
       if (!response.ok) {
         console.error(`HTTP Error: ${response.status}`, request)

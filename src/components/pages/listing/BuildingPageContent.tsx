@@ -2,7 +2,10 @@
 
 import React, { useEffect, useMemo } from 'react'
 
-import { Box, Container, Stack, Typography } from '@mui/material'
+import { Box, Container, Stack, Typography, Breadcrumbs, Link } from '@mui/material'
+import NavigateNextIcon from '@mui/icons-material/NavigateNext'
+import NextLink from 'next/link'
+import { getCatalogUrl } from '../../../utils/urls'
 
 import { DetailsContainer } from '@shared/Containers'
 import {
@@ -101,7 +104,55 @@ const BuildingPageContent = ({
             direction={{ xs: 'column', md: 'row' }}
           >
             <Stack spacing={2} sx={{ flex: 1, width: '100%' }}>
+              <Breadcrumbs
+                separator={<NavigateNextIcon fontSize="small" />}
+                sx={{
+                  mb: 1,
+                  '& .MuiBreadcrumbs-li': {
+                    fontWeight: 500,
+                    fontSize: '0.95rem'
+                  }
+                }}
+              >
+                {address.city && (
+                  <Link
+                    component={NextLink}
+                    href={getCatalogUrl(address.city)}
+                    color="text.secondary"
+                    underline="hover"
+                  >
+                    {address.city}
+                  </Link>
+                )}
+                {address.neighborhood && (
+                  <Link
+                    component={NextLink}
+                    href={getCatalogUrl(address.city, address.neighborhood)}
+                    color="text.primary"
+                    underline="hover"
+                  >
+                    {address.neighborhood}
+                  </Link>
+                )}
+              </Breadcrumbs>
 
+              {(property as any).building && (
+                <Box mb={2}>
+                  <Typography variant="h1" gutterBottom sx={{ fontSize: '2.2rem', fontWeight: 700, mb: 0 }}>
+                    {(property as any).building.name}
+                  </Typography>
+                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap alignItems="center">
+                    <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
+                      {(property as any).building.address}
+                    </Typography>
+                    {(property as any).building.secondary_addresses?.map((addr: string, idx: number) => (
+                      <Typography key={idx} variant="body1" color="text.secondary">
+                        • {addr}
+                      </Typography>
+                    ))}
+                  </Stack>
+                </Box>
+              )}
 
               {/* <HomeHeaderInfo /> */}
               <DetailsContainer>

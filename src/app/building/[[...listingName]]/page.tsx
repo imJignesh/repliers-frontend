@@ -28,7 +28,13 @@ export const generateMetadata = async (props: PropertyPageProps) => {
     if (!p) {
       return content.missingPropertyMetadata
     }
-    return formatMetadata(p, host)
+
+    const metadata = formatMetadata(p, host)
+    if (property.building?.name) {
+      metadata.title = `${property.building.name} - ${metadata.title}`
+    }
+
+    return metadata
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error: any) {
     return content.missingPropertyMetadata

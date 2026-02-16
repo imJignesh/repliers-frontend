@@ -14,66 +14,75 @@ export const parseSlug = (params: Params, searchParams: SearchParams) => {
 
   const boardId = Number(
     (slugs.at(-1) || '').match(/^\d{1,3}$/) &&
-      !['line', 'road', 'rd', 'highway', 'hwy', 'county', 'route'].includes((slugs.at(-2) || '').toLowerCase())
+      !['line', 'road', 'rd', 'st', 'ave', 'highway', 'hwy', 'county', 'route'].includes((slugs.at(-2) || '').toLowerCase())
       ? slugs.pop() || searchConfig.defaultBoardId
       : searchConfig.defaultBoardId
   )
 
-  const suffixList = [
-    'st',
-    'street',
-    'ave',
-    'avenue',
-    'rd',
-    'road',
-    'blvd',
-    'boulevard',
-    'dr',
-    'drive',
-    'crt',
-    'court',
-    'pl',
-    'place',
-    'ln',
-    'lane',
-    'way',
-    'cir',
-    'circle',
-    'cres',
-    'crescent',
-    'ter',
-    'terrace',
-    'hwy',
-    'highway',
-    'sq',
-    'square',
-    'est',
-    'estate',
-    'e',
-    'w',
-    'n',
-    's',
-    'east',
-    'west',
-    'north',
-    'south'
+  const realSuffixes = [
+    'st', 'street', 'ave', 'avenue', 'rd', 'road', 'blvd', 'boulevard', 'dr', 'drive',
+    'crt', 'court', 'pl', 'place', 'ln', 'lane', 'way', 'cir', 'circle', 'cres', 'crescent',
+    'ter', 'terrace', 'hwy', 'highway', 'sq', 'square', 'est', 'estate', 'quay', 'path',
+    'gate', 'mews', 'grove', 'row', 'gdns', 'gardens', 'pky', 'parkway', 'esplanade', 'walk', 'trail'
   ]
 
-  let streetNumber: number = 0
+  const directions = ['n', 's', 'e', 'w', 'north', 'south', 'east', 'west']
+
+  let streetNumber: string = ''
   let streetName: string = ''
+  let streetSuffix: string = ''
+  let streetDirection: string = ''
 
-  const streetNumberIndex = slugs.findIndex((s) => /^\d+$/.test(s))
+  // Look for the first valid address pattern: [NUMBER] [NAME] [SUFFIX]
+  for (let i = 0; i < slugs.length; i++) {
+    // If it's a number (allowing ranges and letters like 326B or 1159-1173)
+    if (/^\d+[a-z]*([-\/]\d+[a-z]*)?$/i.test(slugs[i])) {
+      // Look forward for a suffix
+      for (let j = i + 1; j < slugs.length; j++) {
+        const potentialSuffix = slugs[j].toLowerCase()
+        if (realSuffixes.includes(potentialSuffix)) {
+          // Found a potential match!
+          const numStr = slugs[i]
+          const nameParts = slugs.slice(i + 1, j)
 
-  if (streetNumberIndex !== -1) {
-    streetNumber = Number(slugs[streetNumberIndex])
+          if (nameParts.length > 0) {
+            streetNumber = numStr
+            streetName = nameParts.map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ')
+            streetSuffix = slugs[j]
 
-    // Assume street name follows the street number
-    // Find where the street name ends (first suffix or direction)
-    const nameParts = slugs.slice(streetNumberIndex + 1)
+            const nextPart = slugs[j + 1]?.toLowerCase()
+            if (nextPart && directions.includes(nextPart)) {
+              streetDirection = nextPart
+            }
+
+            return { boardId, streetNumber, streetName, streetSuffix, streetDirection, slug: listingName }
+          }
+        }
+      }
+    }
+  }
+
+  // Fallback for simple slugs or slugs without clear suffix patterns
+  const numberIndex = slugs.findIndex((s) => /^\d+[a-z]*$/i.test(s))
+  if (numberIndex !== -1) {
+    const numStr = slugs[numberIndex]
+    streetNumber = numStr
+
+    const nameParts = slugs.slice(numberIndex + 1)
     let endOfNameIndex = nameParts.length
 
     for (let i = 0; i < nameParts.length; i++) {
-      if (suffixList.includes(nameParts[i].toLowerCase())) {
+      const part = nameParts[i].toLowerCase()
+      if (realSuffixes.includes(part)) {
+        streetSuffix = part
+        endOfNameIndex = i
+        const nextPart = nameParts[i + 1]?.toLowerCase()
+        if (nextPart && directions.includes(nextPart)) {
+          streetDirection = nextPart
+        }
+        break
+      } else if (directions.includes(part)) {
+        streetDirection = part
         endOfNameIndex = i
         break
       }
@@ -84,13 +93,12 @@ export const parseSlug = (params: Params, searchParams: SearchParams) => {
       .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
       .join(' ')
   } else {
-    // Fallback for slugs without numbers (unlikely but safe)
     streetName = slugs
       .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
       .join(' ')
   }
 
-  return { boardId, streetNumber, streetName, slug: listingName }
+  return { boardId, streetNumber, streetName, streetSuffix, streetDirection, slug: listingName }
 }
 
 
@@ -122,14 +130,14 @@ export const fetchProperty = cache(
 )
 
 export const fetchBuilding = cache(
-  async (boardId: number, streetName: string, streetNumber: number, slug?: string) => {
-    return await APIPropertyDetails.fetchBuilding(boardId, streetName, streetNumber, slug)
+  async (boardId: number, streetName: string, streetNumber: string | number, slug?: string, streetSuffix?: string, streetDirection?: string) => {
+    return await APIPropertyDetails.fetchBuilding(boardId, streetName, streetNumber, slug, streetSuffix, streetDirection)
   }
 )
 
 export const fetchBuildingHistory = cache(
-  async (boardId: number, streetName: string, streetNumber: number, slug?: string) => {
-    return await APIPropertyDetails.fetchBuildingHistory(boardId, streetName, streetNumber, slug)
+  async (boardId: number, streetName: string, streetNumber: string | number, slug?: string, streetSuffix?: string, streetDirection?: string) => {
+    return await APIPropertyDetails.fetchBuildingHistory(boardId, streetName, streetNumber, slug, streetSuffix, streetDirection)
   }
 )
 

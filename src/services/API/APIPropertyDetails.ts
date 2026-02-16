@@ -36,25 +36,28 @@ class APIPropertyDetails extends APIBase {
     return this.fetchJSON(`/listings/${mls}/similar?${searchParams}`)
   }
 
-  fetchBuilding(boardId: number, streetName: string, streetNumber: number, slug?: string): Promise<ApiQueryResponse> {
+  fetchBuilding(boardId: number, streetName: string, streetNumber: string | number, slug?: string, streetSuffix?: string, streetDirection?: string): Promise<ApiQueryResponse> {
     const searchParams = queryString.stringify({
       boardId,
       fields: 'address,mlsNumber,images,details,map',
       streetName,
       streetNumber,
+      streetSuffix,
+      streetDirection,
       slug
-      // status: 'U',
     })
 
     return this.fetchJSON<ApiQueryResponse>(`/listings/building?${searchParams}`)
   }
 
-  fetchBuildingHistory(boardId: number, streetName: string, streetNumber: number, slug?: string): Promise<ApiQueryResponse> {
+  fetchBuildingHistory(boardId: number, streetName: string, streetNumber: string | number, slug?: string, streetSuffix?: string, streetDirection?: string): Promise<ApiQueryResponse> {
     const searchParams = queryString.stringify({
       boardId,
       fields: 'address,mlsNumber,images,details,listPrice,soldPrice,listDate,soldDate,lastStatus,type,office,timestamps',
       streetName,
       streetNumber,
+      streetSuffix,
+      streetDirection,
       slug,
       status: ['A', 'U'],
       sortBy: 'updatedOnDesc',

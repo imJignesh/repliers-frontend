@@ -21,11 +21,17 @@ export const generateMetadata = async (props: PropertyPageProps) => {
   const searchParams = await props.searchParams
   const params = await props.params
   const host = getProtocolHost(await headers())
-  const { boardId, streetName, streetNumber, slug } = parseSlug(params, searchParams)
+  const { boardId, streetName, streetNumber, slug, streetSuffix, streetDirection } = parseSlug(params, searchParams)
   try {
-    const property = await fetchBuilding(boardId, streetName, streetNumber, slug)
+    const property = await fetchBuilding(boardId, streetName, streetNumber, slug, streetSuffix, streetDirection)
     const p = property?.listings?.[0]
     if (!p) {
+      if (property.building) {
+        return {
+          title: property.building.name,
+          description: `View units and history for ${property.building.name} at ${property.building.address}`
+        }
+      }
       return content.missingPropertyMetadata
     }
 
@@ -44,16 +50,16 @@ export const generateMetadata = async (props: PropertyPageProps) => {
 const PropertyPage = async (props: PropertyPageProps) => {
   const searchParams = await props.searchParams
   const params = await props.params
-  const { boardId, streetName, streetNumber, slug } = parseSlug(params, searchParams)
+  const { boardId, streetName, streetNumber, slug, streetSuffix, streetDirection } = parseSlug(params, searchParams)
   const listingName = params.listingName?.[0] || ''
 
   try {
     const [property, history] = await Promise.all([
-      fetchBuilding(boardId, streetName, streetNumber, slug),
-      fetchBuildingHistory(boardId, streetName, streetNumber, slug)
+      fetchBuilding(boardId, streetName, streetNumber, slug, streetSuffix, streetDirection),
+      fetchBuildingHistory(boardId, streetName, streetNumber, slug, streetSuffix, streetDirection)
     ])
 
-    if (!property?.listings?.length) {
+    if (!property?.listings?.length && !property?.building) {
       throw { status: 404 }
     }
     return <BuildingPageTemplate property={property} history={history} />

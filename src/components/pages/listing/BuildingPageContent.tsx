@@ -136,23 +136,7 @@ const BuildingPageContent = ({
                 )}
               </Breadcrumbs>
 
-              {(property as any).building && (
-                <Box mb={2}>
-                  <Typography variant="h1" gutterBottom sx={{ fontSize: '2.2rem', fontWeight: 700, mb: 0 }}>
-                    {(property as any).building.name}
-                  </Typography>
-                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap alignItems="center">
-                    <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                      {(property as any).building.address}
-                    </Typography>
-                    {(property as any).building.secondary_addresses?.map((addr: string, idx: number) => (
-                      <Typography key={idx} variant="body1" color="text.secondary">
-                        • {addr}
-                      </Typography>
-                    ))}
-                  </Stack>
-                </Box>
-              )}
+
 
               {/* <HomeHeaderInfo /> */}
               <DetailsContainer>

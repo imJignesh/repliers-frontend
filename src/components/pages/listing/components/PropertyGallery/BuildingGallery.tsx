@@ -83,38 +83,16 @@ const BuildingGallery = ({
                 }}
             >
                 <Box>
-                    <Typography variant="h1" style={{ fontSize: '2rem', lineHeight: 1.2 }}>
-                        {formatBuildingAddress(property.address)}
-                        {building?.secondary_addresses?.length > 0 && (
-                            <Button
-                                size="small"
-                                onClick={() => setShowAllAddresses(!showAllAddresses)}
-                                startIcon={showAllAddresses ? <RemoveIcon /> : <AddIcon />}
-                                sx={{
-                                    ml: 1,
-                                    textTransform: 'none',
-                                    verticalAlign: 'middle',
-                                    fontWeight: 'bold'
-                                }}
-                            >
-                                {showAllAddresses ? 'hide' : `${building.secondary_addresses.length} more`}
-                            </Button>
-                        )}
+                    <Typography variant="h1" sx={{ fontSize: { xs: '1.8rem', md: '2.5rem' }, fontWeight: 700, lineHeight: 1.2, mb: 1 }}>
+                        {building?.name || formatBuildingAddress(property.address)}
                     </Typography>
 
-                    <Collapse in={showAllAddresses}>
-                        <Stack spacing={0.5} mt={1} mb={2}>
-                            {building?.secondary_addresses?.map((addr: string, idx: number) => (
-                                <Typography key={idx} variant="body1" color="text.secondary">
-                                    • {addr}
-                                </Typography>
-                            ))}
-                        </Stack>
-                    </Collapse>
-
-                    <Box mt={1}>
-                        <FullAddressInfo property={property} />
-                    </Box>
+                    <Typography variant="h2" color="text.secondary" sx={{ fontSize: '1.1rem', fontWeight: 500, mb: 2 }}>
+                        {formatBuildingAddress(property.address)}
+                        {building?.secondary_addresses?.length > 0 && (
+                            <> &amp; {building.secondary_addresses.join(' &amp; ')}</>
+                        )}, {property.address.city}
+                    </Typography>
                 </Box>
 
                 <Stack spacing={2} direction="row">

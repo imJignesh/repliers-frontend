@@ -40,8 +40,8 @@ class APIPropertyDetails extends APIBase {
     const searchParams = queryString.stringify({
       boardId,
       fields: 'address,mlsNumber,images,details,map',
-      streetName: !slug ? streetName : undefined,
-      streetNumber: !slug ? streetNumber : undefined,
+      streetName,
+      streetNumber,
       slug
       // status: 'U',
     })
@@ -53,8 +53,8 @@ class APIPropertyDetails extends APIBase {
     const searchParams = queryString.stringify({
       boardId,
       fields: 'address,mlsNumber,images,details,listPrice,soldPrice,listDate,soldDate,lastStatus,type,office,timestamps',
-      streetName: !slug ? streetName : undefined,
-      streetNumber: !slug ? streetNumber : undefined,
+      streetName,
+      streetNumber,
       slug,
       status: ['A', 'U'],
       sortBy: 'updatedOnDesc',

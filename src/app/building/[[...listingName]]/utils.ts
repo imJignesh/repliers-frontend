@@ -60,28 +60,35 @@ export const parseSlug = (params: Params, searchParams: SearchParams) => {
   ]
 
   let streetNumber: number = 0
+  let streetName: string = ''
 
-  if (/^\d+$/.test(slugs[0])) {
-    streetNumber = Number(slugs.shift() || 0)
-  }
+  const streetNumberIndex = slugs.findIndex((s) => /^\d+$/.test(s))
 
-  // Check valid parts to build street name
-  // Filter out the suffixes from end of the array if found
-  // The user requested: "slug will have street offsets like st, street, ave, etc, remove that from street name"
-  // Assuming strict removal from the end of the slug parts.
+  if (streetNumberIndex !== -1) {
+    streetNumber = Number(slugs[streetNumberIndex])
 
-  if (slugs.length > 1) {
-    const lastPart = slugs[slugs.length - 1].toLowerCase()
-    if (suffixList.includes(lastPart)) {
-      slugs.pop()
+    // Assume street name follows the street number
+    // Find where the street name ends (first suffix or direction)
+    const nameParts = slugs.slice(streetNumberIndex + 1)
+    let endOfNameIndex = nameParts.length
+
+    for (let i = 0; i < nameParts.length; i++) {
+      if (suffixList.includes(nameParts[i].toLowerCase())) {
+        endOfNameIndex = i
+        break
+      }
     }
+
+    streetName = nameParts
+      .slice(0, endOfNameIndex)
+      .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+      .join(' ')
+  } else {
+    // Fallback for slugs without numbers (unlikely but safe)
+    streetName = slugs
+      .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+      .join(' ')
   }
-
-  const streetName = slugs
-    .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-    .join(' ')
-
-
 
   return { boardId, streetNumber, streetName, slug: listingName }
 }

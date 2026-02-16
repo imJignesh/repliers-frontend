@@ -21,9 +21,9 @@ export const generateMetadata = async (props: PropertyPageProps) => {
   const searchParams = await props.searchParams
   const params = await props.params
   const host = getProtocolHost(await headers())
-  const { boardId, streetName, streetNumber } = parseSlug(params, searchParams)
+  const { boardId, streetName, streetNumber, slug } = parseSlug(params, searchParams)
   try {
-    const property = await fetchBuilding(boardId, streetName, streetNumber)
+    const property = await fetchBuilding(boardId, streetName, streetNumber, slug)
     const p = property?.listings?.[0]
     if (!p) {
       return content.missingPropertyMetadata
@@ -38,13 +38,13 @@ export const generateMetadata = async (props: PropertyPageProps) => {
 const PropertyPage = async (props: PropertyPageProps) => {
   const searchParams = await props.searchParams
   const params = await props.params
-  const { boardId, streetName, streetNumber } = parseSlug(params, searchParams)
+  const { boardId, streetName, streetNumber, slug } = parseSlug(params, searchParams)
   const listingName = params.listingName?.[0] || ''
 
   try {
     const [property, history] = await Promise.all([
-      fetchBuilding(boardId, streetName, streetNumber),
-      fetchBuildingHistory(boardId, streetName, streetNumber)
+      fetchBuilding(boardId, streetName, streetNumber, slug),
+      fetchBuildingHistory(boardId, streetName, streetNumber, slug)
     ])
 
     if (!property?.listings?.length) {

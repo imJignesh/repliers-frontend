@@ -190,7 +190,7 @@ const CatalogPageContent = ({
                       {buildings.map((building: any, index: number) => {
                         const name = typeof building === 'string' ? building : building.name
                         const address = typeof building === 'string' ? '' : building.address
-                        const slug =
+                        const slug = building.slug ||
                           (building.street.number + '-' + building.street.name.toLowerCase().replaceAll(' ', '-'))
 
                         return (
@@ -259,7 +259,7 @@ const CatalogPageContent = ({
                     {buildings.map((building: any, index: number) => {
                       const name = typeof building === 'string' ? building : building.name
                       const address = typeof building === 'string' ? '' : building.address
-                      const slug =
+                      const slug = building.slug ||
                         (building.street.number + '-' + building.street.name.toLowerCase().replaceAll(' ', '-'))
                       return (
                         <Card

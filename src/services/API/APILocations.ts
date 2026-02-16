@@ -35,10 +35,10 @@ class APILocations extends APIBase {
         }
     }
 
-    async fetchNeighborhoodBuildings(neighborhood: string): Promise<string[]> {
+    async fetchNeighborhoodBuildings(neighborhood: string): Promise<any[]> {
         try {
             const slug = neighborhood.toLowerCase().replace(/[\s\u2011]+/g, '-')
-            return await this.fetchJSON<string[]>(`/area/${slug}/buildings`)
+            return await this.fetchJSON<any[]>(`/area/${slug}/buildings`)
         } catch (error) {
             console.error(`[APILocations] error fetching buildings for ${neighborhood}`, error)
             return []

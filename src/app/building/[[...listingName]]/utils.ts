@@ -46,7 +46,17 @@ export const parseSlug = (params: Params, searchParams: SearchParams) => {
     'hwy',
     'highway',
     'sq',
-    'square'
+    'square',
+    'est',
+    'estate',
+    'e',
+    'w',
+    'n',
+    's',
+    'east',
+    'west',
+    'north',
+    'south'
   ]
 
   let streetNumber: number = 0
@@ -73,7 +83,7 @@ export const parseSlug = (params: Params, searchParams: SearchParams) => {
 
 
 
-  return { boardId, streetNumber, streetName }
+  return { boardId, streetNumber, streetName, slug: listingName }
 }
 
 
@@ -105,14 +115,14 @@ export const fetchProperty = cache(
 )
 
 export const fetchBuilding = cache(
-  async (boardId: number, streetName: string, streetNumber: number) => {
-    return await APIPropertyDetails.fetchBuilding(boardId, streetName, streetNumber)
+  async (boardId: number, streetName: string, streetNumber: number, slug?: string) => {
+    return await APIPropertyDetails.fetchBuilding(boardId, streetName, streetNumber, slug)
   }
 )
 
 export const fetchBuildingHistory = cache(
-  async (boardId: number, streetName: string, streetNumber: number) => {
-    return await APIPropertyDetails.fetchBuildingHistory(boardId, streetName, streetNumber)
+  async (boardId: number, streetName: string, streetNumber: number, slug?: string) => {
+    return await APIPropertyDetails.fetchBuildingHistory(boardId, streetName, streetNumber, slug)
   }
 )
 

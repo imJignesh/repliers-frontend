@@ -40,10 +40,23 @@ const NeighborhoodSitemapPage = async ({ params }: Props) => {
                 {buildings.length > 0 && (
                     <GroupTemplate
                         title={`Buildings in ${neighborhoodName} | ${buildings.length}`}
-                        items={buildings.sort((a, b) => a.localeCompare(b)).map((building) => ({
-                            name: building,
-                            link: `/building/${building.replace(/\s+/g, '-').toLowerCase()}`
-                        }))}
+                        items={buildings
+                            .sort((a, b) => {
+                                const nameA = typeof a === 'string' ? a : a.name
+                                const nameB = typeof b === 'string' ? b : b.name
+                                return nameA.localeCompare(nameB)
+                            })
+                            .map((building) => {
+                                const name = typeof building === 'string' ? building : building.name
+                                const slug = typeof building === 'string'
+                                    ? building.replace(/\s+/g, '-').toLowerCase()
+                                    : building.slug || building.name.replace(/\s+/g, '-').toLowerCase()
+
+                                return {
+                                    name,
+                                    link: `/building/${slug}`
+                                }
+                            })}
                     />
                 )}
                 {listings.length > 0 && (

@@ -26,14 +26,17 @@ const BuildingPageTemplate = ({ property, history }: { property: ApiQueryRespons
         neighborhood: property.building.location?.locality?.name
       } as any,
       images: [],
-      details: {}
+      details: {
+        description: property.building.content
+      } as any,
+      building: property.building
     } as any
   }
 
   if (!p) return null
 
   // Attach building metadata to the listing object so it's available via useProperty()
-  if (property.building) {
+  if (property.building && !(p as any).building) {
     (p as any).building = property.building
   }
 

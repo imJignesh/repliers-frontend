@@ -88,10 +88,21 @@ const BuildingGallery = ({
                     </Typography>
 
                     <Typography variant="h2" color="text.secondary" sx={{ fontSize: '1.1rem', fontWeight: 500, mb: 2 }}>
-                        {formatBuildingAddress(property.address)}
-                        {building?.secondary_addresses?.length > 0 && (
-                            <> &amp; {building.secondary_addresses.join(' &amp; ')}</>
-                        )}, {property.address.city}
+                        {(() => {
+                            const primaryAddr = formatBuildingAddress(property.address);
+                            const otherAddrs = (building?.secondary_addresses || []).filter((addr: string) => {
+                                const normalizedAddr = addr.toLowerCase();
+                                const normalizedPrimary = primaryAddr.toLowerCase();
+                                return normalizedAddr !== normalizedPrimary &&
+                                    (!normalizedAddr.includes(property.address.streetNumber?.toLowerCase() || '') ||
+                                        !normalizedAddr.includes(property.address.streetName?.toLowerCase() || ''));
+                            });
+
+                            if (otherAddrs.length > 0) {
+                                return `${primaryAddr} & ${otherAddrs.join(' & ')}, ${property.address.city}`;
+                            }
+                            return `${primaryAddr}, ${property.address.city}`;
+                        })()}
                     </Typography>
                 </Box>
 

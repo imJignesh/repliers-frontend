@@ -33,7 +33,8 @@ export const parseSlug = (params: Params, searchParams: SearchParams) => {
   let streetSuffix: string = ''
   let streetDirection: string = ''
 
-  // Look for the first valid address pattern: [NUMBER] [NAME] [SUFFIX]
+  // Look for all valid address patterns: [NUMBER] [NAME] [SUFFIX]
+  const candidates: any[] = [];
   for (let i = 0; i < slugs.length; i++) {
     // If it's a number (allowing ranges and letters like 326B or 1159-1173)
     if (/^\d+[a-z]*([-\/]\d+[a-z]*)?$/i.test(slugs[i])) {
@@ -45,21 +46,42 @@ export const parseSlug = (params: Params, searchParams: SearchParams) => {
           const numStr = slugs[i]
           const nameParts = slugs.slice(i + 1, j)
 
-          if (nameParts.length > 0) {
-            streetNumber = numStr
-            streetName = nameParts.map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ')
-            streetSuffix = slugs[j]
+          // Filter out candidates where the street name contains something that looks like a street number
+          // This avoids "Bathurst Condos 7420 Bathurst"
+          const hasInnerNumber = nameParts.some(part => /^\d+$/.test(part));
 
+          if (nameParts.length > 0 && !hasInnerNumber) {
+            let sDir = '';
             const nextPart = slugs[j + 1]?.toLowerCase()
             if (nextPart && directions.includes(nextPart)) {
-              streetDirection = nextPart
+              sDir = nextPart
             }
 
-            return { boardId, streetNumber, streetName, streetSuffix, streetDirection, slug: listingName }
+            candidates.push({
+              boardId,
+              streetNumber: numStr,
+              streetName: nameParts.map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' '),
+              streetSuffix: slugs[j],
+              streetDirection: sDir,
+              slug: listingName,
+              score: nameParts.length // shorter is better?
+            });
           }
         }
       }
     }
+  }
+
+  if (candidates.length > 0) {
+    // Sort by score (street name length) ascending. We prefer concise street names.
+    // Also maybe prefer candidates that appear later in the slug (closer to the end)?
+    // For "7420-bathurst-condos-7420-bathurst-st-thornhill":
+    // Candidate 1: 7420 (idx 0) ... St (idx 5) -> Name: "Bathurst Condos 7420 Bathurst" (4 words). BUT rejected by hasInnerNumber check!
+    // Candidate 2: 7420 (idx 3) ... St (idx 5) -> Name: "Bathurst" (1 word). Accepted.
+
+    // If we didn't have hasInnerNumber check, we would sort by length.
+    candidates.sort((a, b) => a.score - b.score);
+    return candidates[0];
   }
 
   // Fallback for simple slugs or slugs without clear suffix patterns

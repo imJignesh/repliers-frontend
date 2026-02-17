@@ -209,13 +209,15 @@ const CatalogFilters = ({
             const locationData = locationDataFull.data
             locationData.buildingsSlug = buildingsSlug
 
-            if (Array.isArray(buildingsList)) {
-              locationData.buildings = buildingsList.map((b: any) => ({
+            const buildings = buildingsList.data || (Array.isArray(buildingsList) ? buildingsList : [])
+
+            if (Array.isArray(buildings)) {
+              locationData.buildings = buildings.map((b: any) => ({
                 ...b,
-                address: b.fullAddress,
+                address: b.fullAddress || b.address,
                 street: {
-                  number: b.streetNumber,
-                  name: b.streetName
+                  number: b.street?.number || b.streetNumber,
+                  name: b.street?.name || b.streetName
                 }
               }))
             }

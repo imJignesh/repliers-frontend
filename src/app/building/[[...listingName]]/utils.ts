@@ -64,7 +64,8 @@ export const parseSlug = (params: Params, searchParams: SearchParams) => {
               streetSuffix: slugs[j],
               streetDirection: sDir,
               slug: listingName,
-              score: nameParts.length // shorter is better?
+              score: nameParts.length, // shorter is better?
+              index: i // Capture the index of the street number
             });
           }
         }
@@ -73,14 +74,11 @@ export const parseSlug = (params: Params, searchParams: SearchParams) => {
   }
 
   if (candidates.length > 0) {
-    // Sort by score (street name length) ascending. We prefer concise street names.
-    // Also maybe prefer candidates that appear later in the slug (closer to the end)?
-    // For "7420-bathurst-condos-7420-bathurst-st-thornhill":
-    // Candidate 1: 7420 (idx 0) ... St (idx 5) -> Name: "Bathurst Condos 7420 Bathurst" (4 words). BUT rejected by hasInnerNumber check!
-    // Candidate 2: 7420 (idx 3) ... St (idx 5) -> Name: "Bathurst" (1 word). Accepted.
-
-    // If we didn't have hasInnerNumber check, we would sort by length.
-    candidates.sort((a, b) => a.score - b.score);
+    // Sort logic:
+    // 1. Prefer candidates found later in the slug (higher index).
+    //    Why? In "7420-bathurst-condos-7420-bathurst-st-thornhill", the second occurrence
+    //    is the real address ("7420 Bathurst St"), while the first one captures the project name prefix.
+    candidates.sort((a, b) => b.index - a.index);
     return candidates[0];
   }
 

@@ -202,26 +202,20 @@ const CatalogFilters = ({
 
       Promise.all([
         fetch(`https://app.precondo.ca/api/locations/area/${slug}`).then((res) => res.json()),
-        fetch(`https://backend.precondo.ca/api/buildings/area/${buildingsSlug}`).then((res) => res.json())
+        fetch(`https://backend.precondo.ca/api/area/${buildingsSlug}/buildings`).then((res) => res.json())
       ])
-        .then(([locationDataFull, buildingsResponse]) => {
+        .then(([locationDataFull, buildingsList]) => {
           if (locationDataFull.success) {
             const locationData = locationDataFull.data
             locationData.buildingsSlug = buildingsSlug
 
-            if (buildingsResponse.success && Array.isArray(buildingsResponse.data)) {
-              locationData.buildings = buildingsResponse.data.map((b: any) => ({
+            if (Array.isArray(buildingsList)) {
+              locationData.buildings = buildingsList.map((b: any) => ({
                 ...b,
-                name: b.name,
-                slug: b.slug,
-                address: b.formatted_address || b.address,
-                allAddresses: [
-                  b.formatted_address || b.address,
-                  ...(b.secondary_addresses || [])
-                ].filter(Boolean),
-                street: b.street || {
-                  number: b.street_number,
-                  name: b.street_name
+                address: b.fullAddress,
+                street: {
+                  number: b.streetNumber,
+                  name: b.streetName
                 }
               }))
             }

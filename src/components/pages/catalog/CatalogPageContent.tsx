@@ -188,10 +188,9 @@ const CatalogPageContent = ({
                     <Stack spacing={4} direction="row" flexWrap="wrap">
 
                       {buildings.map((building: any, index: number) => {
-                        const name = typeof building === 'string' ? building : building.name
-                        const address = typeof building === 'string' ? '' : building.address
-                        const slug = building.slug ||
-                          (building.street.number + '-' + building.street.name.toLowerCase().replaceAll(' ', '-'))
+                        const name = building.name || 'Unnamed Building'
+                        const allAddresses = building.allAddresses || []
+                        const slug = building.slug
 
                         return (
                           <Card
@@ -212,10 +211,14 @@ const CatalogPageContent = ({
                                 <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem', mb: 0.5 }}>
                                   {name}
                                 </Typography>
-                                {address && (
-                                  <Typography variant="body2" color="text.secondary">
-                                    {address}
-                                  </Typography>
+                                {allAddresses.length > 0 && (
+                                  <Box>
+                                    {allAddresses.map((addr: string, idx: number) => (
+                                      <Typography key={idx} variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+                                        {addr}
+                                      </Typography>
+                                    ))}
+                                  </Box>
                                 )}
                               </CardContent>
                             </CardActionArea>
@@ -257,10 +260,9 @@ const CatalogPageContent = ({
                 ) : (
                   <Stack spacing={4} direction="row" flexWrap="wrap">
                     {buildings.map((building: any, index: number) => {
-                      const name = typeof building === 'string' ? building : building.name
-                      const address = typeof building === 'string' ? '' : building.address
-                      const slug = building.slug ||
-                        (building.street.number + '-' + building.street.name.toLowerCase().replaceAll(' ', '-'))
+                      const name = building.name || 'Unnamed Building'
+                      const allAddresses = building.allAddresses || []
+                      const slug = building.slug
                       return (
                         <Card
                           key={index}
@@ -280,10 +282,14 @@ const CatalogPageContent = ({
                               <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem', mb: 0.5 }}>
                                 {name}
                               </Typography>
-                              {address && (
-                                <Typography variant="body2" color="text.secondary">
-                                  {address}
-                                </Typography>
+                              {allAddresses.length > 0 && (
+                                <Box>
+                                  {allAddresses.map((addr: string, idx: number) => (
+                                    <Typography key={idx} variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+                                      {addr}
+                                    </Typography>
+                                  ))}
+                                </Box>
                               )}
                             </CardContent>
                           </CardActionArea>

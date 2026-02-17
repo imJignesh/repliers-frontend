@@ -622,7 +622,7 @@ const CatalogFilters = ({
                 {/* New Hierarchical Groups View */}
                 {locationTree && locationTree.children && (
                   <>
-                    {locationTree.children.filter((group: any) => group.listing_count > 0).map((group: any) => {
+                    {locationTree.children.filter((group: any) => group.listing_count > 0 || group.building_count > 0).map((group: any) => {
                       const isActive = activeGroupId === group.id
                       return (
                         <Button
@@ -661,7 +661,7 @@ const CatalogFilters = ({
                               color: isActive ? 'inherit' : 'text.secondary'
                             }}
                           >
-                            {formatCount(group.listing_count)}
+                            {formatCount(group.listing_count > 0 ? group.listing_count : group.building_count)}
                           </Box>
                           {isActive ? (
                             <Box component="span" sx={{ transform: 'rotate(180deg)', display: 'inline-flex', ml: 0.5 }}><KeyboardArrowDownIcon /></Box>
@@ -693,7 +693,7 @@ const CatalogFilters = ({
             if (activeGroup && activeGroup.children && activeGroup.children.length > 0) {
               return (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, p: 1, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 2 }}>
-                  {activeGroup.children.filter((child: any) => child.listing_count > 0).map((child: any) => {
+                  {activeGroup.children.filter((child: any) => child.listing_count > 0 || child.building_count > 0).map((child: any) => {
                     const isChildActive = normalize(hood) === normalize(child.name) || normalize(hood) === normalize(child.slug)
                     return (
                       <Chip
@@ -714,7 +714,7 @@ const CatalogFilters = ({
                                 color: isChildActive ? 'inherit' : 'text.secondary'
                               }}
                             >
-                              {formatCount(child.listing_count)}
+                              {formatCount(child.listing_count > 0 ? child.listing_count : child.building_count)}
                             </Box>
                           </Stack>
                         }

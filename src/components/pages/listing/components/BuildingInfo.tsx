@@ -13,6 +13,9 @@ import { useProperty } from 'providers/PropertyProvider'
 const BuildingInfoItem = ({ icon: Icon, label, value }: { icon: any, label: string, value: string | number | null | undefined }) => {
     if (value === null || value === undefined || value === '') return null;
 
+    // Hide single character shorthand like 'C' or 'U' unless it's a number
+    if (typeof value === 'string' && value.length === 1 && !/\d/.test(value)) return null;
+
     return (
         <Stack direction="row" spacing={2} alignItems="center">
             <Box sx={{

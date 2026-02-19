@@ -27,9 +27,13 @@ const getListingData = (property: Property): HistoryItemType => ({
 const BuildingHistoryDetails = ({ history = [] }: { history?: Property[] }) => {
     // Filter out scrubbed entries and count them
     const visibleHistory = history.filter(item => {
+        const pType = item.details?.propertyType?.toLowerCase() || ''
+        const isParking = pType.includes('parking') || pType.includes('locker')
+
         return !scrubbed(item.mlsNumber) &&
             !scrubbed(item.address?.streetNumber) &&
-            !scrubbed(item.listPrice)
+            !scrubbed(item.listPrice) &&
+            !isParking
     })
 
     const scrubbedCount = history.length - visibleHistory.length

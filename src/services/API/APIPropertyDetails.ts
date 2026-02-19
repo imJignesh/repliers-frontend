@@ -31,7 +31,13 @@ class APIPropertyDetails extends APIBase {
 
     })
     if (!mls || undefined == mls) {
-      Promise.resolve({ listings: [] });
+      return Promise.resolve({
+        page: 1,
+        numPages: 0,
+        pageSize: 10,
+        count: 0,
+        similar: []
+      });
     }
     return this.fetchJSON(`/listings/${mls}/similar?${searchParams}`)
   }

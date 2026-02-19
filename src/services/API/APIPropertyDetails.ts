@@ -45,7 +45,7 @@ class APIPropertyDetails extends APIBase {
   fetchBuilding(boardId: number, streetName: string, streetNumber: string | number, slug?: string, streetSuffix?: string, streetDirection?: string): Promise<ApiQueryResponse> {
     const searchParams = queryString.stringify({
       boardId,
-      fields: 'address,mlsNumber,images,details,map',
+      fields: 'address,mlsNumber,images,details,map,class,type',
       streetName,
       streetNumber,
       streetSuffix,
@@ -59,7 +59,7 @@ class APIPropertyDetails extends APIBase {
   fetchBuildingHistory(boardId: number, streetName: string, streetNumber: string | number, slug?: string, streetSuffix?: string, streetDirection?: string): Promise<ApiQueryResponse> {
     const searchParams = queryString.stringify({
       boardId,
-      fields: 'address,mlsNumber,images,details,listPrice,soldPrice,listDate,soldDate,lastStatus,type,office,timestamps',
+      fields: 'address,mlsNumber,images,details,listPrice,soldPrice,listDate,soldDate,lastStatus,type,class,office,timestamps',
       streetName,
       streetNumber,
       streetSuffix,

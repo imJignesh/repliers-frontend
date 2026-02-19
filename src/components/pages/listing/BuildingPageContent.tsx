@@ -40,12 +40,13 @@ import {
   RoomsDetails,
   Sidebar,
   SimilarPropertyCarousel,
-  SummaryDetails
+  SummaryDetails,
+  BuildingInfo,
+  UnitCarousel,
+  BuildingMap
 } from './components'
 
 import { formatBuildingAddress } from '../../../utils/properties/formatters'
-import UnitCarousel from './components/UnitCarousel'
-import BuildingMap from './components/BuildingMap'
 
 const BuildingPageContent = ({
   embedded = false,
@@ -141,16 +142,11 @@ const BuildingPageContent = ({
               {/* <HomeHeaderInfo /> */}
               <DetailsContainer>
                 <Stack spacing={{ xs: 4, sm: 6 }}>
+                  <BuildingInfo />
                   <HomeDescription />
 
-                  {/* {mapType === 'static' ? (
-                    <BuildingMap type={mapType} />
-                  ) : (
-                    <MapOptionsProvider layout="map" style="hybrid">
-                      <BuildingMap />
-                    </MapOptionsProvider>
-                  )} */}
-                  {/* <SummaryDetails /> */}
+
+                  <SummaryDetails />
                 </Stack>
               </DetailsContainer>
 

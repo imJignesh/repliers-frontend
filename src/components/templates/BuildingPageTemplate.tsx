@@ -16,18 +16,22 @@ const BuildingPageTemplate = ({ property, history }: { property: ApiQueryRespons
   let p = property?.listings?.[0]
 
   if (!p && property.building) {
-    // Create a skeleton property object if we have building data but no active listings
+    // Use cached response if available, otherwise create a skeleton property object
+    const cached = property.building.cached_response;
+
     p = {
+      ...(cached || {}),
       address: {
-        streetNumber: property.building.street?.number,
-        streetName: property.building.street?.name,
-        streetSuffix: property.building.street?.suffix,
-        city: property.building.location?.city?.name,
-        neighborhood: property.building.location?.locality?.name
+        streetNumber: property.building.street?.number || cached?.address?.streetNumber,
+        streetName: property.building.street?.name || cached?.address?.streetName,
+        streetSuffix: property.building.street?.suffix || cached?.address?.streetSuffix,
+        city: property.building.location?.city?.name || cached?.address?.city,
+        neighborhood: property.building.location?.locality?.name || cached?.address?.neighborhood
       } as any,
-      images: [],
+      images: (property.building.cover_photo_url ? [property.building.cover_photo_url] : []).concat(cached?.images || []),
       details: {
-        description: property.building.content
+        ...(cached?.details || {}),
+        description: property.building.content || cached?.details?.description
       } as any,
       building: property.building
     } as any

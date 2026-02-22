@@ -11,7 +11,7 @@ import gridConfig from '@configs/cards-grids'
 // TODO: fix constants import from @pages alias
 import { gridColumnsMediaQueries } from '@pages/search/components/MapRoot/constants'
 import { EmptyCatalogListings, EmptyBuildings } from '@shared/EmptyStates'
-import { PropertyCard } from '@shared/Property'
+import { PropertyCard, BuildingCard } from '@shared/Property'
 
 import {
   type ApiBoardArea,
@@ -186,42 +186,9 @@ const CatalogPageContent = ({
                     )
                   ) : (
                     <Stack spacing={4} direction="row" flexWrap="wrap">
-
-                      {buildings.map((building: any, index: number) => {
-                        const name = typeof building === 'string' ? building : building.name
-                        const address = typeof building === 'string' ? '' : building.address
-                        const slug = building.slug ||
-                          (building.street.number + '-' + building.street.name.toLowerCase().replaceAll(' ', '-'))
-
-                        return (
-                          <Card
-                            key={index}
-                            sx={{
-                              width: gridConfig.propertyCardSizes.normal.width,
-                              borderRadius: 2,
-                              boxShadow: 1,
-                              display: 'flex',
-                              overflow: 'hidden'
-                            }}
-                          >
-                            <CardActionArea component={Link} href={`/building/${slug}`} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'stretch', width: '100%' }}>
-                              <Box sx={{ width: 80, bgcolor: 'grey.100', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                <ApartmentIcon sx={{ color: 'text.secondary', fontSize: 32 }} />
-                              </Box>
-                              <CardContent sx={{ flex: 1, p: 2, '&:last-child': { pb: 2 } }}>
-                                <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem', mb: 0.5 }}>
-                                  {name}
-                                </Typography>
-                                {address && (
-                                  <Typography variant="body2" color="text.secondary">
-                                    {address}
-                                  </Typography>
-                                )}
-                              </CardContent>
-                            </CardActionArea>
-                          </Card>
-                        )
-                      })}
+                      {buildings.map((building: any, index: number) => (
+                        <BuildingCard key={index} building={building} />
+                      ))}
                       {buildings.length === 0 && (
                         <EmptyBuildings />
                       )}
@@ -256,40 +223,9 @@ const CatalogPageContent = ({
                   )
                 ) : (
                   <Stack spacing={4} direction="row" flexWrap="wrap">
-                    {buildings.map((building: any, index: number) => {
-                      const name = typeof building === 'string' ? building : building.name
-                      const address = typeof building === 'string' ? '' : building.address
-                      const slug = building.slug ||
-                        (building.street.number + '-' + building.street.name.toLowerCase().replaceAll(' ', '-'))
-                      return (
-                        <Card
-                          key={index}
-                          sx={{
-                            width: gridConfig.propertyCardSizes.normal.width,
-                            borderRadius: 2,
-                            boxShadow: 1,
-                            display: 'flex',
-                            overflow: 'hidden'
-                          }}
-                        >
-                          <CardActionArea component={Link} href={`/building/${slug}`} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'stretch', width: '100%' }}>
-                            <Box sx={{ width: 80, bgcolor: 'grey.100', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                              <ApartmentIcon sx={{ color: 'text.secondary', fontSize: 32 }} />
-                            </Box>
-                            <CardContent sx={{ flex: 1, p: 2, '&:last-child': { pb: 2 } }}>
-                              <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem', mb: 0.5 }}>
-                                {name}
-                              </Typography>
-                              {address && (
-                                <Typography variant="body2" color="text.secondary">
-                                  {address}
-                                </Typography>
-                              )}
-                            </CardContent>
-                          </CardActionArea>
-                        </Card>
-                      )
-                    })}
+                    {buildings.map((building: any, index: number) => (
+                      <BuildingCard key={index} building={building} />
+                    ))}
                     {buildings.length === 0 && (
                       <EmptyBuildings />
                     )}

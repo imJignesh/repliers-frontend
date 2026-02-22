@@ -28,11 +28,33 @@ const BuildingCard = ({ building }: BuildingCardProps) => {
                 rel="noopener noreferrer"
                 style={{ position: 'relative', display: 'block', textDecoration: 'none', color: 'inherit' }}
             >
-                <Gallery
-                    size="normal"
-                    images={[imageUrl]}
-                    icon="house"
-                />
+                <Box sx={{ position: 'relative' }}>
+                    <Gallery
+                        size="normal"
+                        images={[imageUrl]}
+                        icon="house"
+                    />
+                    {building.listing_count > 0 && (
+                        <Box sx={{
+                            position: 'absolute',
+                            top: 12,
+                            right: 12,
+                            bgcolor: 'rgba(0, 0, 0, 0.65)',
+                            backdropFilter: 'blur(8px)',
+                            color: 'white',
+                            px: 1.5,
+                            py: 0.5,
+                            borderRadius: '20px',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            letterSpacing: '0.02em',
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            zIndex: 2
+                        }}>
+                            {building.listing_count} {building.listing_count === 1 ? 'Listing' : 'Listings'}
+                        </Box>
+                    )}
+                </Box>
                 <Box sx={{ p: 2 }}>
                     <Typography variant="h6" sx={{
                         fontWeight: 700,
@@ -47,10 +69,29 @@ const BuildingCard = ({ building }: BuildingCardProps) => {
                     <Typography variant="body2" color="text.secondary" sx={{
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
+                        whiteSpace: 'nowrap',
+                        mb: 0.5
                     }}>
                         {address}
                     </Typography>
+                    {building.listing_count > 0 && (
+                        <Typography variant="caption" sx={{
+                            color: 'primary.main',
+                            fontWeight: 600,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.5
+                        }}>
+                            <Box component="span" sx={{
+                                width: 6,
+                                height: 6,
+                                bgcolor: 'primary.main',
+                                borderRadius: '50%',
+                                display: 'inline-block'
+                            }} />
+                            {building.listing_count} Active {building.listing_count === 1 ? 'Listing' : 'Listings'}
+                        </Typography>
+                    )}
                 </Box>
             </a>
         </CardContainer>

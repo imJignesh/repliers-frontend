@@ -6,8 +6,11 @@ import routes from '@configs/routes'
 
 import { joinNonEmpty } from 'utils/strings'
 
-export const getCDNPath = (fileName: string, size = 'large') =>
-  fileName ? `${apiConfig.repliersCdn}/${fileName}?&webp&class=${size}` : ''
+export const getCDNPath = (fileName: string, size = 'large') => {
+  if (!fileName) return ''
+  if (fileName.startsWith('http')) return fileName
+  return `${apiConfig.repliersCdn}/${fileName}?&webp&class=${size}`
+}
 
 export const getYoutubeVideoId = (url: string) => {
   const regex =

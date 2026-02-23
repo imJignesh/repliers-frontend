@@ -50,7 +50,8 @@ class APIPropertyDetails extends APIBase {
       streetNumber,
       streetSuffix,
       streetDirection,
-      slug
+      slug,
+      type: 'sale'
     })
 
     return this.fetchJSON<ApiQueryResponse>(`/listings/building?${searchParams}`)
@@ -67,7 +68,8 @@ class APIPropertyDetails extends APIBase {
       slug,
       status: ['A', 'U'],
       sortBy: 'updatedOnDesc',
-      resultsPerPage: 100
+      resultsPerPage: 100,
+      type: 'sale'
     })
 
     return this.fetchJSON<ApiQueryResponse>(`/listings/building?${searchParams}`)

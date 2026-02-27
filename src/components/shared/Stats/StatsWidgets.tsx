@@ -16,7 +16,7 @@ import { type LocationStatsParams } from './types'
 export const StatsWidgets = (
   params: Omit<LocationStatsParams, 'propertyClass'>
 ) => {
-  const { city, name = '' } = params
+  const { city, neighborhood, name = '' } = params
   const t = useTranslations()
   const [propertyClass, setPropertyClass] = useState<PropertyClass>('condo')
 
@@ -32,7 +32,7 @@ export const StatsWidgets = (
               {t('Statistics.insightsTitle', { name })}
             </Typography>
 
-            <StatsTabs city={city} onTabChange={setPropertyClass} />
+            <StatsTabs city={city} neighborhood={neighborhood} onTabChange={setPropertyClass} />
             {/* <StatsGraph city={city} propertyClass={propertyClass} /> */}
 
             {/* <Typography

@@ -16,9 +16,12 @@ type DetailsSection =
   | 'neighborhood'
   | 'exterior'
   | 'rooms'
+  | 'insights'
 
 type ResolverSections = {
-  [key in DetailsSection]: DetailsGroupType[]
+  [key in Exclude<DetailsSection, 'insights'>]: DetailsGroupType[]
+} & {
+  insights?: any
 }
 
 type Resolver = (property: Property) => ResolverSections

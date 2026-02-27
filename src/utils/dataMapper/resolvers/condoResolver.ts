@@ -14,7 +14,11 @@ const resolver = (property: Property) => {
     appliances: appliancesResolver(property),
     neighborhood: neighborhoodResolver(property),
     exterior: exteriorResolver(property),
-    rooms: roomsResolver(property)
+    rooms: roomsResolver(property),
+    insights: {
+      city: property.address.city,
+      neighborhood: property.address.neighborhood
+    }
   }
 }
 

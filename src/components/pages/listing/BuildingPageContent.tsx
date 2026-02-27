@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo } from 'react'
 
-import { Box, Container, Stack, Typography, Breadcrumbs, Link } from '@mui/material'
+import { Box, Container, Stack, Typography, Breadcrumbs, Link, Paper } from '@mui/material'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import NextLink from 'next/link'
 import { getCatalogUrl } from '../../../utils/urls'
@@ -43,7 +43,8 @@ import {
   SummaryDetails,
   BuildingInfo,
   UnitCarousel,
-  BuildingMap
+  BuildingMap,
+  InsightsDetails
 } from './components'
 
 import { formatBuildingAddress } from '../../../utils/properties/formatters'
@@ -166,8 +167,9 @@ const BuildingPageContent = ({
               <Box id="history" sx={{ scrollMarginTop: '100px' }}>
                 <BuildingHistoryDetails history={history} />
               </Box>
-
-
+              <Paper variant='outlined'>
+                <InsightsDetails insights={propertyDetails.insights} />
+              </Paper>
             </Stack>
 
             {

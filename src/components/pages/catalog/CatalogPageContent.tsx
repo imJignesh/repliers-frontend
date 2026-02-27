@@ -142,8 +142,8 @@ const CatalogPageContent = ({
             maxWidth={showMap ? false : 'lg'}
             sx={{
               ...gridColumnsMediaQueries,
-              px: gridConfig.gridSpacing,
-              pt: gridConfig.gridSpacing,
+              px: { xs: 1, sm: 2, md: 3 },
+              pt: { xs: 2, sm: 3, md: 4 },
               ...(showMap && {
                 p: 0,
                 height: 'calc(100vh - 140px)', // Approx height
@@ -163,7 +163,17 @@ const CatalogPageContent = ({
                 }}>
                   {viewMode === 'listings' ? (
                     listings?.length > 0 ? (
-                      <Stack spacing={4} direction="row" flexWrap="wrap">
+                      <Stack
+                        spacing={{ xs: 2, sm: 3, md: 4 }}
+                        direction="row"
+                        flexWrap="wrap"
+                        justifyContent="center"
+                        sx={{
+                          '& > *': {
+                            width: { xs: '100% !important', sm: 'calc(49% - 8px) !important', md: 'calc(31% - 11px) !important' }
+                          }
+                        }}
+                      >
                         {listings.map((property, index) => (
                           <PropertyCard
                             key={index}
@@ -185,7 +195,17 @@ const CatalogPageContent = ({
                       <EmptyCatalogListings />
                     )
                   ) : (
-                    <Stack spacing={4} direction="row" flexWrap="wrap">
+                    <Stack
+                      spacing={{ xs: 2, sm: 3, md: 4 }}
+                      direction="row"
+                      flexWrap="wrap"
+                      justifyContent="center"
+                      sx={{
+                        '& > *': {
+                          width: { xs: 'calc(100% - 0px)', sm: 'calc(50% - 6px)', md: 'calc(33.333% - 8px)' }
+                        }
+                      }}
+                    >
                       {buildings.map((building: any, index: number) => (
                         <BuildingCard key={index} building={building} />
                       ))}
@@ -200,7 +220,7 @@ const CatalogPageContent = ({
                     </Stack>
                   )}
                 </Box>
-                <Box sx={{
+                <Box sx={{ 
                   width: { xs: '0%', md: '50%' },
                   display: { xs: 'none', md: 'block' },
                   height: '100%',
@@ -213,7 +233,17 @@ const CatalogPageContent = ({
               <>
                 {viewMode === 'listings' ? (
                   listings?.length > 0 ? (
-                    <Stack spacing={4} direction="row" flexWrap="wrap">
+                    <Stack
+                      spacing={{ xs: 2, sm: 3, md: 4 }}
+                      direction="row"
+                      flexWrap="wrap"
+                      justifyContent="center"
+                      sx={{
+                        '& > *': {
+                          width: { xs: 'calc(100% - 0px)', sm: 'calc(50% - 6px)', md: 'calc(33.333% - 8px)' }
+                        }
+                      }}
+                    >
                       {listings.map((property, index) => (
                         <PropertyCard key={index} property={property} />
                       ))}
@@ -222,7 +252,17 @@ const CatalogPageContent = ({
                     <EmptyCatalogListings />
                   )
                 ) : (
-                  <Stack spacing={4} direction="row" flexWrap="wrap">
+                  <Stack
+                    spacing={{ xs: 2, sm: 3, md: 4 }}
+                    direction="row"
+                    flexWrap="wrap"
+                    justifyContent="center"
+                    sx={{
+                      '& > *': {
+                        width: { xs: 'calc(100% - 0px)', sm: 'calc(50% - 6px)', md: 'calc(33.333% - 8px)' }
+                      }
+                    }}
+                  >
                     {buildings.map((building: any, index: number) => (
                       <BuildingCard key={index} building={building} />
                     ))}

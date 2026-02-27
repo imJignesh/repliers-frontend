@@ -87,8 +87,9 @@ const CatalogHeader = ({
           width="100%"
           direction={{ xs: 'column', md: 'row' }}
           justifyContent={'space-between'}
+          padding={'40px 0'}
         >
-          <Box sx={{ clear: 'both' }}>
+          <Box sx={{ clear: 'both'}}>
             {/* <Button
               href={mapLink}
               target="_blank"
@@ -104,9 +105,9 @@ const CatalogHeader = ({
             >
               Explore
             </Button> */}
-            <Typography variant="h1" style={{ fontSize: '2rem' }}>
+            <Typography variant="h1" style={{ fontSize: '2rem', lineHeight: 1.2 }}>
               {current}{' '}
-              <span style={{ whiteSpace: 'nowrap' }}> Condos for Resale</span>
+              <span> Condos for Resale</span>
             </Typography>
           </Box>
           <Breadcrumbs area={area} city={city} hood={hood} />

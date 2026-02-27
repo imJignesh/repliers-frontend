@@ -140,23 +140,23 @@ const BuildingPageContent = ({
 
 
               {/* <HomeHeaderInfo /> */}
-              <DetailsContainer>
-                <Stack spacing={{ xs: 4, sm: 6 }}>
-                  <BuildingInfo />
-                  <HomeDescription />
 
 
-                  <SummaryDetails />
-                </Stack>
-              </DetailsContainer>
+
+              <BuildingInfo />
+
+
+
+              <HomeDescription />
+
 
               <Box id="features" sx={{ scrollMarginTop: '100px' }}>
                 <FeaturesDetails features={propertyDetails.features} />
               </Box>
               <AppliancesDetails appliances={propertyDetails.appliances} />
-              <ExteriorDetails exterior={propertyDetails.exterior} />
+              {/* <ExteriorDetails exterior={propertyDetails.exterior} /> */}
 
-              <RoomsDetails rooms={propertyDetails.rooms} />
+              {/* <RoomsDetails rooms={propertyDetails.rooms} /> */}
 
               <Box id="active-listings" sx={{ scrollMarginTop: '100px' }}>
                 <UnitCarousel properties={similarProperties} />

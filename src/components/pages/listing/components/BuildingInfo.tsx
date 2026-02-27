@@ -2,9 +2,9 @@
 'use client'
 
 import React from 'react'
-import { Stack, Typography, Grid, Paper, Box } from '@mui/material'
-import CorporateFareIcon from '@mui/icons-material/CorporateFare'
-import LayersIcon from '@mui/icons-material/Layers'
+import { Stack, Typography, Paper, Box } from '@mui/material'
+import TrendingUpIcon from '@mui/icons-material/TrendingUp'
+import SquareFootIcon from '@mui/icons-material/SquareFoot'
 import EventIcon from '@mui/icons-material/Event'
 import ApartmentIcon from '@mui/icons-material/Apartment'
 
@@ -17,7 +17,7 @@ const BuildingInfoItem = ({ icon: Icon, label, value }: { icon: any, label: stri
     if (typeof value === 'string' && value.length === 1 && !/\d/.test(value)) return null;
 
     return (
-        <Stack direction="row" spacing={2} alignItems="center">
+        <Stack direction="row" spacing={1} alignItems="center">
             <Box sx={{
                 bgcolor: 'primary.light',
                 color: 'primary.main',
@@ -30,10 +30,10 @@ const BuildingInfoItem = ({ icon: Icon, label, value }: { icon: any, label: stri
                 <Icon fontSize="small" />
             </Box>
             <Box>
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: -0.5 }}>
+                <Typography variant="body2" fontWeight="bold" color="text.primary" sx={{ display: 'block', mb: 0.2 }}>
                     {label}
                 </Typography>
-                <Typography variant="body1" fontWeight="bold">
+                <Typography variant="body1" fontWeight="normal" lineHeight={1}>
                     {value}
                 </Typography>
             </Box>
@@ -47,72 +47,51 @@ const BuildingInfo = () => {
 
     if (!building) return null
 
-    const hasData = building.stories || building.total_units || building.year_built || building.amenities
+    const hasData = building.price_sqft || building.avg_price_sqft || building.built_year_ext || building.floors_units
 
     if (!hasData) return null
 
     return (
-        <Paper variant="outlined" sx={{ p: 4, borderRadius: 4, bgcolor: '#fdfdfd' }}>
-            <Stack spacing={3}>
-                <Typography variant="h3" sx={{ fontSize: '1.5rem', fontWeight: 700 }}>
-                    Building Information
-                </Typography>
-                <Grid container spacing={4}>
-                    <Grid item xs={12} sm={6} md={3}>
-                        <BuildingInfoItem
-                            icon={LayersIcon}
-                            label="Stories"
-                            value={building.stories}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                        <BuildingInfoItem
-                            icon={ApartmentIcon}
-                            label="Total Units"
-                            value={building.total_units}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                        <BuildingInfoItem
-                            icon={EventIcon}
-                            label="Year Built"
-                            value={building.year_built}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                        <BuildingInfoItem
-                            icon={CorporateFareIcon}
-                            label="Slug"
-                            value={building.slug}
-                        />
-                    </Grid>
-                </Grid>
 
-                {building.amenities && (
-                    <Box sx={{ mt: 2 }}>
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-                            Building Amenities
-                        </Typography>
-                        <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ gap: 1 }}>
-                            {building.amenities.split(',').map((amenity: string) => (
-                                <Box
-                                    key={amenity}
-                                    sx={{
-                                        bgcolor: 'rgba(0,0,0,0.05)',
-                                        px: 2,
-                                        py: 0.5,
-                                        borderRadius: 5,
-                                        fontSize: '0.875rem'
-                                    }}
-                                >
-                                    {amenity.trim()}
-                                </Box>
-                            ))}
-                        </Stack>
-                    </Box>
-                )}
-            </Stack>
-        </Paper>
+        <Stack spacing={0} padding={0}>
+
+
+            <Box sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 2,
+            }}>
+                <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 16px)', md: '1 1 calc(25% - 24px)' } }}>
+                    <BuildingInfoItem
+                        icon={SquareFootIcon}
+                        label="Price/Sqft Range"
+                        value={building.price_sqft}
+                    />
+                </Box>
+                <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 16px)', md: '1 1 calc(25% - 24px)' } }}>
+                    <BuildingInfoItem
+                        icon={TrendingUpIcon}
+                        label="Avg Price/Sqft"
+                        value={building.avg_price_sqft}
+                    />
+                </Box>
+                <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 16px)', md: '1 1 calc(25% - 24px)' } }}>
+                    <BuildingInfoItem
+                        icon={EventIcon}
+                        label="Completed"
+                        value={building.built_year_ext}
+                    />
+                </Box>
+                <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 16px)', md: '1 1 calc(25% - 24px)' } }}>
+                    <BuildingInfoItem
+                        icon={ApartmentIcon}
+                        label="Building Scale"
+                        value={building.floors_units}
+                    />
+                </Box>
+            </Box>
+        </Stack>
+
     )
 }
 

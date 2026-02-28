@@ -127,8 +127,9 @@ const removeTokenFromUrl = () => {
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
 const UserProvider = ({ children }: { children: ReactNode }) => {
+  // guard against server environment where `window`/`localStorage` may be missing
   const localProfile =
-    typeof localStorage !== 'undefined'
+    typeof window !== 'undefined' && typeof localStorage !== 'undefined'
       ? localStorage.getItem(profileKey)
       : null
 
@@ -144,7 +145,9 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const saveProfile = (data: Partial<ApiUserProfile>) => {
     setProfile(data)
-    localStorage.setItem(profileKey, JSON.stringify(data))
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      localStorage.setItem(profileKey, JSON.stringify(data))
+    }
   }
 
   const processAuthResponse = (response: AuthCallbackResponse) => {
@@ -161,9 +164,13 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     clearTokenSync()
     setProfile({})
-    localStorage.removeItem(profileKey)
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      localStorage.removeItem(profileKey)
+    }
     // TODO: not sure if we need this, lets check site behavior without it
-    window.location.reload()
+    if (typeof window !== 'undefined') {
+      window.location.reload()
+    }
   }
 
   const login = async (provider: AuthProvider, code: string) => {

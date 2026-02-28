@@ -397,10 +397,11 @@ const CatalogFilters = ({
         direction="row"
         alignItems="center"
         justifyContent="space-between"
+        flexWrap="wrap"
       >
         {count > 0 && (
           <>
-            <Stack spacing={1} direction="row" alignItems="center">
+            <Stack spacing={1} direction="row" alignItems="center" flexWrap="wrap" paddingTop="20px">
               {clientSide ? (
                 <>
                   {/* <ToggleButtonGroup
@@ -569,7 +570,7 @@ const CatalogFilters = ({
               </Typography>
             </Box>
 
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', paddingBottom:"30px" }}>
               <IconButton onClick={() => handleScroll('left')} size="small" sx={{ p: 0, mr: 1, border: '1px solid', borderColor: 'divider' }}>
                 <ChevronLeftIcon />
               </IconButton>

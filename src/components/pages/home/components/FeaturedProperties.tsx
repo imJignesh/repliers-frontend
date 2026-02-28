@@ -84,41 +84,19 @@ const FeaturedProperties = () => {
         {features.dashboard && <StatsWidgets {...defaultFilters} name={state} />}
 
 
-        <Box
-          sx={{
-            py: { xs: 3, sm: 4, md: 6 },
-            px: { xs: 2, sm: 3, md: 4 },
-            backgroundColor: '#f4f4f4',
-            textAlign: 'center',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center'
-          }}
-        >
+        <Box sx={{ py: 2, px: 2, backgroundColor: '#f4f4f4', textAlign: 'center' }}>
           <Typography
             variant="h3"
+
             sx={{
               fontWeight: 700,
               color: '#555',
               textAlign: 'center',
               maxWidth: '1200px',
               margin: '0 auto 40px',
-              fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' }
             }}
-          >
-            Featured In
-          </Typography>
-          <Box
-            component="img"
-            src="pc-partners.png"
-            alt="Featured In"
-            sx={{
-              width: '100%',
-              maxWidth: { xs: '100%', sm: '600px', md: '800px' },
-              height: 'auto',
-              display: 'block'
-            }}
-          />
+          >Featured In </Typography>
+          <img src="pc-partners.png" alt="Featured In" style={{ maxWidth: '800px', margin: '0 auto' }} />
         </Box>
         {/*
        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
@@ -150,25 +128,10 @@ const FeaturedProperties = () => {
           properties={featured}
         /> */}
         <Box>
-          <CarouselHeader title={'Popular Preconstructions'} navigation={false} onPrev={function (): void {
-            throw new Error('Function not implemented.')
-          } } onNext={function (): void {
-            throw new Error('Function not implemented.')
-          } } />
+          <CarouselHeader title={'Popular Preconstructions'} />
           <br />
           {featured?.length > 0 ? (
-            <Stack
-              spacing={{ xs: 3, sm: 4, md: 4 }}
-              direction="row"
-              flexWrap="wrap"
-              justifyContent="center"
-              sx={{
-                '& > *': {
-                  width: { xs: '100% !important', sm: 'calc(48% - 8px) !important', md: 'calc(32% - 11px) !important' , lg: 'calc(24% - 12px) !important' },
-                  height: '100% !important'
-                }
-              }}
-            >
+            <Stack spacing={4} direction="row" flexWrap="wrap">
               {featured.map((property, index) => (
                 <PropertyCard key={index} property={property} />
               ))}

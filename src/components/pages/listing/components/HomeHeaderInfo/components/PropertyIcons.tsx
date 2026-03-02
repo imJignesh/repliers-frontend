@@ -27,6 +27,7 @@ const BasicPropertyIcons = ({ property }: { property: Property }) => {
   return (
     <Stack
       direction="row"
+      flexWrap="wrap"
       spacing={{ xs: 2, sm: 2, md: 2, lg: 4 }}
       sx={{ pt: { xs: 1, sm: 0 } }}
     >

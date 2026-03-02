@@ -110,18 +110,18 @@ const AppointmentForm = () => {
                 <Stack spacing={2}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                         {!values.is_open && (
-                            <Stack direction="row" spacing={1}>
+                            <Stack direction="column" spacing={2}>
                                 <DatePicker
                                     label="Date"
                                     minDate={dayjs()}
                                     value={values.date}
-                                    slotProps={{ textField: { size: 'small', sx: { flex: 1 } } }}
+                                    slotProps={{ textField: { size: 'small', fullWidth: true } }}
                                     onChange={(newValue) => setValues({ ...values, date: newValue as Dayjs })}
                                 />
                                 <TimePicker
                                     label="Time"
                                     value={values.time}
-                                    slotProps={{ textField: { size: 'small', sx: { flex: 1 } } }}
+                                    slotProps={{ textField: { size: 'small', fullWidth: true } }}
                                     onChange={(newValue) => setValues({ ...values, time: newValue as Dayjs })}
                                 />
                             </Stack>

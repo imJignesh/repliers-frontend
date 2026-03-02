@@ -15,6 +15,30 @@ type ContactRequestInfo = {
   mlsNumber: string
 }
 
+export type LeadRequest = {
+  first_name?: string
+  last_name?: string
+  name?: string
+  email?: string
+  phone?: string
+  url?: string
+  mls_number?: string
+  listing_price?: string
+  listing_neighbourhood?: string
+  listing_city?: string
+  message?: string
+}
+
+export type AppointmentRequest = {
+  first_name?: string
+  last_name?: string
+  email?: string
+  phone?: string
+  url?: string
+  mls_number?: string
+  time_date_field?: string
+}
+
 export type ContactScheduleMethod = 'InPerson' | 'LiveVideo'
 
 type HomeTourRequest = {
@@ -60,6 +84,22 @@ class APIContact extends APIBase {
 
   meetingRequest(body: MeetingRequest) {
     return this.fetchRaw('/contact/schedule/estimate', {
+      method: 'POST',
+      body: JSON.stringify(body)
+    })
+  }
+
+  // New methods for sync backend
+  // Note: These might need a different base URL eventually
+  captureLead(body: LeadRequest) {
+    return this.fetchJSON('/leads', {
+      method: 'POST',
+      body: JSON.stringify(body)
+    })
+  }
+
+  captureAppointment(body: AppointmentRequest) {
+    return this.fetchJSON('/appointments', {
       method: 'POST',
       body: JSON.stringify(body)
     })

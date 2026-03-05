@@ -117,6 +117,17 @@ const LocationsCatalogPage = async (props: {
     )
   }
 
+  const searchFilters = parseUrlFilters(filters)
+  const { listings, count } = await fetchListings({
+    area,
+    city,
+    hood,
+    filters: searchFilters,
+    page
+  })
+
+  if (page > 1 && !listings.length) return <Page404Template />
+
   const byCount = (a: any, b: any) => b.activeCount - a.activeCount
 
   const currentArea = area ? finalAreas.find((a) => a.name === area) : null
@@ -146,34 +157,6 @@ const LocationsCatalogPage = async (props: {
       : (city && currentLocation
         ? (currentLocation as ApiBoardCity).neighborhoods || []
         : (currentArea ? currentArea.cities : []))
-
-  const searchFilters = parseUrlFilters(filters)
-  let { listings, count } = await fetchListings({
-    area,
-    city,
-    hood,
-    filters: searchFilters,
-    page
-  } as any)
-
-  // FALLBACK: If we are on an area page and it's empty, try searching by its child locations (cities/hoods)
-  // This helps when the API (Repliers) has miscategorized "Out of Area" listings under "Toronto" 
-  // but we know they belong to this specific area (like Algoma).
-  if (area && !city && !hood && listings.length === 0 && hoods.length > 0) {
-    const cityNames = hoods.map((h: any) => h.name)
-    const fallback = await fetchListings({
-      city: cityNames as any,
-      filters: searchFilters,
-      page
-    })
-
-    if (fallback.listings.length > 0) {
-      listings = fallback.listings
-      count = fallback.count
-    }
-  }
-
-  if (page > 1 && !listings.length) return <Page404Template />
 
   return (
     <PageTemplate>

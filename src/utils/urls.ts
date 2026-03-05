@@ -71,12 +71,11 @@ export const sanitizeUrl = (url: string) =>
 export const getCatalogUrl = (
   city: string = '',
   hood: string = '',
-  filters: string | string[] = []
+  filters: string[] = []
 ) => {
   const cityUrl = city ? `/${sanitizeUrl(city.replace('-', ' '))}` : ''
   const hoodUrl = hood ? `/${sanitizeUrl(hood)}` : ''
-  const filtersArr = Array.isArray(filters) ? filters : [filters].filter(Boolean)
-  const filterUrl = filtersArr.length ? `/${filtersArr.join('-')}` : ''
+  const filterUrl = filters.length ? `/${filters.join('-')}` : ''
   return `${routes.listings}${cityUrl}${hoodUrl}${filterUrl}`
 }
 

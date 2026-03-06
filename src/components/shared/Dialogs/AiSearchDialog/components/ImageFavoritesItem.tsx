@@ -57,7 +57,7 @@ const FavoritesItem = ({
 
   const imageUrl = getCDNPath(image, 'small')
   const searchUrl = !embedded
-    ? `/search/grid?aiImage=${encodeURIComponent(imageUrl)}`
+    ? `/r/search/grid?aiImage=${encodeURIComponent(imageUrl)}`
     : ''
 
   const handleImageClick = (e: React.MouseEvent) => {

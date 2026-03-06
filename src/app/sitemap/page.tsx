@@ -19,7 +19,7 @@ const SitemapPage = async () => {
                 title={`Areas | ${areas.length}`}
                 items={areas.sort((a, b) => a.name.localeCompare(b.name)).map((area) => ({
                     name: area.name,
-                    link: `/sitemap/${sanitizeUrl(area.name)}`
+                    link: `/r/sitemap/${sanitizeUrl(area.name)}`
                 }))}
             />
         </StaticPageTemplate>

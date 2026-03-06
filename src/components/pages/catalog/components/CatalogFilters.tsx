@@ -106,8 +106,9 @@ const CatalogFilters = ({
     })
   })
 
-  const regions = areas.length ? areas.map((a: ApiBoardArea) => a.name) : Object.keys(citymap).filter((key) => citymap[key].active)
-  const currentCitymap = (areas.length ? dynamicCitymap : citymap) as any
+  const typedCitymap = citymap as Record<string, any>
+  const regions = areas.length ? areas.map((a: ApiBoardArea) => a.name) : Object.keys(typedCitymap).filter((key) => typedCitymap[key].active)
+  const currentCitymap = (areas.length ? dynamicCitymap : typedCitymap) as any
   const router = useRouter()
   const clientSide = useClientSide()
   const { mobile } = useBreakpoints()
@@ -570,7 +571,7 @@ const CatalogFilters = ({
               </Typography>
             </Box>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', paddingBottom:"30px" }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', paddingBottom: "30px" }}>
               <IconButton onClick={() => handleScroll('left')} size="small" sx={{ p: 0, mr: 1, border: '1px solid', borderColor: 'divider' }}>
                 <ChevronLeftIcon />
               </IconButton>

@@ -67,23 +67,33 @@ const CatalogPageContent = ({
   const [viewMode, setViewMode] = useState<'listings' | 'buildings'>('listings')
   const [locationTree, setLocationTree] = useState<any>(null)
   const mapRef = useRef<HTMLDivElement>(null)
-  
+
   // Theme hooks for responsive detection
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   useEffect(() => {
-    const stored = localStorage.getItem('repliers_catalog_map_view')
-    if (stored === 'true') {
+    const storedMap = localStorage.getItem('repliers_catalog_map_view')
+    if (storedMap === 'true') {
       setShowMap(true)
     }
+
+    const storedView = localStorage.getItem('repliers_catalog_view_mode')
+    if (storedView === 'listings' || storedView === 'buildings') {
+      setViewMode(storedView as 'listings' | 'buildings')
+    }
   }, [])
+
+  const handleSetViewMode = (mode: 'listings' | 'buildings') => {
+    setViewMode(mode)
+    localStorage.setItem('repliers_catalog_view_mode', mode)
+  }
 
   const handleToggleMap = () => {
     const newState = !showMap
     setShowMap(newState)
     localStorage.setItem('repliers_catalog_map_view', String(newState))
-    
+
     // Scroll to map on mobile when toggled on
     if (!showMap && mapRef.current) {
       setTimeout(() => {
@@ -136,7 +146,7 @@ const CatalogPageContent = ({
                 showMap={showMap}
                 onToggleMap={handleToggleMap}
                 viewMode={viewMode}
-                setViewMode={setViewMode}
+                setViewMode={handleSetViewMode}
                 onLocationTreeChange={setLocationTree}
               />
             </Container>
@@ -210,7 +220,7 @@ const CatalogPageContent = ({
                                 zoom: 16,
                               })
                               MapService.showPopup(property.mlsNumber)
-                              
+
                               // NEW: Scroll to map on mobile when location icon clicked
                               if (isMobile && mapRef.current) {
                                 mapRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })

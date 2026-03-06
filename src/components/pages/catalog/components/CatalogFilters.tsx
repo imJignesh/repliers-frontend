@@ -191,7 +191,8 @@ const CatalogFilters = ({
   useEffect(() => {
     if (selectedRegion) {
       const slug = selectedRegion.toLowerCase().replace(/\s+/g, '-')
-      const buildingsSlug = hood ? hood.toLowerCase().replace(/\s+/g, '-') : slug
+      const localityName = hood || city // Provide locality via hood or city
+      const buildingsSlug = localityName ? localityName.toLowerCase().replace(/\s+/g, '-') : slug
 
       // Avoid re-fetching if we already have the correct data
       if (locationTree &&
@@ -203,9 +204,17 @@ const CatalogFilters = ({
       }
 
       setIsLocationTreeLoading(true)
+
+      const precondoUrl = process.env.NEXT_PUBLIC_PRECONDO_URL || 'https://app.precondo.ca'
+
+      let buildingsApiUrl = `${precondoUrl}/api/buildings/area/${slug}`;
+      if (localityName) {
+        buildingsApiUrl = `${precondoUrl}/api/buildings/area/${slug}/locality/${buildingsSlug}`;
+      }
+
       Promise.all([
-        fetch(`https://app.precondo.ca/api/locations/area/${slug}`).then((res) => res.json()),
-        fetch(`https://app.precondo.ca/api/buildings/area/${buildingsSlug}`).then((res) => res.json())
+        fetch(`${precondoUrl}/api/locations/area/${slug}`).then((res) => res.json()),
+        fetch(buildingsApiUrl).then((res) => res.json())
       ])
         .then(([locationDataFull, buildingsList]) => {
           if (locationDataFull.success) {
@@ -405,104 +414,81 @@ const CatalogFilters = ({
         justifyContent="space-between"
         flexWrap="wrap"
       >
-        {count > 0 && (
-          <>
-            <Stack spacing={1} direction="row" alignItems="center" flexWrap="wrap" paddingTop="20px">
-              {clientSide ? (
-                <>
-                  {/* <ToggleButtonGroup
-                    exclusive
-                    value={listingStatus}
-                    onChange={(_, value) => value && setFilters({ ...filters, listingStatus: value })}
-                    sx={{
-                      '& .MuiToggleButton-root': {
-                        px: { md: 3, lg: 4 },
-                        fontWeight: 400
-                      }
-                    }}
-                  >
-                    {statusItems.map(([key, label]) => (
-                      <ToggleButton key={key} value={key}>
-                        {label}
-                      </ToggleButton>
-                    ))}
-                  </ToggleButtonGroup> */}
+        <Stack spacing={1} direction="row" alignItems="center" flexWrap="wrap" paddingTop="20px">
+          {clientSide ? (
+            <>
+              <ToggleButtonGroup
+                exclusive
+                value={viewMode}
+                onChange={(_, value) => value && setViewMode(value)}
+                size="small"
+                sx={{ mr: 1, '& .MuiToggleButton-root': { px: 2, height: 40 } }}
+              >
+                <ToggleButton value="listings">Listings</ToggleButton>
+                <ToggleButton value="buildings">Buildings</ToggleButton>
+              </ToggleButtonGroup>
 
-                  <ToggleButtonGroup
-                    exclusive
-                    value={viewMode}
-                    onChange={(_, value) => value && setViewMode(value)}
-                    size="small"
-                    sx={{ mr: 1, '& .MuiToggleButton-root': { px: 2, height: 40 } }}
-                  >
-                    <ToggleButton value="listings">Listings</ToggleButton>
-                    <ToggleButton value="buildings">Buildings</ToggleButton>
-                  </ToggleButtonGroup>
+              <AdvancedFiltersButton size={size} sx={{ height: 40 }} />
 
-                  <AdvancedFiltersButton size={size} sx={{ height: 40 }} />
-
-                  <ToggleButton
-                    value="map"
-                    selected={showMap}
-                    onChange={onToggleMap}
-                    size={size}
-                    sx={{
-                      height: 40,
-                      width: 40,
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      borderRadius: '8px !important',
-                      '&.Mui-selected': {
-                        bgcolor: 'primary.main',
-                        color: 'white',
-                        '&:hover': {
-                          bgcolor: 'primary.dark'
-                        }
-                      }
-                    }}
-                  >
-                    {showMap ? <ListIcon /> : <MapIcon />}
-                  </ToggleButton>
-                </>
-              ) : (
-                <>
-                  <Skeleton variant="rounded" sx={{ width: 257, height: 40 }} />
-
-                </>
-              )}
-            </Stack>
-            <Box
-              sx={{
-                minWidth: { md: 218 },
-                alignContent: 'end',
-                textAlign: 'right'
-              }}
-            >
-              <ListingsCounter count={count} />
-            </Box>
-            <Box
-              sx={{
-                minWidth: { md: 240 },
-                display: 'flex',
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-                height: 40,
-                px: 2,
-                borderRadius: '8px',
-                bgcolor: 'background.paper',
-                border: '1px solid',
-                borderColor: 'divider',
-                transition: 'all 0.2s',
-                '&:hover': {
-                  borderColor: 'primary.light',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
-                }
-              }}
-            >
-              <SortModesSelect filters={filters} onChange={handleSortChange} />
-            </Box>
-          </>
-        )}
+              <ToggleButton
+                value="map"
+                selected={showMap}
+                onChange={onToggleMap}
+                size={size}
+                sx={{
+                  height: 40,
+                  width: 40,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: '8px !important',
+                  '&.Mui-selected': {
+                    bgcolor: 'primary.main',
+                    color: 'white',
+                    '&:hover': {
+                      bgcolor: 'primary.dark'
+                    }
+                  }
+                }}
+              >
+                {showMap ? <ListIcon /> : <MapIcon />}
+              </ToggleButton>
+            </>
+          ) : (
+            <>
+              <Skeleton variant="rounded" sx={{ width: 257, height: 40 }} />
+            </>
+          )}
+        </Stack>
+        <Box
+          sx={{
+            minWidth: { md: 218 },
+            alignContent: 'end',
+            textAlign: 'right'
+          }}
+        >
+          <ListingsCounter count={count} />
+        </Box>
+        <Box
+          sx={{
+            minWidth: { md: 240 },
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            height: 40,
+            px: 2,
+            borderRadius: '8px',
+            bgcolor: 'background.paper',
+            border: '1px solid',
+            borderColor: 'divider',
+            transition: 'all 0.2s',
+            '&:hover': {
+              borderColor: 'primary.light',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+            }
+          }}
+        >
+          <SortModesSelect filters={filters} onChange={handleSortChange} />
+        </Box>
       </Stack>
 
       <Stack sx={{ mb: 2 }} spacing={2}>
@@ -699,66 +685,67 @@ const CatalogFilters = ({
       </Stack>
 
       {/* Active Group Neighborhoods (Chips) */}
-      {locationTree && locationTree.children && (
-        <Box sx={{ mb: 2 }}>
-          {(() => {
-            // Find active group from STATE
-            const activeGroup = locationTree.children.find((g: any) => g.id === activeGroupId)
+      {
+        locationTree && locationTree.children && (
+          <Box sx={{ mb: 2 }}>
+            {(() => {
+              // Find active group from STATE
+              const activeGroup = locationTree.children.find((g: any) => g.id === activeGroupId)
 
-            if (activeGroup && activeGroup.children && activeGroup.children.length > 0) {
-              return (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, p: 1, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 2 }}>
-                  {activeGroup.children.filter((child: any) => child.listing_count > 0 || child.building_count > 0).map((child: any) => {
-                    const isChildActive = normalize(hood) === normalize(child.name) || normalize(hood) === normalize(child.slug)
-                    return (
-                      <Chip
-                        key={child.id}
-                        label={
-                          <Stack direction="row" alignItems="center" gap={0.5}>
-                            <span>{child.name}</span>
-                            <Box
-                              component="span"
-                              sx={{
-                                px: 0.6,
-                                py: 0.2,
-                                borderRadius: '10px',
-                                fontSize: '0.7rem',
-                                lineHeight: 1,
-                                fontWeight: 600,
-                                bgcolor: isChildActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.06)',
-                                color: isChildActive ? 'inherit' : 'text.secondary'
-                              }}
-                            >
-                              {formatCount(child.listing_count > 0 ? child.listing_count : child.building_count)}
-                            </Box>
-                          </Stack>
-                        }
-                        clickable
-                        onClick={() => {
-                          const url = `${routes.listings}/${locationTree.slug}/${child.slug}`
-                          router.push(url)
-                        }}
-                        sx={{
-                          borderRadius: '4px',
-                          bgcolor: isChildActive ? 'primary.main' : 'white',
-                          color: isChildActive ? 'white' : 'text.primary',
-                          border: '1px solid',
-                          borderColor: isChildActive ? 'primary.main' : 'divider',
-                          '&:hover': {
-                            bgcolor: isChildActive ? 'primary.dark' : 'rgba(0, 0, 0, 0.04)',
-                            borderColor: isChildActive ? 'primary.dark' : 'primary.main',
+              if (activeGroup && activeGroup.children && activeGroup.children.length > 0) {
+                return (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, p: 1, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 2 }}>
+                    {activeGroup.children.filter((child: any) => child.listing_count > 0 || child.building_count > 0).map((child: any) => {
+                      const isChildActive = normalize(hood) === normalize(child.name) || normalize(hood) === normalize(child.slug)
+                      return (
+                        <Chip
+                          key={child.id}
+                          label={
+                            <Stack direction="row" alignItems="center" gap={0.5}>
+                              <span>{child.name}</span>
+                              <Box
+                                component="span"
+                                sx={{
+                                  px: 0.6,
+                                  py: 0.2,
+                                  borderRadius: '10px',
+                                  fontSize: '0.7rem',
+                                  lineHeight: 1,
+                                  fontWeight: 600,
+                                  bgcolor: isChildActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.06)',
+                                  color: isChildActive ? 'inherit' : 'text.secondary'
+                                }}
+                              >
+                                {formatCount(child.listing_count > 0 ? child.listing_count : child.building_count)}
+                              </Box>
+                            </Stack>
                           }
-                        }}
-                      />
-                    )
-                  })}
-                </Box>
-              )
-            }
-            return null
-          })()}
-        </Box>
-      )}
+                          clickable
+                          onClick={() => {
+                            const url = `${routes.listings}/${locationTree.slug}/${child.slug}`
+                            router.push(url)
+                          }}
+                          sx={{
+                            borderRadius: '4px',
+                            bgcolor: isChildActive ? 'primary.main' : 'white',
+                            color: isChildActive ? 'white' : 'text.primary',
+                            border: '1px solid',
+                            borderColor: isChildActive ? 'primary.main' : 'divider',
+                            '&:hover': {
+                              bgcolor: isChildActive ? 'primary.dark' : 'rgba(0, 0, 0, 0.04)',
+                              borderColor: isChildActive ? 'primary.dark' : 'primary.main',
+                            }
+                          }}
+                        />
+                      )
+                    })}
+                  </Box>
+                )
+              }
+              return null
+            })()}
+          </Box>
+        )}
 
       <AdvancedFiltersDialog />
     </>

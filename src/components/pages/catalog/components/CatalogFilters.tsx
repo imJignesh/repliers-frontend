@@ -205,7 +205,7 @@ const CatalogFilters = ({
       setIsLocationTreeLoading(true)
       Promise.all([
         fetch(`https://app.precondo.ca/api/locations/area/${slug}`).then((res) => res.json()),
-        fetch(`https://app.precondo.ca/api/area/${buildingsSlug}/buildings`).then((res) => res.json())
+        fetch(`https://app.precondo.ca/api/buildings/area/${buildingsSlug}`).then((res) => res.json())
       ])
         .then(([locationDataFull, buildingsList]) => {
           if (locationDataFull.success) {

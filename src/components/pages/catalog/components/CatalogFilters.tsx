@@ -138,6 +138,7 @@ const CatalogFilters = ({
 
   // Location filter state
   const [locationTree, setLocationTree] = useState<any>(null)
+  const [isLocationTreeLoading, setIsLocationTreeLoading] = useState(false)
 
   const [selectedRegion, setSelectedRegion] = useState<string | null>(() => {
     const areaMatch = areas.find(
@@ -201,9 +202,10 @@ const CatalogFilters = ({
         return
       }
 
+      setIsLocationTreeLoading(true)
       Promise.all([
         fetch(`https://app.precondo.ca/api/locations/area/${slug}`).then((res) => res.json()),
-        fetch(`https://backend.precondo.ca/api/area/${buildingsSlug}/buildings`).then((res) => res.json())
+        fetch(`https://app.precondo.ca/api/area/${buildingsSlug}/buildings`).then((res) => res.json())
       ])
         .then(([locationDataFull, buildingsList]) => {
           if (locationDataFull.success) {
@@ -236,6 +238,9 @@ const CatalogFilters = ({
           console.error(err)
           setLocationTree(null)
           if (onLocationTreeChange) onLocationTreeChange(null)
+        })
+        .finally(() => {
+          setIsLocationTreeLoading(false)
         })
     } else {
       setLocationTree(null)
@@ -592,87 +597,95 @@ const CatalogFilters = ({
                   scrollbarWidth: 'none'
                 }}
               >
-                {!locationTree && getSubLocations(selectedRegion)
-                  .sort((a, b) => {
-                    if (hood?.toLowerCase() === a.toLowerCase()) return -1
-                    if (hood?.toLowerCase() === b.toLowerCase()) return 1
-                    return a.localeCompare(b)
-                  })
-                  .map((locationName) => (
-                    <Button
-                      key={locationName}
-                      component={Link}
-                      href={getSubLocationUrl(locationName)}
-                      variant={hood?.toLowerCase() === locationName.toLowerCase() ? 'contained' : 'outlined'}
-                      sx={{
-                        padding: 0,
-                        textTransform: 'none',
-                        whiteSpace: 'nowrap',
-                        flexShrink: 0,
-                        borderRadius: '4px',
-                        borderColor: 'primary.light',
-                        '&:hover': {
-                          bgcolor: 'primary.main',
-                          color: 'white'
-                        }
-                      }}
-                    >
-                      {capitalize(locationName)}
-                    </Button>
-                  ))}
-
-                {/* New Hierarchical Groups View */}
-                {locationTree && locationTree.children && (
+                {isLocationTreeLoading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <Skeleton key={i} variant="rounded" width={120} height={36} sx={{ flexShrink: 0, borderRadius: '4px' }} />
+                  ))
+                ) : (
                   <>
-                    {locationTree.children.filter((group: any) => group.listing_count > 0 || group.building_count > 0).map((group: any) => {
-                      const isActive = activeGroupId === group.id
-                      return (
+                    {!locationTree && getSubLocations(selectedRegion)
+                      .sort((a, b) => {
+                        if (hood?.toLowerCase() === a.toLowerCase()) return -1
+                        if (hood?.toLowerCase() === b.toLowerCase()) return 1
+                        return a.localeCompare(b)
+                      })
+                      .map((locationName) => (
                         <Button
-                          key={group.id}
-                          // Toggle local state only, no redirect
-                          onClick={() => setActiveGroupId(isActive ? null : group.id)}
-                          variant={isActive ? 'contained' : 'outlined'}
+                          key={locationName}
+                          component={Link}
+                          href={getSubLocationUrl(locationName)}
+                          variant={hood?.toLowerCase() === locationName.toLowerCase() ? 'contained' : 'outlined'}
                           sx={{
+                            padding: 0,
                             textTransform: 'none',
                             whiteSpace: 'nowrap',
                             flexShrink: 0,
-                            padding: '0 5px 0 10px',
-                            borderRadius: '4px', // More "toggle" like rounded shape
-                            borderColor: isActive ? 'primary.main' : 'divider',
-                            bgcolor: isActive ? 'primary.main' : 'background.paper',
-                            color: isActive ? 'white' : 'text.primary',
-                            boxShadow: isActive ? 2 : 0,
+                            borderRadius: '4px',
+                            borderColor: 'primary.light',
                             '&:hover': {
-                              bgcolor: isActive ? 'primary.dark' : 'rgba(0, 0, 0, 0.04)',
-                              borderColor: isActive ? 'primary.dark' : 'text.primary',
+                              bgcolor: 'primary.main',
+                              color: 'white'
                             }
                           }}
                         >
-                          {group.name}
-                          <Box
-                            component="span"
-                            sx={{
-                              ml: 1,
-                              px: 0.75,
-                              py: 0.25,
-                              borderRadius: '12px',
-                              fontSize: '0.75rem',
-                              lineHeight: 1,
-                              fontWeight: 600,
-                              bgcolor: isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.06)',
-                              color: isActive ? 'inherit' : 'text.secondary'
-                            }}
-                          >
-                            {formatCount(group.listing_count > 0 ? group.listing_count : group.building_count)}
-                          </Box>
-                          {isActive ? (
-                            <Box component="span" sx={{ transform: 'rotate(180deg)', display: 'inline-flex', ml: 0.5 }}><KeyboardArrowDownIcon /></Box>
-                          ) : (
-                            <Box component="span" sx={{ display: 'inline-flex', ml: 0.5 }}><KeyboardArrowDownIcon /></Box>
-                          )}
+                          {capitalize(locationName)}
                         </Button>
-                      )
-                    })}
+                      ))}
+
+                    {/* New Hierarchical Groups View */}
+                    {locationTree && locationTree.children && (
+                      <>
+                        {locationTree.children.filter((group: any) => group.listing_count > 0 || group.building_count > 0).map((group: any) => {
+                          const isActive = activeGroupId === group.id
+                          return (
+                            <Button
+                              key={group.id}
+                              // Toggle local state only, no redirect
+                              onClick={() => setActiveGroupId(isActive ? null : group.id)}
+                              variant={isActive ? 'contained' : 'outlined'}
+                              sx={{
+                                textTransform: 'none',
+                                whiteSpace: 'nowrap',
+                                flexShrink: 0,
+                                padding: '0 5px 0 10px',
+                                borderRadius: '4px', // More "toggle" like rounded shape
+                                borderColor: isActive ? 'primary.main' : 'divider',
+                                bgcolor: isActive ? 'primary.main' : 'background.paper',
+                                color: isActive ? 'white' : 'text.primary',
+                                boxShadow: isActive ? 2 : 0,
+                                '&:hover': {
+                                  bgcolor: isActive ? 'primary.dark' : 'rgba(0, 0, 0, 0.04)',
+                                  borderColor: isActive ? 'primary.dark' : 'text.primary',
+                                }
+                              }}
+                            >
+                              {group.name}
+                              <Box
+                                component="span"
+                                sx={{
+                                  ml: 1,
+                                  px: 0.75,
+                                  py: 0.25,
+                                  borderRadius: '12px',
+                                  fontSize: '0.75rem',
+                                  lineHeight: 1,
+                                  fontWeight: 600,
+                                  bgcolor: isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.06)',
+                                  color: isActive ? 'inherit' : 'text.secondary'
+                                }}
+                              >
+                                {formatCount(group.listing_count > 0 ? group.listing_count : group.building_count)}
+                              </Box>
+                              {isActive ? (
+                                <Box component="span" sx={{ transform: 'rotate(180deg)', display: 'inline-flex', ml: 0.5 }}><KeyboardArrowDownIcon /></Box>
+                              ) : (
+                                <Box component="span" sx={{ display: 'inline-flex', ml: 0.5 }}><KeyboardArrowDownIcon /></Box>
+                              )}
+                            </Button>
+                          )
+                        })}
+                      </>
+                    )}
                   </>
                 )}
               </Box>

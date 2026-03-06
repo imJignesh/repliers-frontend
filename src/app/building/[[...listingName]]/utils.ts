@@ -162,13 +162,31 @@ export const fetchBuildingHistory = cache(
 )
 
 export const fetchNearbies = cache(async (listingName: string) => {
+  if (!listingName) return []
+
   const parsedAddress = parseSeoUrl(listingName)
   const { streetName, streetSuffix, city, boardId } = parsedAddress
-  const query = `${streetName} ${streetSuffix}, ${city}`
+
+  // Use a more robust query construction
+  let query = ''
+  let searchFields = 'address.streetName,address.streetSuffix,address.city'
+
+  if (streetName && city) {
+    query = `${streetName}${streetSuffix ? ' ' + streetSuffix : ''}, ${city}`
+  } else if ((parsedAddress as any).address) {
+    query = (parsedAddress as any).address
+    // If we only have a general address string, search more broadly
+    searchFields = 'address.streetName,address.streetSuffix,address.city,address.neighborhood'
+  } else {
+    // Last resort: use the slug itself as a search query
+    query = listingName.replace(/-/g, ' ')
+    searchFields = 'address.streetName,address.streetSuffix,address.city,address.neighborhood'
+  }
+
   const fetchParams: Partial<ApiQueryParams> = {
     search: query,
-    searchFields: 'address.streetName,address.streetSuffix,address.city',
-    boardId,
+    searchFields,
+    boardId: boardId || searchConfig.defaultBoardId,
     status: 'A',
     type: 'sale',
     resultsPerPage: 4,
@@ -180,7 +198,7 @@ export const fetchNearbies = cache(async (listingName: string) => {
     const response = await SearchService.fetch(fetchParams)
     return response?.listings || []
   } catch (error) {
-    console.error('[fetchNearbies] error', fetchParams, error)
+    console.error('[fetchNearbies] error', { listingName, query, fetchParams }, error)
     return []
   }
 })

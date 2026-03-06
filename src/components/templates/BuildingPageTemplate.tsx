@@ -15,6 +15,15 @@ import { PageTemplate } from '.'
 const BuildingPageTemplate = ({ property, history }: { property: ApiQueryResponse, history?: ApiQueryResponse }) => {
   let p = property?.listings?.[0]
 
+  // If we have curated content for this building in Laravel, it should ALWAYS take precedence 
+  // over the description of any individual unit listing from Repliers.
+  if (p && property.building?.content) {
+    if (!p.details) p.details = {} as any
+    p.details.description = property.building.content
+      // Ensure root description is also updated for consistency
+      ; (p as any).description = property.building.content
+  }
+
   if (!p && property.building) {
     // Use cached response if available, otherwise create a skeleton property object
     const cached = property.building.cached_response;

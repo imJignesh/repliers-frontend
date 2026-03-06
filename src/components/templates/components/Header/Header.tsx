@@ -111,7 +111,7 @@ const Header = () => {
                             key={area.name}
                             onClick={() => {
                               popupState.close()
-                              const path = `/locations/${area.name
+                              const path = `${routes.listings}/${area.name
                                 .toLowerCase()
                                 .replaceAll(' ', '-')}`
                               router.push(path)

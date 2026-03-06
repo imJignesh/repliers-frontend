@@ -18,7 +18,7 @@ const BuildingCard = ({ building }: BuildingCardProps) => {
         (streetNum && streetName ? `${streetNum}-${streetName.toLowerCase().replaceAll(' ', '-')}` : name.toLowerCase().replaceAll(' ', '-'))
 
     const imageUrl = building.cover_photo_url || building.coverPhotoUrl || 'https://stage25.precondo.ca/precondo_main_image.webp'
-    const linkUrl = `/building/${slug}`
+    const linkUrl = `/r/building/${slug}`
 
     return (
         <CardContainer size="normal" mlsNumber={slug}>

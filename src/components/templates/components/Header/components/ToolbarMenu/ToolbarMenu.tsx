@@ -30,15 +30,15 @@ const ToolbarMenu = ({ sx }: { sx?: SxProps }) => {
   const toolbarConfigs = useMemo<ToolbarConfig[]>(() => {
     return [
       {
-        url: '/locations/toronto/for-sale',
+        url: '/r/locations/toronto/for-sale',
         item: 'For Sale'
       },
       // {
-      //   url: '/locations/toronto/for-rent',
+      //   url: '/r/locations/toronto/for-rent',
       //   item: 'For Rent'
       // },
       {
-        url: '/locations/toronto/new-condos-and-preconstruction',
+        url: '/r/locations/toronto/new-condos-and-preconstruction',
         item: 'Pre-Construction'
       },
       {

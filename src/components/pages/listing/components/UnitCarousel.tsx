@@ -28,7 +28,7 @@ const UnitCarousel = ({
       <Box>
         <CarouselHeader title={'Active Units'} navigation={false} onPrev={() => { }} onNext={() => { }} />
         <br />
-        <Stack spacing={4} direction="row" flexWrap="wrap">
+        <Stack spacing={4} direction="row" flexWrap="wrap" justifyContent="center">
           {activeUnits.map((property, index) => (
             <PropertyCard key={index} property={property} />
           ))}

@@ -301,6 +301,7 @@ const CatalogPageContent = ({
                 <Stack
                   direction="row"
                   flexWrap="wrap"
+                  justifyContent="center"
                   gap={{ xs: 1.5, sm: 2, md: 3 }}
                   sx={{
                     '& > *': {

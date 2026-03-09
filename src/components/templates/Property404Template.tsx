@@ -18,7 +18,9 @@ const phrases = {
   404: "We're sorry. The listing you are looking for isn't there.",
   403: 'Access denied. You are not authorized to view this listing.',
   410: 'The listing you are looking for was $. ',
-  500: 'An unexpected error occurred. Please try again later.'
+  500: 'An unexpected error occurred. Please try again later.',
+  502: 'Gateway error. The server is temporarily unable to service your request.',
+  503: 'The server is currently unavailable. Please try again later.'
 }
 
 type ErrorCode = keyof typeof phrases

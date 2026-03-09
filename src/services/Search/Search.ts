@@ -27,7 +27,7 @@ class SearchService {
   }
 
   async fetch(params: Partial<ApiQueryParams | Filters>) {
-    if (this.disabled) return Promise.reject()
+    if (this.disabled) return Promise.reject('disabled')
 
     this.abortController = new AbortController()
 
@@ -39,11 +39,11 @@ class SearchService {
       )
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      return Promise.reject()
+      return Promise.reject(error)
     }
     // everything is fine but the current user interaction
     // disabled fetches AFTER we started this request
-    return this.disabled ? Promise.reject() : response
+    return this.disabled ? Promise.reject('disabled') : response
   }
 
   async fetchListings(params: any) {

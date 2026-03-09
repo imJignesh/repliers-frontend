@@ -29,9 +29,11 @@ import { StatsChart } from './StatsChart'
 
 export const StatsGraph = ({
   city = '',
+  neighborhood,
   propertyClass
 }: {
   city?: string | string[]
+  neighborhood?: string | string[]
   propertyClass: PropertyClass
 }) => {
   const t = useTranslations()
@@ -50,10 +52,11 @@ export const StatsGraph = ({
 
   const fetchChartData = async () => {
     const propertyClassArray = (
-      propertyClass === 'all' ? ['residential', 'condo'] : [propertyClass]
+      (propertyClass as string) === 'all' ? ['residential', 'condo'] : [propertyClass]
     ) as PropertyClass[]
     const params = {
       city,
+      neighborhood,
       timeRange,
       propertyClass: propertyClassArray
     }
@@ -81,7 +84,7 @@ export const StatsGraph = ({
 
   useEffect(() => {
     if (visible) fetchChartData()
-  }, [visible, action, propertyClass, city, timeRange])
+  }, [visible, action, propertyClass, city, neighborhood, timeRange])
 
   return (
     <GraphContainer

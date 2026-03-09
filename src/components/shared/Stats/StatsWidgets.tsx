@@ -33,16 +33,16 @@ export const StatsWidgets = (
             </Typography>
 
             <StatsTabs city={city} neighborhood={neighborhood} onTabChange={setPropertyClass} />
-            {/* <StatsGraph city={city} propertyClass={propertyClass} /> */}
+            <StatsGraph city={city} neighborhood={neighborhood} propertyClass={propertyClass} />
 
-            {/* <Typography
+            <Typography
               align="center"
               variant="caption"
               color="secondary.main"
               sx={{ whiteSpace: 'pre-line' }}
             >
               {t('Statistics.statsDisclaimer')}
-            </Typography> */}
+            </Typography>
           </Stack>
         </Container>
       </Box>

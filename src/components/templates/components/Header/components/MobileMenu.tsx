@@ -11,6 +11,7 @@ import ProfileMenuPill from './ProfileMenuPill'
 import ToolbarMenu from './ToolbarMenu'
 import APILocations, { type Area } from 'services/API/APILocations'
 import { useRouter } from 'next/navigation'
+import routes from '@configs/routes'
 
 const MobileMenu = () => {
   const [open, setOpen] = useState(false)
@@ -75,7 +76,7 @@ const MobileMenu = () => {
                     key={area.name}
                     onClick={() => {
                       setOpen(false)
-                      const path = `/locations/${area.name.toLowerCase().replaceAll(' ', '-')}`
+                      const path = `${routes.listings}/${area.name.toLowerCase().replaceAll(' ', '-')}`
                       router.push(path)
                     }}
                   >

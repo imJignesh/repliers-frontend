@@ -35,7 +35,7 @@ const AreaSitemapPage = async ({ params }: Props) => {
                 title={`Browse ${areaName} areas or search all ${areaName} condos`}
                 items={neighborhoods.sort((a, b) => a.localeCompare(b)).map((hood) => ({
                     name: hood,
-                    link: `/sitemap/${area}/${sanitizeUrl(hood)}`
+                    link: `/r/sitemap/${area}/${sanitizeUrl(hood)}`
                 }))}
             />
         </StaticPageTemplate>

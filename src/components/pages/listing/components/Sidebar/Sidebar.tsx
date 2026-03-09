@@ -2,12 +2,14 @@ import React, { useState } from 'react'
 
 import { Box, Paper, Skeleton, Tab, Tabs } from '@mui/material'
 
+import { useUser } from 'providers/UserProvider'
 import useClientSide from 'hooks/useClientSide'
 
-import { RequestInfoForm, TourHomeForm } from './components'
+import { RequestInfoForm, AppointmentForm } from './components'
 
 const Sidebar = () => {
   const clientSide = useClientSide()
+  const { authenticated } = useUser()
   const [value, setValue] = useState(0)
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue)
@@ -24,7 +26,7 @@ const Sidebar = () => {
       }}
     >
       <Tabs value={value} variant="fullWidth" onChange={handleChange}>
-        <Tab label="Request info" />
+        <Tab label={authenticated ? "Book Appointment" : "Request info"} />
       </Tabs>
       <Box
         sx={{
@@ -35,7 +37,7 @@ const Sidebar = () => {
         }}
       >
         <Box>
-          <RequestInfoForm />
+          {authenticated ? <AppointmentForm /> : <RequestInfoForm />}
         </Box>
       </Box>
     </Paper>

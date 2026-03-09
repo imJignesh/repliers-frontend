@@ -12,6 +12,7 @@ import { parseUrlFilters, parseUrlParams } from './_parsers'
 import { fetchListings, fetchLocations } from './_requests'
 import { generateCatalogMetadata } from './_ssg'
 import { extractCities, extractLocation } from './_utils'
+import { beautify } from './_parsers'
 
 // catalog pages CANT BE STATICALLY GENERATED (SSG)
 // because we need a token cookie to fetch listings from the client side
@@ -64,7 +65,8 @@ const LocationsCatalogPage = async (props: {
     boardId,
     listingId,
     localAddress,
-    location: { area: urlArea, city: urlCity, neighborhood: urlHood }
+    location: { area: urlArea, city: urlCity, neighborhood: urlHood },
+    unknowns
   } = parseUrlParams(slugs)
 
   // Fetch data needed for identification
@@ -88,13 +90,42 @@ const LocationsCatalogPage = async (props: {
   let city = urlCity
   let hood = urlHood
 
-  // If city matches an area name, it's actually an area page
-  const areaMatch = finalAreas.find(
-    (a) => a.name.toLowerCase() === city.toLowerCase()
-  )
-  if (areaMatch && !area) {
-    area = areaMatch.name
-    city = ''
+  const normalize = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  if (!area) {
+    const asArea = finalAreas.find((a) => normalize(a.name) === normalize(city));
+    if (asArea) {
+      area = asArea.name;
+
+      const slug2 = hood;
+      const asCity = asArea.cities?.find((c: any) => normalize(c.name || c) === normalize(slug2));
+
+      if (asCity) {
+        city = typeof asCity === 'string' ? asCity : asCity.name;
+        hood = unknowns.length > 0 ? beautify(unknowns.shift() as string) : '';
+      } else {
+        let foundCity = null;
+        let foundHood = null;
+        if (asArea.cities) {
+          for (const c of asArea.cities) {
+            const h = c.neighborhoods?.find((n: any) => normalize(n.name || n) === normalize(slug2));
+            if (h) {
+              foundCity = c.name;
+              foundHood = typeof h === 'string' ? h : h.name;
+              break;
+            }
+          }
+        }
+
+        if (foundHood) {
+          city = foundCity;
+          hood = foundHood;
+        } else {
+          city = slug2 || '';
+          hood = unknowns.length > 0 ? beautify(unknowns.shift() as string) : '';
+        }
+      }
+    }
   }
 
   // extract the correct neighborhood name from the list of areas

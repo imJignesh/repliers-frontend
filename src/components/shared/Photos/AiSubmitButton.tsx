@@ -35,7 +35,7 @@ const AiSubmitButton = ({
     setLayout = useMapOptions().setLayout
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
-    searchUrl = `/search/grid?aiImage=${encodeURIComponent(imageUrl)}`
+    searchUrl = `/r/search/grid?aiImage=${encodeURIComponent(imageUrl)}`
   }
 
   const handleClick = (e: React.MouseEvent) => {

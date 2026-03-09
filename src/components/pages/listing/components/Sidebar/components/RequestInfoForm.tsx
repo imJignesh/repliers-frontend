@@ -18,14 +18,13 @@ import { validateEmail, validatePhone } from 'utils/validators'
 
 import AgreementText from './AgreementText'
 
-const getFormData = (form: any, message: string) => {
-  const { phone, email, fname, lname } = form
+const getFormData = (profile: any) => {
   return {
-    message,
-    name: joinNonEmpty([fname, lname], ' '),
-    email: email || '',
-    phone: formatPhoneNumber(phone),
-    askFinancing: false
+    first_name: profile?.fname || '',
+    last_name: profile?.lname || '',
+    email: profile?.email || '',
+    phone: profile?.phone ? formatPhoneNumber(profile.phone) : '',
+    message: ''
   }
 }
 
@@ -33,13 +32,12 @@ const RequestInfoForm = () => {
   const { profile } = useUser()
   const { showSnackbar } = useSnackbar()
   const {
-    property: { address, mlsNumber }
+    property: { address, mlsNumber, listPrice }
   } = useProperty()
   const [loading, setLoading] = useState(false)
   const [formTouched, setFormTouched] = useState(false)
-  const messageText = `I want to talk about ${formatFullAddress(address, true)}`
 
-  const [values, setValues] = useState(getFormData(profile, messageText))
+  const [values, setValues] = useState(getFormData(profile))
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -51,28 +49,37 @@ const RequestInfoForm = () => {
     setValues({ ...values, phone })
   }
 
-  const validName = values.name && values.name.length <= 70
+  const validFirstName = values.first_name && values.first_name.length <= 70
+  const validLastName = values.last_name && values.last_name.length <= 70
   const validPhone = validatePhone(values.phone)
   const validEmail = validateEmail(values.email)
 
-  const formValid = validName && validPhone && validEmail
+  const formValid = validFirstName && validLastName && validPhone && validEmail
 
   const handleSubmit = () => {
     setFormTouched(true)
     if (!formValid) return
     setLoading(true)
 
-    const { name, email, phone, message } = values
+    const { first_name, last_name, email, phone, message } = values
 
-    APIContact.requestInfo({
-      name,
+    // Auto capture details
+    const currentUrl = typeof window !== 'undefined' ? window.location.href : ''
+
+    APIContact.captureLead({
+      first_name,
+      last_name,
       email,
       phone: sanitizePhoneNumber(phone),
       message,
-      mlsNumber
+      mls_number: mlsNumber,
+      url: currentUrl,
+      listing_price: listPrice,
+      listing_neighbourhood: address.neighborhood,
+      listing_city: address.city
     })
       .then(() => {
-        showSnackbar('You can view all prices and sales history now.', 'success')
+        showSnackbar('Thank you! Your request has been sent.', 'success')
       })
       .catch((e) => {
         showSnackbar(extractErrorMessage(e), 'error')
@@ -84,69 +91,57 @@ const RequestInfoForm = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit} autoComplete="off">
+    <form onSubmit={(e) => { e.preventDefault(); handleSubmit() }} autoComplete="off">
       <Stack spacing={2}>
-        <Grid container columns={2} spacing={2}>
-          <Grid size={2}>
-            <TextField
-              fullWidth
-              name="name"
-              label="Name"
-              value={values.name}
-              onChange={handleInputChange}
-              error={formTouched && (!values.name || values.name.length > 70)}
-              helperText={
-                formTouched && !values.name
-                  ? 'Required field '
-                  : values.name.length > 70
-                    ? 'Max 70 chars for this field'
-                    : ''
-              }
-            />
-          </Grid>
-          <Grid size={{ xs: 2, sm: 1, md: 2 }}>
-            <TextField
-              fullWidth
-              name="email"
-              type="email"
-              label="Email"
-              value={values.email}
-              onChange={handleInputChange}
-              error={formTouched && !validEmail}
-              helperText={formTouched && !validEmail ? 'Enter valid email' : ''}
-            />
-          </Grid>
-          <Grid size={{ xs: 2, sm: 1, md: 2 }}>
-            <TextField
-              fullWidth
-              type="tel"
-              name="phone"
-              label="Phone"
-              placeholder="(555) 555-1234"
-              value={values.phone}
-              onChange={handlePhoneChange}
-              error={formTouched && !validPhone}
-              helperText={formTouched && !validPhone ? 'Required field ' : ''}
-            />
-          </Grid>
-          <Grid size={2}>
-            <TextField
-              rows={3}
-              multiline
-              fullWidth
-              name="message"
-              label="Message"
-              value={values.message}
-              onChange={handleInputChange}
-              error={formTouched && !values.message}
-              helperText={
-                formTouched && !values.message
-                  ? 'Message should not be empty'
-                  : ''
-              }
-            />
-          </Grid>
-        </Grid>
+        <TextField
+          fullWidth
+          name="first_name"
+          label="First Name"
+          value={values.first_name}
+          onChange={handleInputChange}
+          error={formTouched && !validFirstName}
+          helperText={formTouched && !validFirstName ? 'Required field ' : ''}
+        />
+        <TextField
+          fullWidth
+          name="last_name"
+          label="Last Name"
+          value={values.last_name}
+          onChange={handleInputChange}
+          error={formTouched && !validLastName}
+          helperText={formTouched && !validLastName ? 'Required field ' : ''}
+        />
+        <TextField
+          fullWidth
+          name="email"
+          type="email"
+          label="Email"
+          value={values.email}
+          onChange={handleInputChange}
+          error={formTouched && !validEmail}
+          helperText={formTouched && !validEmail ? 'Enter valid email' : ''}
+        />
+        <TextField
+          fullWidth
+          type="tel"
+          name="phone"
+          label="Phone"
+          placeholder="(555) 555-1234"
+          value={values.phone}
+          onChange={handlePhoneChange}
+          error={formTouched && !validPhone}
+          helperText={formTouched && !validPhone ? 'Required field ' : ''}
+        />
+        <TextField
+          rows={3}
+          multiline
+          fullWidth
+          name="message"
+          label="Message"
+          placeholder="I'm interested in this property"
+          value={values.message}
+          onChange={handleInputChange}
+        />
 
         <Button
           fullWidth

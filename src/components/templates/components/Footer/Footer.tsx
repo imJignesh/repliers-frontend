@@ -202,7 +202,7 @@ const Footer = () => {
                       </a>
                     </li>
                     <li id="menu-item-sitemap" className="menu-item">
-                      <a href="/sitemap">
+                      <a href="/r/sitemap">
                         <ChevronRightIcon sx={{ fontSize: { xs: 14, md: 16 }, color: '#3889c7' }} />
                         <span className="suki-menu-item-title">Sitemap</span>
                       </a>

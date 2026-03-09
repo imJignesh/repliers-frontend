@@ -54,7 +54,7 @@ const NeighborhoodSitemapPage = async ({ params }: Props) => {
 
                                 return {
                                     name,
-                                    link: `/building/${slug}`
+                                    link: `/r/building/${slug}`
                                 }
                             })}
                     />
@@ -86,7 +86,7 @@ const NeighborhoodSitemapPage = async ({ params }: Props) => {
 
                             return {
                                 name: displayName,
-                                link: `/listing/${linkSlug}`
+                                link: `/r/listing/${linkSlug}`
                             }
                         })}
                     />

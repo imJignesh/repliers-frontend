@@ -266,7 +266,7 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const checkAuthenticated = () => {
-    setAuthenticated(Cookies.get('authenticated') === 'true')
+    setAuthenticated(Cookies.get('rauthenticated') === 'true')
   }
 
   useEffect(() => {

@@ -10,19 +10,27 @@ import EstimatePage, {
 
 import { fetchFeatures } from 'utils/features'
 
+import { headers } from 'next/headers'
+import { getProtocolHost } from 'utils/urls'
+
 // NOTE: Dynamically generate metadata for the Estimate Landing Page based on feature flags.
 // When manually setting rootPage with feature flags for the estimate page,
 // Next.js does not recognize EstimatePage as a page component and skips page-level metadata configuration.
 // To prevent this, metadata must be generated dynamically using feature flags.
 export const generateMetadata = async (props: any): Promise<Metadata> => {
   const features = await fetchFeatures()
+  const host = getProtocolHost(await headers())
 
   if (features.rootPage === 'estimate') {
     // landing page metadata
     return await generateEstimateMetadata(props)
   }
   // other pages will be handled inside layout.tsx
-  return {}
+  return {
+    alternates: {
+      canonical: host
+    }
+  }
 }
 
 const HomePage = async (props: any) => {

@@ -2,6 +2,7 @@ import { headers } from 'next/headers'
 import type React from 'react'
 
 import content from '@configs/content'
+import routes from '@configs/routes'
 import { Property404Template, PropertyPageTemplate } from '@templates'
 
 import { formatMetadata } from 'utils/properties'
@@ -35,9 +36,13 @@ export const generateMetadata = async (props: PropertyPageProps) => {
       return content.missingPropertyMetadata
     }
 
-    const metadata = formatMetadata(p, host)
+    const metadata: any = formatMetadata(p, host)
     if (property.building?.name) {
       metadata.title = `${property.building.name} - ${metadata.title}`
+    }
+
+    metadata.alternates = {
+      canonical: host + routes.building + '/' + slug
     }
 
     return metadata

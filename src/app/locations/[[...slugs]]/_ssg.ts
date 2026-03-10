@@ -16,6 +16,9 @@ import {
 } from './_utils'
 import { type Params, type SearchParams } from './page'
 
+import { headers } from 'next/headers'
+import { getProtocolHost } from 'utils/urls'
+
 const disableSSG = process.env.DISABLE_SSG || false
 
 export const generateCatalogMetadata = async ({
@@ -25,6 +28,7 @@ export const generateCatalogMetadata = async ({
   params: Params
   searchParams: SearchParams
 }) => {
+  const host = getProtocolHost(await headers())
   const page = Number(searchParams.page) || 1
   const { slugs } = params
 
@@ -49,9 +53,12 @@ export const generateCatalogMetadata = async ({
     ? ` Prices starting at ${formatEnglishPrice(listPrice.min)}.`
     : ''
 
-  const meta = {
+  const meta: any = {
     title: `${count} ${catalogTitle} in ${shortLocation}`,
-    description: `Find ${count} ${catalogTitle} in ${fullLocation}. Visit ${content.siteName} to see photos, prices & neighbourhood info.${lowestPrice}`
+    description: `Find ${count} ${catalogTitle} in ${fullLocation}. Visit ${content.siteName} to see photos, prices & neighbourhood info.${lowestPrice}`,
+    alternates: {
+      canonical: host + '/locations/' + slugs.join('/')
+    }
   }
   return meta
 }

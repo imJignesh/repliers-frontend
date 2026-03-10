@@ -40,9 +40,6 @@ const content = {
       default: 'Precondo' // fallback
     },
     // metadataBase: new URL('https://smartmls.com/'), // canonical URL
-    alternates: {
-      canonical: '/'
-    },
     generator: 'Next.js',
     applicationName: 'Precondo',
     referrer: 'origin-when-cross-origin',

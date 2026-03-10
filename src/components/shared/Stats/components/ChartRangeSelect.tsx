@@ -15,6 +15,7 @@ export const ChartRangeSelect = ({
 
   return (
     <TextField
+      id="chart-range-select"
       select
       size="small"
       value={value}

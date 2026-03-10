@@ -6,8 +6,17 @@ import { StaticPageTemplate } from '@templates'
 import { GroupTemplate } from '@pages/catalog/components'
 import { sanitizeUrl } from 'utils/urls'
 
-export const metadata: Metadata = {
-    title: 'Find condos for Sale'
+import { headers } from 'next/headers'
+import { getProtocolHost } from 'utils/urls'
+
+export const generateMetadata = async (): Promise<Metadata> => {
+    const host = getProtocolHost(await headers())
+    return {
+        title: 'Find condos for Sale',
+        alternates: {
+            canonical: host + '/sitemap'
+        }
+    }
 }
 
 const SitemapPage = async () => {

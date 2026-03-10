@@ -99,7 +99,10 @@ export const formatMetadata = (property: Property, host?: string | null) => {
     description: scrubbed(description)
       ? propsConfig.scrubbedDescriptionLabel
       : description,
-    openGraph
+    openGraph,
+    alternates: {
+      canonical: host + getSeoUrl(property)
+    }
   }
 }
 

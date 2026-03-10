@@ -12,10 +12,17 @@ type Props = {
     params: Promise<{ area: string, neighborhood: string }>
 }
 
+import { headers } from 'next/headers'
+import { getProtocolHost } from 'utils/urls'
+
 export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
-    const { neighborhood } = await params
+    const { area, neighborhood } = await params
+    const host = getProtocolHost(await headers())
     return {
-        title: `Listings & Buildings - ${capitalize(neighborhood.replace(/-/g, ' '))}`
+        title: `Listings & Buildings - ${capitalize(neighborhood.replace(/-/g, ' '))}`,
+        alternates: {
+            canonical: host + `/sitemap/${area}/${neighborhood}`
+        }
     }
 }
 

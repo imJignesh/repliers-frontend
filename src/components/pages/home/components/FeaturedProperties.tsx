@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl'
 
 import { Container, Stack, Typography, Box, Button, Card } from '@mui/material'
 
-import { PropertyCard, PropertyCarousel } from '@shared/Property'
+import { PropertyCard, PropertyCarousel, BuildingCard } from '@shared/Property'
 
 import { type ApiQueryParams, type Property } from 'services/API'
 import SearchService from 'services/Search'
@@ -18,6 +18,7 @@ import defaultLocation from '@configs/location'
 
 const FeaturedProperties = () => {
   const [featured, setFeatured] = useState<Property[]>([])
+  const [featuredBuildings, setFeaturedBuildings] = useState<any[]>([])
   const [recentlySold, setRecentlySold] = useState<Property[]>([])
   const [showcased, setShowcased] = useState<Property[]>([])
   const t = useTranslations('HomePage')
@@ -26,11 +27,12 @@ const FeaturedProperties = () => {
   const filters: Partial<ApiQueryParams> = {
     class: 'condo',
     minPrice: 1_000_000,
-    resultsPerPage: 12
+    resultsPerPage: 8
   }
 
   const soldFilters: Partial<ApiQueryParams> = {
     ...filters,
+    resultsPerPage: 12,
     status: 'A',
     sortBy: 'soldDateDesc'
   }
@@ -68,10 +70,23 @@ const FeaturedProperties = () => {
     }
   }
 
+  const fetchFeaturedBuildings = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_PRECONDO_URL}/api/buildings?tag=featured`)
+      const data = await response.json()
+      if (data && data.data) {
+        setFeaturedBuildings(data.data.slice(0, 8))
+      }
+    } catch (error) {
+      console.error('FeaturedBuildings::Error fetching data', error)
+    }
+  }
+
   useEffect(() => {
     fetchFeatured()
     fetchRecentlySold()
     fetchShowcased()
+    fetchFeaturedBuildings()
   }, [])
   const { state, defaultFilters } = defaultLocation
 
@@ -81,45 +96,10 @@ const FeaturedProperties = () => {
         <PropertyCarousel title={t('justListed')} properties={featured} />
         <PropertyCarousel title={t('recentlySold')} properties={recentlySold} />
 
-        {features.dashboard && <StatsWidgets {...defaultFilters} name={state} />}
+        {features.dashboard && <StatsWidgets {...defaultFilters} name={`Toronto`} />}
 
 
-        <Box
-          sx={{
-            py: { xs: 3, sm: 4, md: 6 },
-            px: { xs: 2, sm: 3, md: 4 },
-            backgroundColor: '#f4f4f4',
-            textAlign: 'center',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center'
-          }}
-        >
-          <Typography
-            variant="h3"
-            sx={{
-              fontWeight: 700,
-              color: '#555',
-              textAlign: 'center',
-              maxWidth: '1200px',
-              margin: '0 auto 40px',
-              fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' }
-            }}
-          >
-            Featured In
-          </Typography>
-          <Box
-            component="img"
-            src="pc-partners.png"
-            alt="Featured In"
-            sx={{
-              width: '100%',
-              maxWidth: { xs: '100%', sm: '600px', md: '800px' },
-              height: 'auto',
-              display: 'block'
-            }}
-          />
-        </Box>
+
         {/*
        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
           <Card
@@ -152,9 +132,9 @@ const FeaturedProperties = () => {
         <Box>
           <CarouselHeader title={'Popular Preconstructions'} navigation={false} onPrev={function (): void {
             throw new Error('Function not implemented.')
-          } } onNext={function (): void {
+          }} onNext={function (): void {
             throw new Error('Function not implemented.')
-          } } />
+          }} />
           <br />
           {featured?.length > 0 ? (
             <Stack
@@ -164,7 +144,7 @@ const FeaturedProperties = () => {
               justifyContent="center"
               sx={{
                 '& > *': {
-                  width: { xs: '100% !important', sm: 'calc(48% - 8px) !important', md: 'calc(32% - 11px) !important' , lg: 'calc(24% - 12px) !important' },
+                  width: { xs: '100% !important', sm: 'calc(48% - 8px) !important', md: 'calc(32% - 11px) !important', lg: 'calc(24% - 12px) !important' },
                   height: '100% !important'
                 }
               }}
@@ -176,6 +156,72 @@ const FeaturedProperties = () => {
           ) : (
             <Typography variant="body1" color="text.secondary"></Typography>
           )}
+        </Box>
+
+        <Box>
+          <CarouselHeader title={'Popular Buildings'} navigation={false} onPrev={function (): void {
+            throw new Error('Function not implemented.')
+          }} onNext={function (): void {
+            throw new Error('Function not implemented.')
+          }} />
+          <br />
+          {featuredBuildings?.length > 0 ? (
+            <Stack
+              spacing={{ xs: 3, sm: 4, md: 4 }}
+              direction="row"
+              flexWrap="wrap"
+              justifyContent="center"
+              sx={{
+                '& > *': {
+                  width: { xs: '100% !important', sm: 'calc(48% - 8px) !important', md: 'calc(32% - 11px) !important', lg: 'calc(24% - 12px) !important' },
+                  height: '100% !important'
+                }
+              }}
+            >
+              {featuredBuildings.map((building, index) => (
+                <BuildingCard key={index} building={building} />
+              ))}
+            </Stack>
+          ) : (
+            <Typography variant="body1" color="text.secondary"></Typography>
+          )}
+        </Box>
+
+        <Box
+          sx={{
+            py: { xs: 3, sm: 4, md: 6 },
+            px: { xs: 2, sm: 3, md: 4 },
+            backgroundColor: '#f4f4f4',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
+          }}
+        >
+          <Typography
+            variant="h3"
+            sx={{
+              fontWeight: 700,
+              color: '#555',
+              textAlign: 'center',
+              maxWidth: '1200px',
+              margin: '0 auto 40px',
+              fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' }
+            }}
+          >
+            Featured In
+          </Typography>
+          <Box
+            component="img"
+            src="pc-partners.png"
+            alt="Featured In"
+            sx={{
+              width: '100%',
+              maxWidth: { xs: '100%', sm: '600px', md: '600px' },
+              height: 'auto',
+              display: 'block'
+            }}
+          />
         </Box>
       </Stack>
     </Container>

@@ -1,6 +1,6 @@
 const routes = {
   home: '/r',
-  login: '/r/login',
+  // login: '/r/login',
 
   search: '/r/search',
   map: '/r/search/map',
@@ -15,26 +15,21 @@ const routes = {
   building: '/r/building', // [...id]
   listings: '/r/locations',
   // estimate: '/r/estimate',
-  dashboard: '/r/dashboard',
-  favorites: '/r/favorites',
-  saveSearch: '/r/saved-searches',
-  imageFavorites: '/r/image-favorites',
-  recentlyViewed: '/r/recently-viewed',
-  profile: '/r/profile',
+  // dashboard: '/r/dashboard',
+  // favorites: '/r/favorites',
+  // saveSearch: '/r/saved-searches',
+  // imageFavorites: '/r/image-favorites',
+  // recentlyViewed: '/r/recently-viewed',
+  // profile: '/r/profile',
 
   // estimates management
-  admin: '/r/admin',
-  adminAgents: '/r/admin/agents',
+  // admin: '/r/admin',
+  // adminAgents: '/r/admin/agents',
 
-  agent: '/r/agent',
-  agentClient: '/r/agent/client', // [...id]
+  // agent: '/r/agent',
+  // agentClient: '/r/agent/client', // [...id]
 
   // static pages
-  cookies: '/r/cookies-policy',
-  privacy: '/r/privacy-policy',
-  terms: '/r/terms-of-use',
-
-  // will be set to home or dashboard or agent
   loginRedirect: '/r'
 }
 

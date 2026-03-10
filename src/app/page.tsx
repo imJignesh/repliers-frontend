@@ -22,11 +22,7 @@ export const generateMetadata = async (props: any): Promise<Metadata> => {
     return await generateEstimateMetadata(props)
   }
   // other pages will be handled inside layout.tsx
-  return {
-    alternates: {
-      canonical: '/r'
-    }
-  }
+  return {}
 }
 
 const HomePage = async (props: any) => {

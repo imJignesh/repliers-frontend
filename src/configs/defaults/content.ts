@@ -4,22 +4,22 @@ import { type ToolbarConfig } from '@templates/Header/components/ToolbarMenu'
 
 const content = {
   siteLogo: {
-    url: 'https://precondo.ca/r/logo.svg',
+    url: 'https://stage25.precondo.ca/logo.svg',
     width: 36,
     height: 36
   },
   siteMobileLogo: {
-    url: 'https://precondo.ca/r/logo.svg',
+    url: 'https://stage25.precondo.ca/logo.svg',
     width: 36,
     height: 36
   },
   siteFooterLogo: {
-    url: 'https://precondo.ca/r/logo-footer.svg',
+    url: 'https://stage25.precondo.ca/logo-footer.svg',
     width: 80,
     height: 100
   },
-  siteSplashscreen: 'https://precondo.ca/r/precondo_main_image.webp',
-  loginSplashscreen: 'https://precondo.ca/r/precondo_main_image.webp',
+  siteSplashscreen: 'https://stage25.precondo.ca/precondo_main_image.webp',
+  loginSplashscreen: 'https://stage25.precondo.ca/precondo_main_image.webp',
   siteName: 'Precondo',
   siteDefaultBrokerageName: 'DEFAULT BROKERAGE NAME',
   siteKeywords: ['Precondo', 'Precondos for sale in Canada'],
@@ -39,10 +39,10 @@ const content = {
       template: 'Precondo > %s',
       default: 'Precondo' // fallback
     },
-    metadataBase: new URL('https://precondo.ca'),
-    // alternates: {
-    //   canonical: '/'
-    // },
+    // metadataBase: new URL('https://smartmls.com/'), // canonical URL
+    alternates: {
+      canonical: '/'
+    },
     generator: 'Next.js',
     applicationName: 'Precondo',
     referrer: 'origin-when-cross-origin',
@@ -58,7 +58,7 @@ const content = {
     description:
       "Welcome to Precondo, your exclusive access to all the new and upcoming condos in Canada. Everything you'll need when it comes to properties for Sale, Rent & Preconstruction Properties!",
     icons: {
-      icon: 'https://precondo.ca/r/favicon.ico'
+      icon: 'https://stage25.precondo.ca/favicon.ico'
     }
   } as Metadata,
   estimateMetadata: {

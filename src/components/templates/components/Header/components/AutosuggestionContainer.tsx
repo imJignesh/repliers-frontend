@@ -26,7 +26,7 @@ const AutosuggestionContainer = ({
         margin: 'auto'
       }}
     >
-      <Suspense>{children}</Suspense>
+      <Suspense fallback={null}>{children}</Suspense>
     </Box>
   )
 }

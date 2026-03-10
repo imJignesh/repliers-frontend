@@ -4,7 +4,7 @@ import content from '@configs/content'
 
 import { type ApiBoardCity } from 'services/API'
 import { formatEnglishPrice } from 'utils/formatters'
-import { getCatalogUrl, sanitizeUrl } from 'utils/urls'
+import { sanitizeUrl } from 'utils/urls'
 
 import { parseUrlFilters, parseUrlParams } from './_parsers'
 import { fetchListings, fetchLocations } from './_requests'
@@ -51,10 +51,7 @@ export const generateCatalogMetadata = async ({
 
   const meta = {
     title: `${count} ${catalogTitle} in ${shortLocation}`,
-    description: `Find ${count} ${catalogTitle} in ${fullLocation}. Visit ${content.siteName} to see photos, prices & neighbourhood info.${lowestPrice}`,
-    alternates: {
-      canonical: getCatalogUrl(city, hood, filters)
-    }
+    description: `Find ${count} ${catalogTitle} in ${fullLocation}. Visit ${content.siteName} to see photos, prices & neighbourhood info.${lowestPrice}`
   }
   return meta
 }

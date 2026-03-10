@@ -89,11 +89,9 @@ export const formatMetadata = (property: Property, host?: string | null) => {
     images
   } = property
 
-  const seoUrl = getSeoUrl(property)
-
   const openGraph = {
     images: getCDNPath(images[0], 'small'),
-    url: host ? host + seoUrl : seoUrl
+    url: host + getSeoUrl(property)
   }
 
   return {
@@ -101,10 +99,7 @@ export const formatMetadata = (property: Property, host?: string | null) => {
     description: scrubbed(description)
       ? propsConfig.scrubbedDescriptionLabel
       : description,
-    openGraph,
-    alternates: {
-      canonical: seoUrl
-    }
+    openGraph
   }
 }
 

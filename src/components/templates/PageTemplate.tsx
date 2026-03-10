@@ -25,7 +25,7 @@ const PageTemplate = ({
 }) => {
   return (
     <>
-      <Suspense>
+      <Suspense fallback={null}>
         <DialogWindows />
       </Suspense>
       <Stack direction="column" minHeight="100svh" bgcolor={bgcolor}>

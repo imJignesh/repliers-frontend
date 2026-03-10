@@ -44,7 +44,7 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
   const messages = await getMessages()
 
   return (
-    <html lang={locale}>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <meta
           name="format-detection"
@@ -53,7 +53,6 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
       </head>
       <body>
         <TrackingInline />
-        <GlobalStyles styles={globalStyles} />
         <Providers
           locale={locale}
           messages={messages}
@@ -61,6 +60,7 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
           featureOptions={options}
           locations={locations}
         >
+          <GlobalStyles styles={globalStyles} />
           {children}
         </Providers>
       </body>

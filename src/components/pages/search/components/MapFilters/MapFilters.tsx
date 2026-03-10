@@ -110,7 +110,7 @@ const MapFilters = () => {
           <AiChat />
         </DesktopOnly>
       )} */}
-      <Suspense>
+      <Suspense fallback={null}>
         {/* {features.aiSearch && <AiSearchDialog />} */}
         <AdvancedFiltersDialog />
       </Suspense>

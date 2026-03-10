@@ -87,7 +87,7 @@ const HomePageBanner = ({
               }
             }}
           >
-            <Suspense>
+            <Suspense fallback={null}>
               <Stack direction="row" sx={{ width: '100%', height: '100%' }}>
                 <Box
                   sx={{

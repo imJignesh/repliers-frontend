@@ -91,7 +91,7 @@ const EstimatePageContent = async (props: PageProps) => {
           rest={rest}
         >
           <EstimateStepsProvider>
-            <Suspense>
+            <Suspense fallback={null}>
               <EstimateRouteWrapper />
             </Suspense>
           </EstimateStepsProvider>

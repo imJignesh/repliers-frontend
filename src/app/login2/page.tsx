@@ -6,7 +6,7 @@ import { ClientLoginPageContent } from '@pages/login'
 const LoginPage = () => {
   return (
     <PageTemplate noHeader noFooter>
-      <Suspense>
+      <Suspense fallback={null}>
         <ClientLoginPageContent />
       </Suspense>
     </PageTemplate>

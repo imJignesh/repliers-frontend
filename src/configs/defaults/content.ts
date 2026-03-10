@@ -4,22 +4,22 @@ import { type ToolbarConfig } from '@templates/Header/components/ToolbarMenu'
 
 const content = {
   siteLogo: {
-    url: 'https://stage25.precondo.ca/logo.svg',
+    url: 'https://precondo.ca/r/logo.svg',
     width: 36,
     height: 36
   },
   siteMobileLogo: {
-    url: 'https://stage25.precondo.ca/logo.svg',
+    url: 'https://precondo.ca/r/logo.svg',
     width: 36,
     height: 36
   },
   siteFooterLogo: {
-    url: 'https://stage25.precondo.ca/logo-footer.svg',
+    url: 'https://precondo.ca/r/logo-footer.svg',
     width: 80,
     height: 100
   },
-  siteSplashscreen: 'https://stage25.precondo.ca/precondo_main_image.webp',
-  loginSplashscreen: 'https://stage25.precondo.ca/precondo_main_image.webp',
+  siteSplashscreen: 'https://precondo.ca/r/precondo_main_image.webp',
+  loginSplashscreen: 'https://precondo.ca/r/precondo_main_image.webp',
   siteName: 'Precondo',
   siteDefaultBrokerageName: 'DEFAULT BROKERAGE NAME',
   siteKeywords: ['Precondo', 'Precondos for sale in Canada'],
@@ -36,11 +36,11 @@ const content = {
 
   siteMetadata: {
     title: {
-      template: 'Precondo > %s',
-      default: 'Precondo' // fallback
+      template: '%s',
+      default: 'Precondo | Search & Analyze All Condos in Canada' // fallback
     },
     // metadataBase: new URL('https://smartmls.com/'), // canonical URL
-    generator: 'Next.js',
+    generator: 'Precondo',
     applicationName: 'Precondo',
     referrer: 'origin-when-cross-origin',
     // keywords: ['DEFAULTKEY1', 'DEFAULTKEY2'],
@@ -55,9 +55,19 @@ const content = {
     description:
       "Welcome to Precondo, your exclusive access to all the new and upcoming condos in Canada. Everything you'll need when it comes to properties for Sale, Rent & Preconstruction Properties!",
     icons: {
-      icon: 'https://stage25.precondo.ca/favicon.ico'
+      icon: 'https://precondo.ca/r/favicon.ico'
     }
   } as Metadata,
+  propertyMetadataTemplates: {
+    listing: {
+      title: '{{propertyType}} in {{neighborhood}}, {{city}} - {{address}} {{price}} - Precondo',
+      description: 'Check out this {{status}} {{propertyType}} at {{address}}, {{neighborhood}}, {{city}}. Offered at {{price}} with {{beds}} beds and {{baths}} baths.'
+    },
+    building: {
+      title: '{{buildingName}} at {{address}}, {{city}} - Units & History - Precondo',
+      description: 'View available units, past sales, and full history for {{buildingName}} located at {{address}}, {{city}}.'
+    }
+  },
   estimateMetadata: {
     title:
       'Precondo lorem ipsum dolor sit amet, consectetur adipiscing elit DEFAULTSTATE.',

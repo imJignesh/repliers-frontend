@@ -25,21 +25,29 @@ export const generateMetadata = async (props: PropertyPageProps) => {
   const { boardId, streetName, streetNumber, slug, streetSuffix, streetDirection } = parseSlug(params, searchParams)
   try {
     const property = await fetchBuilding(boardId, streetName, streetNumber, slug, streetSuffix, streetDirection)
+    const buildName = property.building?.name || ''
     const p = property?.listings?.[0]
     if (!p) {
       if (property.building) {
-        return {
-          title: property.building.name,
-          description: `View units and history for ${property.building.name} at ${property.building.address}`
-        }
+        // mock property for metadata generator to still interpolate correctly
+        const mockProperty = {
+          details: { description: '' },
+          images: [],
+          address: {
+            streetNumber: property.building.streetNumber,
+            streetName: property.building.streetName,
+            streetSuffix: property.building.streetSuffix,
+            city: property.building.city,
+            neighborhood: property.building.neighborhood
+          }
+        } as any
+        
+        return formatMetadata(mockProperty, host, { type: 'building', buildingName: buildName })
       }
       return content.missingPropertyMetadata
     }
 
-    const metadata: any = formatMetadata(p, host)
-    if (property.building?.name) {
-      metadata.title = `${property.building.name} - ${metadata.title}`
-    }
+    const metadata: any = formatMetadata(p, host, { type: 'building', buildingName: buildName })
 
     metadata.alternates = {
       canonical: host + routes.building + '/' + slug

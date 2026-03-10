@@ -8,8 +8,10 @@ import { capitalize, joinNonEmpty } from '../strings'
 import { getCDNPath } from '../urls'
 
 import { sanitizeScrubbed, sanitizeStreetNumber } from './sanitizers'
-import { getSeoTitle, getSeoUrl } from './seo'
-import { scrubbed } from '.'
+import { getSeoStatus, getSeoTitle, getSeoType, getSeoUrl } from './seo'
+import { getBathrooms, getBedrooms, scrubbed, sold } from '.'
+import contentConfig from '@configs/content'
+import { formatEnglishPrice } from 'utils/formatters'
 
 
 
@@ -83,22 +85,66 @@ export const formatFullAddress = (
   ).replace(/\s+/g, ' ')
 }
 
-export const formatMetadata = (property: Property, host?: string | null) => {
+export const formatMetadata = (
+  property: Property,
+  host?: string | null,
+  options?: {
+    type?: 'listing' | 'building'
+    buildingName?: string
+  }
+) => {
   const {
-    details: { description },
-    images
+    details,
+    images,
+    address,
+    listPrice,
+    soldPrice
   } = property
+  const { description, propertyType } = details
+  const { neighborhood, city } = address
 
   const openGraph = {
     images: getCDNPath(images[0], 'small'),
     url: host + getSeoUrl(property)
   }
 
+  const beds = getBedrooms(details)
+  const baths = getBathrooms(details)
+  
+  const priceToUse = sold(property) ? soldPrice : listPrice
+  const formattedPrice = (!scrubbed(priceToUse) && priceToUse) ? formatEnglishPrice(priceToUse) : ''
+
+  const variables: Record<string, string> = {
+    status: getSeoStatus(property),
+    propertyType: getSeoType(propertyType || ''),
+    neighborhood: capitalize(neighborhood || ''),
+    city: capitalize(city || ''),
+    address: formatShortAddress(address, true),
+    price: formattedPrice,
+    beds: beds.count.toString(),
+    baths: baths.count.toString(),
+    buildingName: options?.buildingName || ''
+  }
+
+  const interpolate = (template: string) => {
+    return template.replace(/{{(.*?)}}/g, (_, key) => variables[key.trim()] || '')
+  }
+
+  const type = options?.type || 'listing'
+  // @ts-ignore
+  const templates = contentConfig.propertyMetadataTemplates?.[type] || {}
+
+  let title = templates.title ? interpolate(templates.title) : getSeoTitle(property)
+  
+  // Cleanup artifacts like " -  - " if price or building name is empty
+  title = title.replace(/\s\s+/g, ' ').replace(/ - - /g, ' - ').replace(/^ - | - $/g, '')
+
+  let finalDescription = templates.description ? interpolate(templates.description) : description
+  finalDescription = scrubbed(finalDescription) ? propsConfig.scrubbedDescriptionLabel : finalDescription
+
   return {
-    title: getSeoTitle(property),
-    description: scrubbed(description)
-      ? propsConfig.scrubbedDescriptionLabel
-      : description,
+    title,
+    description: finalDescription,
     openGraph,
     alternates: {
       canonical: host + getSeoUrl(property)

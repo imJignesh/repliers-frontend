@@ -591,8 +591,10 @@ const CatalogFilters = ({
                   <>
                     {!locationTree && getSubLocations(selectedRegion)
                       .sort((a, b) => {
-                        if (hood?.toLowerCase() === a.toLowerCase()) return -1
-                        if (hood?.toLowerCase() === b.toLowerCase()) return 1
+                        const isAActive = normalize(hood) === normalize(a) || normalize(city) === normalize(a)
+                        const isBActive = normalize(hood) === normalize(b) || normalize(city) === normalize(b)
+                        if (isAActive) return -1
+                        if (isBActive) return 1
                         return a.localeCompare(b)
                       })
                       .map((locationName) => (
@@ -600,7 +602,7 @@ const CatalogFilters = ({
                           key={locationName}
                           component={Link}
                           href={getSubLocationUrl(locationName)}
-                          variant={hood?.toLowerCase() === locationName.toLowerCase() ? 'contained' : 'outlined'}
+                          variant={normalize(hood) === normalize(locationName) || normalize(city) === normalize(locationName) ? 'contained' : 'outlined'}
                           sx={{
                             padding: 0,
                             textTransform: 'none',
@@ -696,7 +698,7 @@ const CatalogFilters = ({
                 return (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, p: 1, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 2 }}>
                     {activeGroup.children.filter((child: any) => child.listing_count > 0 || child.building_count > 0).map((child: any) => {
-                      const isChildActive = normalize(hood) === normalize(child.name) || normalize(hood) === normalize(child.slug)
+                      const isChildActive = normalize(hood) === normalize(child.name) || normalize(hood) === normalize(child.slug) || normalize(city) === normalize(child.name) || normalize(city) === normalize(child.slug)
                       return (
                         <Chip
                           key={child.id}

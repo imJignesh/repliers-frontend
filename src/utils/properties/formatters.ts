@@ -148,6 +148,10 @@ export const formatMetadata = (
     openGraph,
     alternates: {
       canonical: host + getSeoUrl(property)
+    },
+    robots: {
+      index: type !== 'listing',
+      follow: type !== 'listing'
     }
   }
 }

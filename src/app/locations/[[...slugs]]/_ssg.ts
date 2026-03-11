@@ -58,6 +58,10 @@ export const generateCatalogMetadata = async ({
     description: `Find ${count} ${catalogTitle} in ${fullLocation}. Visit ${content.siteName} to see photos, prices & neighbourhood info.${lowestPrice}`,
     alternates: {
       canonical: host + '/locations/' + slugs.join('/')
+    },
+    robots: {
+      index: true,
+      follow: true
     }
   }
   return meta

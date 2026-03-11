@@ -93,7 +93,8 @@ const NeighborhoodSitemapPage = async ({ params }: Props) => {
 
                             return {
                                 name: displayName,
-                                link: `/r/listing/${linkSlug}`
+                                link: `/r/listing/${linkSlug}`,
+                                rel: 'nofollow,noindex'
                             }
                         })}
                     />

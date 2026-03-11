@@ -15,6 +15,7 @@ const GroupTemplate = ({
   items: {
     name: string
     link: string
+    rel?: string
     count?: number
     distance?: number
   }[]
@@ -50,7 +51,7 @@ const GroupTemplate = ({
               : {})
           }}
         >
-          {items.map(({ name, link, distance = 0, count = 0 }, index) => (
+          {items.map(({ name, link, rel, distance = 0, count = 0 }, index) => (
             <Typography key={index} variant="body2" noWrap sx={{
               transition: 'transform 0.2s',
               '&:hover': {
@@ -58,7 +59,7 @@ const GroupTemplate = ({
                 '& a': { color: 'primary.main' }
               }
             }}>
-              <Link href={link} style={{ display: 'flex', alignItems: 'center', transition: 'color 0.2s', textDecoration: 'none', color: 'inherit' }}>
+              <Link href={link} rel={rel} style={{ display: 'flex', alignItems: 'center', transition: 'color 0.2s', textDecoration: 'none', color: 'inherit' }}>
                 {name.replaceAll('/', ' / ')}
 
                 {count > 0 && (

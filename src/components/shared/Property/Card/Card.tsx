@@ -111,6 +111,7 @@ const PropertyCard = React.memo(
         <a
           href={linkUrl}
           target={openInNewTab ? '_blank' : '_self'}
+          rel="nofollow,noindex"
           onClick={handleClick}
           style={{ position: 'relative', display: 'block' }}
         >

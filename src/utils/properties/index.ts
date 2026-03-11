@@ -43,7 +43,8 @@ export {
 export {
   sanitizeAddress,
   sanitizeScrubbed,
-  sanitizeStreetNumber
+  sanitizeStreetNumber,
+  isPureAmenity
 } from './sanitizers'
 export { sortPropertyScoredImages } from './scores'
 export {

@@ -17,6 +17,7 @@ import {
 
 import { APIBase } from 'services/API'
 import { getPath } from 'utils/path'
+import { isPureAmenity } from 'utils/properties'
 
 type SelectOptionsContextType = {
   fields: string[]
@@ -83,7 +84,7 @@ const SelectOptionsProvider = ({
     options.forEach((option) => {
       option.split(',').forEach((parsedOption) => {
         const trimmedOption = parsedOption.trim()
-        if (trimmedOption === '') return
+        if (trimmedOption === '' || !isPureAmenity(trimmedOption)) return
         uniqueOptions.add(trimmedOption)
       })
     })

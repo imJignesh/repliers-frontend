@@ -1,6 +1,7 @@
 import { type Primitive } from 'utils/formatters'
 
 import { type DetailsGroupType } from './types'
+import { isPureAmenity } from 'utils/properties'
 
 export const isEmptyValue = (value: Primitive | string[]) => {
   if (value === null || value === undefined) return true
@@ -30,9 +31,15 @@ export function sanitizeStringWithDelimiter(
         .split(delimiter || ',')
         .map((item: string) => item.trim())
         .filter(Boolean)
+        .filter(isPureAmenity)
     : null
 }
 
 export function sanitizeItems(items: string[] | undefined): string[] | null {
-  return items ? items.map((item: string) => item.trim()).filter(Boolean) : null
+  return items
+    ? items
+        .map((item: string) => item.trim())
+        .filter(Boolean)
+        .filter(isPureAmenity)
+    : null
 }

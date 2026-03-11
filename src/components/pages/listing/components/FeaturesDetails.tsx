@@ -5,6 +5,7 @@ import { Box, Typography } from '@mui/material'
 import { DetailsContainer } from '@shared/Containers'
 import { type DetailsGroupType } from 'utils/dataMapper'
 import { useProperty } from 'providers/PropertyProvider'
+import { isPureAmenity } from 'utils/properties'
 
 const FeaturesDetails = ({ features }: { features?: DetailsGroupType[] }) => {
   const t = useTranslations()
@@ -12,9 +13,10 @@ const FeaturesDetails = ({ features }: { features?: DetailsGroupType[] }) => {
   const building = (property as any)?.building
   const amenities = building?.amenities
 
-  const amenitiesList = Array.isArray(amenities)
+  const amenitiesList = (Array.isArray(amenities)
     ? amenities
-    : (typeof amenities === 'string' ? amenities.split(',').map(a => a.trim()).filter(Boolean) : [])
+    : (typeof amenities === 'string' ? amenities.split(',').map(a => a.trim()).filter(Boolean) : []))
+    .filter(isPureAmenity)
 
   const maintenanceInclude = building?.included_in_maintenance_fees
   const maintenanceList = typeof maintenanceInclude === 'string'

@@ -9,11 +9,15 @@ import { SQFT_PER_ACRE } from 'utils/numbers'
 
 import type { ResolverItem } from '../types'
 import { isEmptyValue } from '../utils'
+import { isPureAmenity } from 'utils/properties'
 
 import createResolver from './createResolver'
 
 const arrayFormatter = (property: EstimatePayload, value?: any) => {
-  return Array.isArray(value) ? value.join(', ') : value
+  if (Array.isArray(value)) {
+    return value.filter(isPureAmenity).join(', ')
+  }
+  return isPureAmenity(value) ? value : null
 }
 
 const formatters = {

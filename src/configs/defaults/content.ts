@@ -60,12 +60,12 @@ const content = {
   } as Metadata,
   propertyMetadataTemplates: {
     listing: {
-      title: '{{propertyType}} in {{neighborhood}}, {{city}} - {{address}} {{price}} - Precondo',
-      description: 'Check out this {{status}} {{propertyType}} at {{address}}, {{neighborhood}}, {{city}}. Offered at {{price}} with {{beds}} beds and {{baths}} baths.'
+      title: '{{propertyType}} in {{neighborhood}}, {{city}} - {{address}} | Precondo',
+      description: 'Check out {{propertyType}} at {{address}}, {{neighborhood}}, {{city}}.'
     },
     building: {
-      title: '{{buildingName}} at {{address}}, {{city}} - Units & History - Precondo',
-      description: 'View available units, past sales, and full history for {{buildingName}} located at {{address}}, {{city}}.'
+      title: '{{buildingName}} - {{address}}, {{city}} | Precondo',
+      description: 'Find condos for sale at {{buildingName}} located at {{address}}, {{city}}.Browse available units, past sale prices, and full building history on Precondo'
     }
   },
   estimateMetadata: {

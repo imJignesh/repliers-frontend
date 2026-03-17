@@ -114,12 +114,16 @@ export const formatMetadata = (
   const priceToUse = sold(property) ? soldPrice : listPrice
   const formattedPrice = (!scrubbed(priceToUse) && priceToUse) ? formatEnglishPrice(priceToUse) : ''
 
+  const type = options?.type || 'listing'
+
   const variables: Record<string, string> = {
     status: getSeoStatus(property),
     propertyType: getSeoType(propertyType || ''),
     neighborhood: capitalize(neighborhood || ''),
     city: capitalize(city || ''),
-    address: formatShortAddress(address, true),
+    address: type === 'building'
+      ? formatBuildingAddress(address, true)
+      : formatShortAddress(address, true),
     price: formattedPrice,
     beds: beds.count.toString(),
     baths: baths.count.toString(),
@@ -129,8 +133,6 @@ export const formatMetadata = (
   const interpolate = (template: string) => {
     return template.replace(/{{(.*?)}}/g, (_, key) => variables[key.trim()] || '')
   }
-
-  const type = options?.type || 'listing'
   // @ts-ignore
   const templates = contentConfig.propertyMetadataTemplates?.[type] || {}
 

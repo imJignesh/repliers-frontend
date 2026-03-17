@@ -75,16 +75,16 @@ const HomeHeaderInfo = () => {
               direction="row"
               sx={{
                 order: { sm: 2, lg: 3 },
-                ...(!pdpHeaderButtons && {
+                // ...(!pdpHeaderButtons && {
                   // NOTE: temporary solution until we decide how the empty layout should look
                   pointerEvents: 'none',
                   visibility: 'hidden',
                   opacity: 0
-                })
+                // })
               }}
             >
-              {features.pdpShare && <ShareButton />}
-              {features.favorites && <FavoritesButton />}
+              {/* {features.pdpShare && <ShareButton />}
+              {features.favorites && <FavoritesButton />} */}
             </Stack>
           </Stack>
           <Stack

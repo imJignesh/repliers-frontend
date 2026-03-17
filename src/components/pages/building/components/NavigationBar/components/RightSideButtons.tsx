@@ -24,7 +24,7 @@ const RightSideButtons = ({ sticky }: { sticky: boolean }) => {
       justifyContent="flex-end"
       sx={{ width: 148 }}
     >
-      {!blurred && (
+      {/* {!blurred && (
         <>
           {features.pdpShare && (
             <FallInTransition show={sticky}>
@@ -37,7 +37,7 @@ const RightSideButtons = ({ sticky }: { sticky: boolean }) => {
             </FallInTransition>
           )}
         </>
-      )}
+      )} */}
     </Stack>
   )
 }

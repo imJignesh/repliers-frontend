@@ -7,7 +7,8 @@ import {
     Button,
     Stack,
     TextField,
-    Box
+    Box,
+    MenuItem
 } from '@mui/material'
 import {
     DatePicker,
@@ -121,15 +122,29 @@ const AppointmentForm = () => {
                                     slotProps={{ textField: { size: 'small', fullWidth: true } }}
                                     onChange={(newValue) => setValues({ ...values, date: newValue as Dayjs })}
                                 />
-                                <TimePicker
+                                <TextField
+                                    select
                                     label="Time"
-                                    minutesStep={30}
-                                    minTime={dayjs().set('hour', 9).set('minute', 0)}
-                                    maxTime={dayjs().set('hour', 19).set('minute', 0)}
-                                    value={values.time}
-                                    slotProps={{ textField: { size: 'small', fullWidth: true } }}
-                                    onChange={(newValue) => setValues({ ...values, time: newValue as Dayjs })}
-                                />
+                                    size="small"
+                                    fullWidth
+                                    value={values.time.format('HH:mm')}
+                                    onChange={(e) => {
+                                        const [hours, minutes] = e.target.value.split(':').map(Number)
+                                        setValues({ ...values, time: dayjs().hour(hours).minute(minutes) })
+                                    }}
+                                >
+                                    {Array.from({ length: 21 }).map((_, i) => {
+                                        const hour = 9 + Math.floor(i / 2)
+                                        const minute = (i % 2) * 30
+                                        const timeLabel = dayjs().hour(hour).minute(minute).format('hh:mm A')
+                                        const timeValue = dayjs().hour(hour).minute(minute).format('HH:mm')
+                                        return (
+                                            <MenuItem key={timeValue} value={timeValue}>
+                                                {timeLabel}
+                                            </MenuItem>
+                                        )
+                                    })}
+                                </TextField>
                             </Stack>
                         )}
                         {values.is_open && (
@@ -185,7 +200,7 @@ const AppointmentForm = () => {
                         type="tel"
                         name="phone"
                         label="Phone"
-                        placeholder="(555) 555-1234"
+                        placeholder="+1 (555) 555-1234"
                         value={values.phone}
                         onChange={handlePhoneChange}
                         error={formTouched && !validPhone}

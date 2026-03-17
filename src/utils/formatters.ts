@@ -10,12 +10,20 @@ import { scrubbed } from './properties'
 export type Primitive = string | number | boolean | bigint | null | undefined
 
 export const formatPhoneNumber = (value: string | null | undefined) => {
-  const phoneNumber = value
-    ? parsePhoneNumber(value, i18nConfig.phoneNumberLocale)
-    : ''
-  if (!phoneNumber) return ''
+  if (!value) return ''
+  try {
+    const phoneNumber = parsePhoneNumber(value, i18nConfig.phoneNumberLocale) || parsePhoneNumber(value)
+    if (!phoneNumber) return value
 
-  return phoneNumber.formatNational()
+    // If it's international or not the default country, use international format
+    if (phoneNumber.country !== i18nConfig.phoneNumberLocale || value.startsWith('+')) {
+      return phoneNumber.formatInternational()
+    }
+
+    return phoneNumber.formatNational()
+  } catch (e) {
+    return value
+  }
 }
 
 export const formatPhoneNumberAsYouType = (
@@ -24,8 +32,14 @@ export const formatPhoneNumberAsYouType = (
 ) => {
   // backspace handling
   if (newVal.length < (currentVal || '').length) return newVal
-  // library formating
-  return new AsYouType(i18nConfig.phoneNumberLocale).input(newVal)
+  
+  // If it starts with +, use generic international formatting
+  // Otherwise use default locale
+  const asYouType = newVal.startsWith('+') 
+    ? new AsYouType() 
+    : new AsYouType(i18nConfig.phoneNumberLocale)
+    
+  return asYouType.input(newVal)
 }
 
 type FormatDateOptions = {

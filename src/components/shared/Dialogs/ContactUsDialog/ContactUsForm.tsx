@@ -163,7 +163,7 @@ const ContactUsForm = ({
                   name="phone"
                   label="Phone"
                   type="tel"
-                  placeholder="(555) 555-1234"
+                  placeholder="+1 (555) 555-1234"
                   fullWidth
                   onChange={handleChangePhone}
                   value={values.phone}

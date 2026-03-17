@@ -126,7 +126,7 @@ const RequestInfoForm = () => {
           type="tel"
           name="phone"
           label="Phone"
-          placeholder="(555) 555-1234"
+          placeholder="+1 (555) 555-1234"
           value={values.phone}
           onChange={handlePhoneChange}
           error={formTouched && !validPhone}

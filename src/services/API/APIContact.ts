@@ -13,6 +13,9 @@ type ContactRequestInfo = {
   phone: string
   message: string
   mlsNumber: string
+  listing_price?: string
+  listing_neighbourhood?: string
+  listing_city?: string
 }
 
 export type LeadRequest = {
@@ -36,9 +39,11 @@ export type AppointmentRequest = {
   phone?: string
   url?: string
   mls_number?: string
-  time_date_field?: string
   appointment_date?: string
   appointment_time?: string
+  listing_price?: string
+  listing_neighbourhood?: string
+  listing_city?: string
 }
 
 export type ContactScheduleMethod = 'InPerson' | 'LiveVideo'

@@ -33,7 +33,7 @@ const RequestInfoForm = () => {
   const { profile } = useUser()
   const { showSnackbar } = useSnackbar()
   const {
-    property: { address, mlsNumber }
+    property: { address, mlsNumber, listPrice }
   } = useProperty()
   const [loading, setLoading] = useState(false)
   const [formTouched, setFormTouched] = useState(false)
@@ -69,7 +69,10 @@ const RequestInfoForm = () => {
       email,
       phone: sanitizePhoneNumber(phone),
       message,
-      mlsNumber
+      mlsNumber,
+      listing_price: listPrice,
+      listing_neighbourhood: address?.neighborhood,
+      listing_city: address?.city
     })
       .then(() => {
         showSnackbar('You can view all prices and sales history now.', 'success')

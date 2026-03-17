@@ -48,7 +48,7 @@ const AppointmentForm = () => {
     const [values, setValues] = useState(getFormData(profile))
 
     const {
-        property: { mlsNumber }
+        property: { address, mlsNumber, listPrice }
     } = useProperty()
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,7 +94,10 @@ const AppointmentForm = () => {
             url: currentUrl,
             mls_number: mlsNumber,
             appointment_date: appointmentDate,
-            appointment_time: appointmentTime
+            appointment_time: appointmentTime,
+            listing_price: listPrice,
+            listing_neighbourhood: address?.neighborhood,
+            listing_city: address?.city
         })
             .then(() => {
                 showSnackbar('Appointment booked successfully!', 'success')

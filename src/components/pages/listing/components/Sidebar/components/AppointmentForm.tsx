@@ -123,6 +123,7 @@ const AppointmentForm = () => {
                                 />
                                 <TimePicker
                                     label="Time"
+                                    minutesStep={30}
                                     minTime={dayjs().set('hour', 9).set('minute', 0)}
                                     maxTime={dayjs().set('hour', 19).set('minute', 0)}
                                     value={values.time}

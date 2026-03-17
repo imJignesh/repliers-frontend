@@ -37,6 +37,8 @@ export type AppointmentRequest = {
   url?: string
   mls_number?: string
   time_date_field?: string
+  appointment_date?: string
+  appointment_time?: string
 }
 
 export type ContactScheduleMethod = 'InPerson' | 'LiveVideo'

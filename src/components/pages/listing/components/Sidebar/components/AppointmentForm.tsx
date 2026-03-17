@@ -69,7 +69,10 @@ const AppointmentForm = () => {
     const validPhone = validatePhone(values.phone)
     const validEmail = validateEmail(values.email)
 
-    const formValid = validFirstName && validLastName && validPhone && validEmail && (values.is_open || (values.date && values.time))
+    const validDate = values.is_open || (values.date && (values.date.isAfter(dayjs(), 'day') || values.date.isSame(dayjs().add(1, 'day'), 'day')))
+    const validTime = values.is_open || (values.time && values.time.hour() >= 9 && values.time.hour() <= 19)
+
+    const formValid = validFirstName && validLastName && validPhone && validEmail && validDate && validTime;
 
     const handleSubmit = () => {
         setFormTouched(true)
@@ -79,9 +82,8 @@ const AppointmentForm = () => {
         const { first_name, last_name, email, phone, date, time, is_open } = values
         const currentUrl = typeof window !== 'undefined' ? window.location.href : ''
 
-        const timeDateValue = is_open
-            ? "I'm Open"
-            : `${date.format('YYYY-MM-DD')} ${time.format('HH:mm')}`
+        const appointmentDate = is_open ? "I'm Open" : date.format('YYYY-MM-DD')
+        const appointmentTime = is_open ? "I'm Open" : time.format('HH:mm')
 
         APIContact.captureAppointment({
             first_name,
@@ -90,7 +92,8 @@ const AppointmentForm = () => {
             phone: sanitizePhoneNumber(phone),
             url: currentUrl,
             mls_number: mlsNumber,
-            time_date_field: timeDateValue
+            appointment_date: appointmentDate,
+            appointment_time: appointmentTime
         })
             .then(() => {
                 showSnackbar('Appointment booked successfully!', 'success')
@@ -113,13 +116,15 @@ const AppointmentForm = () => {
                             <Stack direction="column" spacing={2}>
                                 <DatePicker
                                     label="Date"
-                                    minDate={dayjs()}
+                                    minDate={dayjs().add(1, 'day')}
                                     value={values.date}
                                     slotProps={{ textField: { size: 'small', fullWidth: true } }}
                                     onChange={(newValue) => setValues({ ...values, date: newValue as Dayjs })}
                                 />
                                 <TimePicker
                                     label="Time"
+                                    minTime={dayjs().set('hour', 9).set('minute', 0)}
+                                    maxTime={dayjs().set('hour', 19).set('minute', 0)}
                                     value={values.time}
                                     slotProps={{ textField: { size: 'small', fullWidth: true } }}
                                     onChange={(newValue) => setValues({ ...values, time: newValue as Dayjs })}

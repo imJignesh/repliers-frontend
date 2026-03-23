@@ -63,6 +63,7 @@ export const parseSlug = (params: Params, searchParams: SearchParams) => {
               streetName: nameParts.map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' '),
               streetSuffix: slugs[j],
               streetDirection: sDir,
+              buildingName: slugs.slice(0, i).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' '),
               slug: listingName,
               score: nameParts.length, // shorter is better?
               index: i // Capture the index of the street number
@@ -84,9 +85,11 @@ export const parseSlug = (params: Params, searchParams: SearchParams) => {
 
   // Fallback for simple slugs or slugs without clear suffix patterns
   const numberIndex = slugs.findIndex((s) => /^\d+[a-z]*$/i.test(s))
+  let buildingName: string = ''
   if (numberIndex !== -1) {
     const numStr = slugs[numberIndex]
     streetNumber = numStr
+    buildingName = slugs.slice(0, numberIndex).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ')
 
     const nameParts = slugs.slice(numberIndex + 1)
     let endOfNameIndex = nameParts.length
@@ -118,7 +121,7 @@ export const parseSlug = (params: Params, searchParams: SearchParams) => {
       .join(' ')
   }
 
-  return { boardId, streetNumber, streetName, streetSuffix, streetDirection, slug: listingName }
+  return { boardId, streetNumber, streetName, streetSuffix, streetDirection, buildingName, slug: listingName }
 }
 
 

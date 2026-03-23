@@ -139,7 +139,7 @@ export const formatMetadata = (
   let title = templates.title ? interpolate(templates.title) : getSeoTitle(property)
   
   // Cleanup artifacts like " -  - " if price or building name is empty
-  title = title.replace(/\s\s+/g, ' ').replace(/ - - /g, ' - ').replace(/^ - | - $/g, '')
+  title = title.replace(/\s\s+/g, ' ').replace(/ - - /g, ' - ').replace(/^ - | - $/g, '').replace(/,(\s*\|)/g, '$1').replace(/,\s*$/g, '')
 
   let finalDescription = templates.description ? interpolate(templates.description) : description
   finalDescription = scrubbed(finalDescription) ? propsConfig.scrubbedDescriptionLabel : finalDescription

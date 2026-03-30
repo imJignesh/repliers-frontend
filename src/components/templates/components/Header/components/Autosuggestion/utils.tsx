@@ -10,12 +10,18 @@ import { capitalize, joinNonEmpty } from 'utils/strings'
 
 export const getListingLabel = (option: AutosuggestionOption) => {
   const { source } = option || {}
-  const { address } = (source as Property) || {}
-  const { city } = address
+  const { address, full_address } = (source as any) || {}
+  if (full_address) return full_address
+  const { city } = address || {}
   return joinNonEmpty([
     formatShortAddress(address),
     capitalize(String(city || '').trim())
   ])
+}
+
+export const getBuildingLabel = (option: any) => {
+  const { source } = option || {}
+  return joinNonEmpty([source.name, source.address])
 }
 
 export const getAreaLabel = (option: AutosuggestionOption) => {

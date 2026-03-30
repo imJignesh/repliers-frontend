@@ -16,9 +16,10 @@ import { type AutocompleteRenderInputParams } from '@mui/material/Autocomplete'
 
 import mapConfig from '@configs/map'
 import searchConfig from '@configs/search'
+import routes from '@configs/routes'
 import IcoSearch from '@icons/IcoSearch'
 
-import { APISearch } from 'services/API'
+import { APISearch, APILocations } from 'services/API'
 import {
   type AutosuggestionOption,
   type MapboxAddress,
@@ -44,12 +45,14 @@ import { getSeoUrl } from 'utils/properties'
 
 import OptionAddress from './components/OptionAddress'
 import OptionArea from './components/OptionArea'
+import OptionBuilding from './components/OptionBuilding'
 import OptionGroup from './components/OptionGroup'
 import OptionListing from './components/OptionListing'
 import OptionLoader from './components/OptionLoader'
 import {
   getAddressLabel,
   getAreaLabel,
+  getBuildingLabel,
   getListingLabel,
   removeQueryParam,
   updateQueryParam
@@ -90,6 +93,7 @@ const Autosuggestion = ({
   const [listings, setListings] = useState<Property[]>([])
   const [address, setAddress] = useState<MapboxAddress[]>([])
   const [locations, setLocations] = useState<AutosuggestionOption[]>([])
+  const [buildings, setBuildings] = useState<any[]>([])
 
   const { map } = MapService
 
@@ -114,11 +118,19 @@ const Autosuggestion = ({
           // because it is (probably) the parent region of the neighborhood or city.
           // TRIE doesn't have them in the index
           const trieQuery = query.split(',').at(0) || ''
-          setLocations(await searchLocations(trieQuery))
-          const { address, listings } =
-            await APISearch.fetchAutosuggestions(query)
-          setAddress(address)
-          setListings(listings)
+          const [trieLocations, laravelResults] = await Promise.all([
+            searchLocations(trieQuery),
+            APILocations.fetchAutosuggestions(query)
+          ])
+
+          setLocations(trieLocations)
+          setBuildings(laravelResults.buildings || [])
+          setListings(laravelResults.listings || [])
+          // We can still keep mapbox addresses if we want to call APISearch too, 
+          // but the user said "instead", so let's see. 
+          // For now, let's keep Mapbox addresses if they are still needed for street search.
+          const { address: mapboxAddress } = await APISearch.fetchAutosuggestions(query)
+          setAddress(mapboxAddress)
         } catch (error) {
           console.error('Failed to fetch autosuggestions:', error)
           // Handle error state here, e.g., show a message to the user
@@ -162,6 +174,12 @@ const Autosuggestion = ({
         source: listing
       })
     })
+    buildings.forEach((building) => {
+      options.push({
+        type: 'building',
+        source: building
+      })
+    })
   }
 
   // TODO: useCallback
@@ -181,6 +199,8 @@ const Autosuggestion = ({
         return <OptionAddress key={key} props={otherProps} option={option} />
       case 'listing':
         return <OptionListing key={key} props={otherProps} option={option} />
+      case 'building':
+        return <OptionBuilding key={key} props={otherProps} option={option} />
       default:
         return null
     }
@@ -228,6 +248,8 @@ const Autosuggestion = ({
         return getAddressLabel(option)
       case 'listing':
         return getListingLabel(option)
+      case 'building':
+        return getBuildingLabel(option)
       default:
         return ''
     }
@@ -237,6 +259,7 @@ const Autosuggestion = ({
     setOpen(false)
     setAddress([])
     setListings([])
+    setBuildings([])
     setLocations([])
     setSearchString('')
     setPosition({ center: null, zoom: defaultAddressZoom })
@@ -336,6 +359,11 @@ const Autosuggestion = ({
         break
       case 'listing':
         handleListingClick(option)
+        break
+      case 'building':
+        // Buildings are handled by Link in OptionBuilding, 
+        // but if we want to handle it here too:
+        router.push(`${routes.building}/${option.source.slug}`)
         break
       default:
     }

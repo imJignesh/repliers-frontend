@@ -44,6 +44,15 @@ class APILocations extends APIBase {
             return []
         }
     }
+
+    async fetchAutosuggestions(q: string): Promise<any> {
+        try {
+            return await this.fetchJSON<any>(`/search?q=${encodeURIComponent(q)}`)
+        } catch (error) {
+            console.error(`[APILocations] error fetching autosuggestions for ${q}`, error)
+            return { buildings: [], listings: [], locations: [], success: false }
+        }
+    }
 }
 
 const apiLocationsInstance = new APILocations()

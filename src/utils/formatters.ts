@@ -68,7 +68,7 @@ export const formatDate = (
 
 export const toSafeNumber = (value: Primitive) => {
   if (typeof value === 'boolean') return value ? 1 : 0
-  if (typeof value === 'string') return parseFloat(value.replace(',', '')) || 0
+  if (typeof value === 'string') return parseFloat(value.replace(/[^\d.]/g, '')) || 0
   if (
     typeof value !== 'number' ||
     Number.isNaN(value) ||

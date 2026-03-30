@@ -26,7 +26,7 @@ const ImageContainer = ({
   blurVariant = 'card',
   loading = 'lazy'
 }: {
-  src: string
+  src?: string
   icon: ImagePlaceholderIconType
   score?: number
   index?: number
@@ -37,9 +37,12 @@ const ImageContainer = ({
   blurVariant?: RestrictedMessageVariant
 }) => {
   const [loaded, setLoaded] = useState(false)
+  const isLockSlide = src?.startsWith('lock:') || false
+  const realSrc = (isLockSlide ? src?.split('lock:')[1] : src) || ''
   // first element of the gallery should be eagerly loaded
-  const imageSrc = getCDNPath(src, size)
-  const style = blurred
+  const imageSrc = getCDNPath(realSrc, size)
+  const isBlurred = blurred || isLockSlide
+  const style = isBlurred
     ? { filter: `blur(${propsConfig.blurredImageRadius}px)` }
     : {}
 
@@ -61,7 +64,11 @@ const ImageContainer = ({
           style={style}
         />
       )}
-      {blurred && loaded && <RestrictedMessage variant={blurVariant} />}
+      {isLockSlide ? (
+        <RestrictedMessage variant={blurVariant} />
+      ) : (
+        isBlurred && loaded && <RestrictedMessage variant={blurVariant} />
+      )}
     </Box>
   )
 }

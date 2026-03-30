@@ -23,23 +23,53 @@ const RestrictedMessage = ({
         transform: 'translate(0%, -50%)'
       }}
     >
-      <Stack spacing={1} alignItems="center">
-        <VisibilityOffOutlinedIcon
-          fontSize={iconFontSize}
-          sx={{ color: 'common.white' }}
-        />
-        {variant !== 'map' && (
-          <Typography
-            variant={messageVariant}
+      <Stack spacing={1.5} alignItems="center">
+        {variant === 'card' ? (
+          <Box
             sx={{
-              px: 5,
-              maxWidth: 400,
+              px: { xs: 2, md: 3 },
+              py: 1.5,
+              borderRadius: 2,
+              backgroundColor: 'primary.main',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+              color: 'common.white',
               textAlign: 'center',
-              color: 'common.white'
+              width: 'max-content',
+              maxWidth: '90%',
             }}
           >
-            {content.restrictedPropertyTitle}
-          </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: 700,
+                letterSpacing: '0.02em',
+                color: 'common.white',
+                lineHeight: 1.2
+              }}
+            >
+              REGISTER TO VIEW PHOTOS
+            </Typography>
+          </Box>
+        ) : (
+          <>
+            <VisibilityOffOutlinedIcon
+              fontSize={iconFontSize}
+              sx={{ color: 'common.white' }}
+            />
+            {variant !== 'map' && (
+              <Typography
+                variant={messageVariant}
+                sx={{
+                  px: 5,
+                  maxWidth: 400,
+                  textAlign: 'center',
+                  color: 'common.white'
+                }}
+              >
+                {content.restrictedPropertyTitle}
+              </Typography>
+            )}
+          </>
         )}
       </Stack>
     </Box>

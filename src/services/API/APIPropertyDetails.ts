@@ -45,7 +45,7 @@ class APIPropertyDetails extends APIBase {
   fetchBuilding(boardId: number, streetName: string, streetNumber: string | number, slug?: string, streetSuffix?: string, streetDirection?: string): Promise<ApiQueryResponse> {
     const searchParams = queryString.stringify({
       boardId,
-      fields: 'address,mlsNumber,images,details,map,class,type',
+      fields: 'address,mlsNumber,images,details,map,class,type,listPrice',
       streetName,
       streetNumber,
       streetSuffix,

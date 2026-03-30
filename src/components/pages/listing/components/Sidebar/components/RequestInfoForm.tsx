@@ -150,7 +150,7 @@ const RequestInfoForm = () => {
           variant="contained"
           onClick={handleSubmit}
         >
-          Request info
+          REGISTER TO VIEW PHOTOS
         </Button>
 
         <AgreementText />

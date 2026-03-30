@@ -69,7 +69,7 @@ const PropertyCard = React.memo(
     const linkUrl = getSeoUrl(property, { startImage })
 
     const blurredGallery =
-      features.blurRestrictedProperty && restricted(property) && !authenticated
+      (features.blurRestrictedProperty && restricted(property) && !authenticated) || !authenticated
 
     const tags: PropertyTag[] = []
 
@@ -119,7 +119,7 @@ const PropertyCard = React.memo(
             size={size}
             icon={icon}
             images={images}
-            start={startImage}
+            start={blurredGallery ? 0 : startImage}
             scores={imagesScore}
             blurred={blurredGallery}
             onMouseEnter={() => onGalleryEnter?.()}

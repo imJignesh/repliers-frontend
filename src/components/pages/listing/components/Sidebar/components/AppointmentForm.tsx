@@ -217,7 +217,7 @@ const AppointmentForm = () => {
                         variant="contained"
                         onClick={handleSubmit}
                     >
-                        Book Appointment
+                        Book a Viewing
                     </Button>
 
                     <AgreementText />

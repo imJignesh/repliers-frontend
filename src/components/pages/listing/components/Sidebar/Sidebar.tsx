@@ -26,7 +26,7 @@ const Sidebar = () => {
       }}
     >
       <Tabs value={value} variant="fullWidth" onChange={handleChange}>
-        <Tab label={authenticated ? "Book Appointment" : "Request info"} />
+        <Tab label={authenticated ? "Book a Viewing" : "REGISTER TO VIEW PHOTOS"} />
       </Tabs>
       <Box
         sx={{

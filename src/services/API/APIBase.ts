@@ -20,6 +20,19 @@ class APIBase {
       headers.append('X-Forwarded-From', forwarded.from)
     }
 
+    if (typeof window === 'undefined') {
+      try {
+        const { cookies } = await import('next/headers')
+        const cookieStore = await cookies()
+        const cookieHeader = cookieStore.toString()
+        if (cookieHeader) {
+          headers.append('Cookie', cookieHeader)
+        }
+      } catch (e) {
+        // SSR context where next/headers might not be available or fails
+      }
+    }
+
     const token = await getToken()
     if (token && !expired(token)) {
       headers.append('Authorization', `Bearer ${token}`)

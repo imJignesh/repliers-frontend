@@ -57,11 +57,17 @@ const Gallery = React.memo(
     // CardGallery with only one image passed would simply display the image,
     // without interaction controls and Embla ribbon.
     const [carouselActive, setCarouselActive] = useState(false)
-    // the image to be displayed before the carousel is activated
     const firstImage = [images[start]]
-    images = carouselActive ? images : firstImage
-    // map cards should only show the first image
-    if (sizeMap || blurred) images = firstImage
+    const lockSlide = `lock:${firstImage[0]}`
+
+    // determine images for carousel
+    if (!carouselActive) {
+      images = firstImage
+    } else if (blurred && !sizeMap) {
+      images = [firstImage[0], lockSlide]
+    } else if (sizeMap || (blurred && !sizeMap)) {
+      images = firstImage
+    }
 
     const [hovered, setHovered] = useState(false)
     const [carouselRef, carouselApi] = useEmblaCarousel({
@@ -152,6 +158,7 @@ const Gallery = React.memo(
                       loading={loading}
                       size={cdnImageSize}
                       score={scores?.[index]}
+                      blurred={image.startsWith('lock:') || (index === 0 ? false : blurred)}
                     />
                   ))}
                 </Box>
@@ -167,7 +174,7 @@ const Gallery = React.memo(
             <ImageContainer
               icon={icon}
               src={images[0]}
-              blurred={blurred}
+              blurred={false}
               blurVariant={blurVariant}
               size={cdnImageSize}
             />

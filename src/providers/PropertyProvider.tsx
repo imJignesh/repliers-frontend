@@ -14,7 +14,7 @@ import { type Property } from 'services/API'
 import { restricted, sold } from 'utils/properties'
 import { useAuthenticated } from 'hooks/useAuthenticated'
 
-import { useFeatures } from './FeaturesProvider'
+import { useFeatures } from 'providers/FeaturesProvider'
 
 type PropertyContextProps = {
   community?: string
@@ -39,7 +39,7 @@ const PropertyProvider = ({
   const { mlsNumber, boardId, comparables } = property
   const soldProperty = sold(property)
   const blurred =
-    features.blurRestrictedProperty && restricted(property) && !authenticated
+    (features.blurRestrictedProperty && restricted(property) && !authenticated) || !authenticated
 
   const [similarProperties, setSimilarProperties] = useState<Property[]>(
     soldProperty && comparables?.length ? comparables : []

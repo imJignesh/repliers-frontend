@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useEffect } from 'react'
-
-import { Box, Container, Stack, Typography } from '@mui/material'
+import NextLink from 'next/link'
+import { Box, Container, Stack, Typography, Breadcrumbs, Link } from '@mui/material'
+import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 
 import { DetailsContainer } from '@shared/Containers'
 import {
@@ -36,6 +37,7 @@ import {
 } from './components'
 
 import { formatShortAddress } from '../../../utils/properties/formatters'
+import { getCatalogUrl } from '../../../utils/urls'
 
 const PropertyPageContent = ({
   embedded = false,
@@ -81,6 +83,47 @@ const PropertyPageContent = ({
           direction={{ xs: 'column', md: 'row' }}
         >
           <Stack spacing={2} sx={{ flex: 1, width: '100%' }}>
+            <Breadcrumbs
+              separator={<NavigateNextIcon fontSize="small" />}
+              sx={{
+                mb: 1,
+                mt: -1,
+                '& .MuiBreadcrumbs-li': {
+                  fontWeight: 500,
+                  fontSize: '0.95rem'
+                }
+              }}
+            >
+              {address.city && (
+                <Link
+                  component={NextLink}
+                  href={getCatalogUrl(address.city)}
+                  color="text.secondary"
+                  underline="hover"
+                >
+                  {address.city}
+                </Link>
+              )}
+              {address.neighborhood && (
+                <Link
+                  component={NextLink}
+                  href={getCatalogUrl(address.city, address.neighborhood)}
+                  color="text.secondary"
+                  underline="hover"
+                >
+                  {address.neighborhood}
+                </Link>
+              )}
+              {(property as any).building?.name && (
+                <Typography
+                  color="text.primary"
+                  sx={{ fontWeight: 500, fontSize: '0.95rem' }}
+                >
+                  {(property as any).building.name}
+                </Typography>
+              )}
+            </Breadcrumbs>
+
             <Typography variant="h1" style={{ fontSize: '2rem' }}>
               {formatShortAddress(address)}
             </Typography>
@@ -110,6 +153,7 @@ const PropertyPageContent = ({
 
           {features.pdpSidebar && !agentRole && (
             <Box
+              id="building-request-form"
               sx={{
                 top: 32 + (embedded ? 52 : 60),
                 // 32px is the offset between content containers

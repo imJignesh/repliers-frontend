@@ -11,10 +11,12 @@ import useClientSide from 'hooks/useClientSide'
 
 import {
   DesktopGallery,
+  GalleryLockOverlay,
   MobileGallery,
   ThumbnailsRibbon,
   ThumbnailsSkeleton
 } from './components'
+import { useAuthenticated } from 'hooks/useAuthenticated'
 
 const PropertyGallery = () => {
   const { property } = useProperty()
@@ -34,6 +36,7 @@ const PropertyGallery = () => {
   const [activeThumbnailIndex, setActiveThumbnailIndex] = useState(startImage)
 
   const clientSide = useClientSide()
+  const authenticated = useAuthenticated()
   const { mobile } = useBreakpoints()
 
   const handleChange = (index: number) => {
@@ -64,10 +67,14 @@ const PropertyGallery = () => {
             <DesktopGallery active={activeIndex} onChange={handleChange} />
           )}
 
-          <ThumbnailsRibbon
-            active={activeThumbnailIndex}
-            onClick={handleChange}
-          />
+          {authenticated ? (
+            <ThumbnailsRibbon
+              active={activeThumbnailIndex}
+              onClick={handleChange}
+            />
+          ) : (
+            <GalleryLockOverlay />
+          )}
         </>
       ) : (
         <ThumbnailsSkeleton />

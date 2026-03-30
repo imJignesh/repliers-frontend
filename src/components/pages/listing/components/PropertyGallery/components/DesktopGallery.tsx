@@ -78,7 +78,8 @@ const DesktopGallery = ({
         overflow: 'hidden',
         position: 'relative',
         bgcolor: 'background.default',
-        aspectRatio: { sm: '3/2', md: 'auto' },
+        aspectRatio: { sm: '3/2', md: blurred ? '3/1' : 'auto' },
+        maxHeight: { md: 400 },
         ...(blurred && {
           pointerEvents: 'none',
           '& img': { filter: `blur(${propsConfig.blurredImageRadius}px)` }
@@ -112,7 +113,7 @@ const DesktopGallery = ({
               />
             </Box>
           )}
-          {!blurred ? (
+          {!blurred && (
             <>
               {activeImageLargeUrl && (
                 <Box
@@ -179,8 +180,6 @@ const DesktopGallery = ({
                 </>
               )}
             </>
-          ) : (
-            <RestrictedMessage variant="gallery" />
           )}
         </>
       )}

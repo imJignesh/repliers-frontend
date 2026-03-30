@@ -112,10 +112,20 @@ const PropertyPageContent = ({
                 <Link
                   component={NextLink}
                   href={getCatalogUrl(address.city, address.neighborhood)}
-                  color="text.primary"
+                  color="text.secondary"
                   underline="hover"
                 >
                   {address.neighborhood}
+                </Link>
+              )}
+              {(property as any).building?.name && (
+                <Link
+                  component={NextLink}
+                  href={`/building/${(property as any).building.slug}`}
+                  color="text.primary"
+                  underline="hover"
+                >
+                  {(property as any).building.name}
                 </Link>
               )}
             </Breadcrumbs>

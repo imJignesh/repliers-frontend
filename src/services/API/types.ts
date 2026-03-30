@@ -706,6 +706,7 @@ export type AutosuggestionSourceType =
   | 'neighborhood'
   | 'address'
   | 'listing'
+  | 'building'
   | 'loader'
 
 export type AutosuggestionOptionType = 'group' | AutosuggestionSourceType

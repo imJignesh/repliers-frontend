@@ -126,11 +126,7 @@ const Autosuggestion = ({
           setLocations(trieLocations)
           setBuildings(laravelResults.buildings || [])
           setListings(laravelResults.listings || [])
-          // We can still keep mapbox addresses if we want to call APISearch too, 
-          // but the user said "instead", so let's see. 
-          // For now, let's keep Mapbox addresses if they are still needed for street search.
-          const { address: mapboxAddress } = await APISearch.fetchAutosuggestions(query)
-          setAddress(mapboxAddress)
+          setAddress([]) // Clear Mapbox addresses
         } catch (error) {
           console.error('Failed to fetch autosuggestions:', error)
           // Handle error state here, e.g., show a message to the user
@@ -154,7 +150,7 @@ const Autosuggestion = ({
   if (loading) {
     options.push({ type: 'loader' })
   } else {
-    locations.forEach((location) => {
+    locations.slice(0, 3).forEach((location) => {
       const { source, parent } = location
       options.push({
         type: 'city', // combining both existing types into one, `location.type` not needed,
@@ -162,24 +158,29 @@ const Autosuggestion = ({
         parent
       })
     })
-    address.forEach((address) => {
+    address.slice(0, 3).forEach((address) => {
       options.push({
         type: 'address',
         source: address
       })
     })
-    listings.forEach((listing) => {
+    listings.slice(0, 3).forEach((listing) => {
       options.push({
         type: 'listing',
         source: listing
       })
     })
-    buildings.forEach((building) => {
+    buildings.slice(0, 3).forEach((building) => {
       options.push({
         type: 'building',
         source: building
       })
     })
+  }
+
+  // Ensure absolute max 9 results just in case (e.g. if address has items)
+  if (options.length > 9) {
+    options.length = 9
   }
 
   // TODO: useCallback
@@ -363,7 +364,7 @@ const Autosuggestion = ({
       case 'building':
         // Buildings are handled by Link in OptionBuilding, 
         // but if we want to handle it here too:
-        router.push(`${routes.building}/${option.source.slug}`)
+        router.push(`${routes.building}/${(option.source as any).slug}`)
         break
       default:
     }
@@ -396,7 +397,6 @@ const Autosuggestion = ({
           options={options}
           filterSelectedOptions
           filterOptions={(x) => x}
-          groupBy={(option) => option.type}
           onBlur={() => setOpen(false)}
           onFocus={() => setOpen(searchString.length >= minCharsToSuggest)}
           onChange={(e, v) => handleChange(v)}
@@ -413,11 +413,6 @@ const Autosuggestion = ({
           getOptionLabel={getOptionLabel}
           renderInput={renderInputElement}
           renderOption={renderOptionElement}
-          renderGroup={({ key, group, children }) => (
-            <OptionGroup key={key} group={group}>
-              {children}
-            </OptionGroup>
-          )}
         />
         {showButton && (
           <Button

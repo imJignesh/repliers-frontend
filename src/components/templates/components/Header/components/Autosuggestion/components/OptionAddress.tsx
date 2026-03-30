@@ -21,7 +21,7 @@ const OptionAddress = ({
   const addressUrl = `${routes.address}/?${params}`
 
   return (
-    <OptionItem {...props}>
+    <OptionItem {...props} badge="Address">
       <Link
         href={addressUrl}
         onClick={(e) => {

@@ -21,7 +21,7 @@ const OptionArea = ({
   const areaUrl = `${routes.area}/?${params}`
 
   return (
-    <OptionItem {...props}>
+    <OptionItem {...props} badge="Location">
       <Link
         href={areaUrl}
         onClick={(e) => {

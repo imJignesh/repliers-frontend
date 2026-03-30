@@ -16,7 +16,7 @@ const OptionListing = ({
   option: AutosuggestionOption
 }) => {
   return (
-    <OptionItem {...props}>
+    <OptionItem {...props} badge="Listing">
       <Link href={getSeoUrl(option.source as Property)}>
         {getListingLabel(option)}
         {/* <Typography variant="caption">{mlsNumber}</Typography> */}

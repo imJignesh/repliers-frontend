@@ -1,10 +1,17 @@
 import React from 'react'
 
-import { Box } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 
 import { toRem } from 'utils/theme'
 
-const OptionItem = ({ children, ...props }: { children: React.ReactNode }) => (
+const OptionItem = ({
+  badge,
+  children,
+  ...props
+}: {
+  badge?: string
+  children: React.ReactNode
+} & React.HTMLAttributes<HTMLLIElement>) => (
   <li {...props}>
     <Box
       sx={{
@@ -14,12 +21,49 @@ const OptionItem = ({ children, ...props }: { children: React.ReactNode }) => (
         borderRadius: 2,
         fontSize: toRem(14),
         bgcolor: 'background.default',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-        overflow: 'hidden'
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 2
       }}
     >
-      {children}
+      <Box
+        sx={{
+          flex: 1,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          '& a': {
+            display: 'block',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            width: '100%',
+            color: 'inherit',
+            textDecoration: 'none'
+          }
+        }}
+      >
+        {children}
+      </Box>
+      {badge && (
+        <Box
+          sx={{
+            px: 1,
+            py: 0.25,
+            borderRadius: 1,
+            bgcolor: 'primary.main',
+            color: 'primary.contrastText',
+            fontSize: toRem(10),
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: 0.5,
+            flexShrink: 0
+          }}
+        >
+          {badge}
+        </Box>
+      )}
     </Box>
   </li>
 )

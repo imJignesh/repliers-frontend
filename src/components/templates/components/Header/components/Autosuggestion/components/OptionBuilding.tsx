@@ -13,7 +13,7 @@ const OptionBuilding = ({
 }) => {
   const { source } = option
   return (
-    <OptionItem {...props}>
+    <OptionItem {...props} badge="Building">
       <Link href={`${routes.building}/${source.slug}`}>
         {source.name}
         <span style={{ fontSize: '0.8em', color: '#666', marginLeft: '8px' }}>

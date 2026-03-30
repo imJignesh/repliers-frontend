@@ -6,7 +6,7 @@ import {
 } from 'services/API'
 import { type Filters } from 'services/Search'
 
-export const listingStatuses = ['active', 'rent'] as const
+export const listingStatuses = ['active', 'rent', 'sold'] as const
 
 export type ListingStatus = (typeof listingStatuses)[number]
 

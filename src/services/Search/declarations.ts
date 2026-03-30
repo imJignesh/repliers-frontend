@@ -111,6 +111,11 @@ export const optionalTransformers: OptionalTransformers = {
       type: 'sale',
       status: STATUS_AVAILABLE,
       lastStatus: [LAST_STATUS_NEW, LAST_STATUS_SC]
+    }),
+    sold: () => ({
+      type: 'sale',
+      status: STATUS_UNAVAILABLE,
+      lastStatus: LAST_STATUS_SOLD
     })
   },
 

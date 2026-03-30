@@ -485,7 +485,7 @@ export interface ApiQueryParams {
   clusterLimit: number
 
   listings: boolean
-
+  brokerage: string
   lat: string
   long: string
   radius: number // in KM

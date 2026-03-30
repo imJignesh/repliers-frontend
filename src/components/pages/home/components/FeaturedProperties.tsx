@@ -19,22 +19,24 @@ import defaultLocation from '@configs/location'
 const FeaturedProperties = () => {
   const [featured, setFeatured] = useState<Property[]>([])
   const [featuredBuildings, setFeaturedBuildings] = useState<any[]>([])
-  const [recentlySold, setRecentlySold] = useState<Property[]>([])
+  const [showcasedListings, setShowcasedListings] = useState<Property[]>([])
   const [showcased, setShowcased] = useState<Property[]>([])
   const t = useTranslations('HomePage')
   const features = useFeatures()
 
   const filters: Partial<ApiQueryParams> = {
     class: 'condo',
-    minPrice: 1_000_000,
+    propertyType: 'Condo Apt',
+    city: 'Toronto',
+    sortBy: 'createdOnDesc',
     resultsPerPage: 8
   }
 
-  const soldFilters: Partial<ApiQueryParams> = {
-    ...filters,
+  const showcasedFilters: Partial<ApiQueryParams> = {
+    brokerage: 'IRISE',
     resultsPerPage: 12,
     status: 'A',
-    sortBy: 'soldDateDesc'
+    sortBy: 'createdOnDesc'
   }
 
   const filterShowcased: Partial<ApiQueryParams> = {
@@ -61,12 +63,12 @@ const FeaturedProperties = () => {
     }
   }
 
-  const fetchRecentlySold = async () => {
+  const fetchShowcasedListings = async () => {
     try {
-      const response = await SearchService.fetchListings(soldFilters)
-      if (response) setRecentlySold(response.listings)
+      const response = await SearchService.fetchListings(showcasedFilters)
+      if (response) setShowcasedListings(response.listings)
     } catch (error) {
-      console.error('RecentlySold::Error fetching data', error)
+      console.error('ShowcasedListings::Error fetching data', error)
     }
   }
 
@@ -84,7 +86,7 @@ const FeaturedProperties = () => {
 
   useEffect(() => {
     fetchFeatured()
-    fetchRecentlySold()
+    fetchShowcasedListings()
     fetchShowcased()
     fetchFeaturedBuildings()
   }, [])
@@ -94,7 +96,7 @@ const FeaturedProperties = () => {
     <Container maxWidth="lg">
       <Stack spacing={6} py={8}>
         <PropertyCarousel title={t('justListed')} properties={featured} />
-        <PropertyCarousel title={t('recentlySold')} properties={recentlySold} />
+        <PropertyCarousel title={t('recentlySold')} properties={showcasedListings} />
 
         {features.dashboard && <StatsWidgets {...defaultFilters} name={`Toronto`} />}
 
@@ -126,7 +128,7 @@ const FeaturedProperties = () => {
         </Box>
 */}
         {/* <PropertyCarousel
-          title={'Featured Listings in Toronto'}
+          title={'Recent Listings in Toronto'}
           properties={featured}
         /> */}
         <Box>

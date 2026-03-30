@@ -168,21 +168,13 @@ export const parseUrlFilters = (filters: string[]) => {
     // defaults
     listingStatus: 'active',
     listingType: 'condo',
-    sortBy: 'listPriceDesc'
+    sortBy: 'createdOnDesc'
   }
 
   filters.forEach((filter) => {
     // string matches
     switch (filter) {
       // WARN: not sure we should give this option to users
-      case 'sold':
-        searchFilters.listingStatus = 'sold'
-        break
-      // WARN: not sure we should give this option to users
-      case 'any':
-      case 'all':
-        searchFilters.listingStatus = 'all'
-        break
       case 'for-lease':
       case 'for-rent':
         searchFilters.listingStatus = 'rent'

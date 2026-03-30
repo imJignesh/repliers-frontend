@@ -127,20 +127,24 @@ const removeTokenFromUrl = () => {
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
 const UserProvider = ({ children }: { children: ReactNode }) => {
-  // guard against server environment where `window`/`localStorage` may be missing
-  const localProfile =
-    typeof window !== 'undefined' && typeof localStorage !== 'undefined'
-      ? localStorage.getItem(profileKey)
-      : null
-
-  const [profile, setProfile] = useState(
-    localProfile ? JSON.parse(localProfile) : {}
-  )
+  const [profile, setProfile] = useState({} as any)
   const [loading, setLoading] = useState(false)
-  const [authenticated, setAuthenticated] = useState(Cookies.get('rauthenticated') === 'true')
+  const [isMounted, setIsMounted] = useState(false)
+  const [authenticated, setAuthenticated] = useState(false)
   // eslint-disable-next-line no-undef
   const refreshTimeout = useRef<NodeJS.Timeout | null>(null)
-  const token = getTokenSync()
+
+  useEffect(() => {
+    setIsMounted(true)
+    setAuthenticated(Cookies.get('rauthenticated') === 'true')
+    
+    const localProfile = typeof localStorage !== 'undefined' ? localStorage.getItem(profileKey) : null
+    if (localProfile) {
+      setProfile(JSON.parse(localProfile))
+    }
+  }, [])
+
+  const token = isMounted ? getTokenSync() : null
   const logged = Boolean(token)
 
   const saveProfile = (data: Partial<ApiUserProfile>) => {
@@ -296,7 +300,7 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
     } else if (refreshNeeded(token)) {
       refresh()
     }
-  }, [])
+  }, [token])
 
   const contextValue = React.useMemo(
     () =>

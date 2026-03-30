@@ -6,7 +6,7 @@ import {
 } from 'services/API'
 import { type Filters } from 'services/Search'
 
-export const listingStatuses = ['active', 'sold', 'all', 'rent'] as const
+export const listingStatuses = ['active', 'rent'] as const
 
 export type ListingStatus = (typeof listingStatuses)[number]
 
@@ -83,7 +83,7 @@ export const aiQualityFeatureNames: Partial<
 export const defaultFilters: Filters = {
   listingStatus: 'active',
   listingType: 'condo',
-  sortBy: 'listPriceDesc'
+  sortBy: 'createdOnDesc'
 }
 
 export const defaultAdvancedFilters: Filters = {

@@ -9,6 +9,7 @@ import Select from 'components/atoms/PatchedSelect'
 
 import { type ApiSortBy } from 'services/API'
 import { type Filters } from 'services/Search'
+import { defaultFilters } from '@configs/filters'
 import { useFeatures } from 'providers/FeaturesProvider'
 
 type SortMode = {
@@ -41,7 +42,7 @@ const SortModesSelect = ({
   ]
 
   const aiSearch = !!filters?.imageSearchItems
-  const value = filters?.sortBy || 'listPriceDesc'
+  const value = filters?.sortBy || defaultFilters.sortBy || 'createdOnDesc'
 
   const handleChange = (event: SelectChangeEvent<unknown>) => {
     const newValue = event.target.value as ApiSortBy

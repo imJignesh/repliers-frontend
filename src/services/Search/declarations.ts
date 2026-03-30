@@ -107,19 +107,10 @@ export const optionalTransformers: OptionalTransformers = {
       propertyType: TYPE_RENTAL,
       lastStatus: [LAST_STATUS_NEW, LAST_STATUS_SC]
     }),
-    sold: () => ({
-      type: 'sale',
-      status: STATUS_UNAVAILABLE,
-      lastStatus: LAST_STATUS_SOLD
-    }),
     active: () => ({
       type: 'sale',
       status: STATUS_AVAILABLE,
       lastStatus: [LAST_STATUS_NEW, LAST_STATUS_SC]
-    }),
-    all: () => ({
-      type: 'sale',
-      status: [STATUS_AVAILABLE, STATUS_UNAVAILABLE]
     })
   },
 

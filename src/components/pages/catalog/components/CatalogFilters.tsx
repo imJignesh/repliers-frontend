@@ -276,7 +276,7 @@ const CatalogFilters = ({
     if (status === 'sold') urlFilters.push('sold')
     if (status === 'all') urlFilters.push('all')
 
-    if (sort && sort !== 'listPriceDesc') urlFilters.push('sort-' + sort)
+    if (sort && sort !== 'createdOnDesc') urlFilters.push('sort-' + sort)
 
     if (f.minPrice) urlFilters.push(`above - ${f.minPrice} `)
     if (f.maxPrice) urlFilters.push(`below - ${f.maxPrice} `)

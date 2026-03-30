@@ -96,6 +96,7 @@ const AppointmentForm = () => {
             appointment_date: appointmentDate,
             appointment_time: appointmentTime,
             listing_price: listPrice,
+            price: listPrice,
             listing_neighbourhood: address?.neighborhood,
             listing_city: address?.city
         })
@@ -113,6 +114,7 @@ const AppointmentForm = () => {
 
     return (
         <form onSubmit={(e) => { e.preventDefault(); handleSubmit() }} autoComplete="off">
+            <input type="hidden" name="price" value={listPrice || ''} />
             <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <Stack spacing={2}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>

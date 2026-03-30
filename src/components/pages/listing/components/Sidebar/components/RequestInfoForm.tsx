@@ -75,6 +75,7 @@ const RequestInfoForm = () => {
       mls_number: mlsNumber,
       url: currentUrl,
       listing_price: listPrice,
+      price: listPrice,
       listing_neighbourhood: address.neighborhood,
       listing_city: address.city
     })
@@ -92,6 +93,7 @@ const RequestInfoForm = () => {
 
   return (
     <form onSubmit={(e) => { e.preventDefault(); handleSubmit() }} autoComplete="off">
+      <input type="hidden" name="price" value={listPrice || ''} />
       <Stack spacing={2}>
         <TextField
           fullWidth

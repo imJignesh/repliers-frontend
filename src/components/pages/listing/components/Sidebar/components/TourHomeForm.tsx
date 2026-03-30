@@ -55,7 +55,7 @@ const TourHomeForm = () => {
   const [values, setValues] = useState(getFormData(profile))
 
   const {
-    property: { mlsNumber }
+    property: { mlsNumber, listPrice }
   } = useProperty()
 
   const [method, setMethod] = useState<ContactScheduleMethod>('InPerson')
@@ -94,6 +94,8 @@ const TourHomeForm = () => {
       email,
       method,
       mlsNumber,
+      price: listPrice,
+      listing_price: listPrice,
       phone: sanitizePhoneNumber(phone),
       date: date.format(i18nConfig.dateFormat),
       time: time.format(i18nConfig.timeFormat)
@@ -112,6 +114,7 @@ const TourHomeForm = () => {
 
   return (
     <form onSubmit={handleSubmit} autoComplete="off">
+      <input type="hidden" name="price" value={listPrice || ''} />
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Stack spacing={2}>
           <Grid container columns={2} spacing={2}>

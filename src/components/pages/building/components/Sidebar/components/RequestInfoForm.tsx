@@ -71,6 +71,7 @@ const RequestInfoForm = () => {
       message,
       mlsNumber,
       listing_price: listPrice,
+      price: listPrice,
       listing_neighbourhood: address?.neighborhood,
       listing_city: address?.city
     })
@@ -88,6 +89,7 @@ const RequestInfoForm = () => {
 
   return (
     <form onSubmit={handleSubmit} autoComplete="off">
+      <input type="hidden" name="price" value={listPrice || ''} />
       <Stack spacing={2}>
         <Grid container columns={2} spacing={2}>
           <Grid size={2}>

@@ -16,6 +16,7 @@ type ContactRequestInfo = {
   listing_price?: string
   listing_neighbourhood?: string
   listing_city?: string
+  price?: string
 }
 
 export type LeadRequest = {
@@ -30,6 +31,7 @@ export type LeadRequest = {
   listing_neighbourhood?: string
   listing_city?: string
   message?: string
+  price?: string
 }
 
 export type AppointmentRequest = {
@@ -44,6 +46,7 @@ export type AppointmentRequest = {
   listing_price?: string
   listing_neighbourhood?: string
   listing_city?: string
+  price?: string
 }
 
 export type ContactScheduleMethod = 'InPerson' | 'LiveVideo'
@@ -56,6 +59,8 @@ type HomeTourRequest = {
   date: string
   time: string
   mlsNumber: string
+  price?: string
+  listing_price?: string
 }
 
 type MeetingRequest = {

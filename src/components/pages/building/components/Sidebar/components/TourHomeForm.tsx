@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded'
@@ -53,6 +53,16 @@ const TourHomeForm = () => {
   const [loading, setLoading] = useState(false)
   const [formTouched, setFormTouched] = useState(false)
   const [values, setValues] = useState(getFormData(profile))
+  const [isBooked, setIsBooked] = useState(false)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const bookedUrls = JSON.parse(localStorage.getItem('booked_appointments') || '[]')
+      if (bookedUrls.includes(window.location.pathname)) {
+        setIsBooked(true)
+      }
+    }
+  }, [])
 
   const {
     property: { mlsNumber, listPrice }
@@ -102,6 +112,14 @@ const TourHomeForm = () => {
     })
       .then(() => {
         showSnackbar('You can view all prices and sales history now.', 'success')
+        if (typeof window !== 'undefined') {
+          const bookedUrls = JSON.parse(localStorage.getItem('booked_appointments') || '[]')
+          if (!bookedUrls.includes(window.location.pathname)) {
+            bookedUrls.push(window.location.pathname)
+            localStorage.setItem('booked_appointments', JSON.stringify(bookedUrls))
+          }
+        }
+        setIsBooked(true)
       })
       .catch((e) => {
         showSnackbar(extractErrorMessage(e), 'error')
@@ -110,6 +128,16 @@ const TourHomeForm = () => {
         setLoading(false)
         setFormTouched(false)
       })
+  }
+
+  if (isBooked) {
+    return (
+      <Stack spacing={2} alignItems="center" justifyContent="center" sx={{ py: 4 }}>
+        <Typography variant="h6" color="primary" textAlign="center" fontWeight="bold">
+          Your Appointment Has Been Booked
+        </Typography>
+      </Stack>
+    )
   }
 
   return (

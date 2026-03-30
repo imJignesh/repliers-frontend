@@ -21,6 +21,7 @@ const FeaturedProperties = () => {
   const [featuredBuildings, setFeaturedBuildings] = useState<any[]>([])
   const [showcasedListings, setShowcasedListings] = useState<Property[]>([])
   const [showcased, setShowcased] = useState<Property[]>([])
+  const [popularPreconstructions, setPopularPreconstructions] = useState<any[]>([])
   const t = useTranslations('HomePage')
   const features = useFeatures()
 
@@ -34,7 +35,7 @@ const FeaturedProperties = () => {
 
   const showcasedFilters: Partial<ApiQueryParams> = {
     brokerage: 'IRISE',
-    resultsPerPage: 12,
+    resultsPerPage: 8,
     status: 'A',
     sortBy: 'createdOnDesc'
   }
@@ -72,6 +73,32 @@ const FeaturedProperties = () => {
     }
   }
 
+  const fetchPreconstructions = async () => {
+    try {
+      const ids = '783878,802840,823055,703649,791013,810770,807678,814448,812442,683657'
+      const response = await fetch(`https://precondo.ca/wp-json/wp/v2/lv_listing?include=${ids}&_embed`)
+      const data = await response.json()
+      if (Array.isArray(data)) {
+        const mapped = data.slice(0, 8).map(post => {
+          const terms = post._embedded?.['wp:term'] || []
+          const location = terms.flat().find((t: any) => t.taxonomy === 'listing_location')?.name || ''
+
+          return {
+            id: post.id,
+            name: post.title?.rendered,
+            address: location,
+            link: post.link,
+            coverPhotoUrl: post._embedded?.['wp:featuredmedia']?.[0]?.source_url,
+            isExternal: true
+          }
+        })
+        setPopularPreconstructions(mapped)
+      }
+    } catch (error) {
+      console.error('Preconstructions::Error fetching data', error)
+    }
+  }
+
   const fetchFeaturedBuildings = async () => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_PRECONDO_URL}/api/buildings?tag=featured`)
@@ -89,6 +116,7 @@ const FeaturedProperties = () => {
     fetchShowcasedListings()
     fetchShowcased()
     fetchFeaturedBuildings()
+    fetchPreconstructions()
   }, [])
   const { state, defaultFilters } = defaultLocation
 
@@ -138,7 +166,7 @@ const FeaturedProperties = () => {
             throw new Error('Function not implemented.')
           }} />
           <br />
-          {featured?.length > 0 ? (
+          {popularPreconstructions?.length > 0 ? (
             <Stack
               spacing={{ xs: 3, sm: 4, md: 4 }}
               direction="row"
@@ -151,8 +179,8 @@ const FeaturedProperties = () => {
                 }
               }}
             >
-              {featured.map((property, index) => (
-                <PropertyCard key={index} property={property} />
+              {popularPreconstructions.map((building, index) => (
+                <BuildingCard key={index} building={building} />
               ))}
             </Stack>
           ) : (

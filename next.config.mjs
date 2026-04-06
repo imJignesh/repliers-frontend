@@ -16,7 +16,7 @@ const loggingConfig =
     : {}
 
 const nextConfig = {
-  assetPrefix: '/r',
+  basePath: '/r',
   pageExtensions: ['tsx', 'ts', 'jsx', 'js', 'mdx', 'md'],
 
   // Note: 'eslint' and 'typescript' ignore keys are handled differently in v16.

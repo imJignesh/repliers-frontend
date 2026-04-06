@@ -27,5 +27,35 @@
         }
       ]
     }
-  ]
+  ],
+  "rewrites": [
+    {
+      "source": "/r/_next/(.*)",
+      "destination": "/_next/$1"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/locations/(.*)",
+      "destination": "/r/locations/$1",
+      "permanent": true
+    },
+    {
+      "source": "/listing/(.*)",
+      "destination": "/r/listing/$1",
+      "permanent": true
+    },
+    {
+      "source": "/building/(.*)",
+      "destination": "/r/building/$1",
+      "permanent": true
+    },
+    {
+      "source": "/search/(.*)",
+      "destination": "/r/search/$1",
+      "permanent": true
+    }
+  ],
+  "cleanUrls": true,
+  "trailingSlash": false
 }

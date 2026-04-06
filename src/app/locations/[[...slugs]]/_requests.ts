@@ -71,12 +71,36 @@ export const fetchLocations = async (
   neighborhood = ''
 ): Promise<ApiBoardArea[]> => {
   try {
-    const response = await APISearch.fetchLocations({
-      city,
-      neighborhood,
-      activeCountLimit
-    })
-    return response?.boards[0]?.classes[0]?.areas || []
+    const { APILocations } = await import('services/API');
+    const dynamicAreasData = await APILocations.fetchAreas();
+
+    // Map the simple filtered Structure back to the complex ApiBoardArea structure 
+    // that the rest of the frontend expects.
+    const mapped: ApiBoardArea[] = dynamicAreasData.map((a: any) => ({
+      name: a.name,
+      cities: a.neighborhoods.map((name: string) => ({
+        name,
+        activeCount: 0,
+        location: { lat: 0, lng: 0 },
+        state: 'ON',
+        neighborhoods: []
+      }))
+    }));
+
+    // If city is specified, we behave like Repliers' search and return only that city 
+    // or its neighborhoods.
+    if (city) {
+      const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const target = normalize(city);
+      const matchedArea = mapped.find(a => a.cities.some(c => normalize(c.name) === target));
+      if (neighborhood) {
+          // just return the area containing it for now, 
+          // or filter the tree further if really mapping is needed.
+      }
+      return matchedArea ? [matchedArea] : [];
+    }
+
+    return mapped;
   } catch (error) {
     console.error(
       `[fetchLocations] error "${city}" > "${neighborhood}"\n`,
@@ -107,15 +131,8 @@ const distanceFilter = (item: CatalogItem) =>
 
 export const fetchNearbyLocations = async (city: string, neighborhood = '') => {
   try {
-    const response = await APISearch.fetchLocations({
-      ...(neighborhood ? { city } : {}),
-      // pass the city param if we are inside neighborhood page and
-      // pass nothing to fetch nearby cities if we are at the root level
-      activeCountLimit
-    })
-
-    const { areas } = response?.boards[0]?.classes[0] || {}
-    const currentLocation = extractLocation(areas, city, neighborhood)
+    const areas = await fetchLocations(city, neighborhood);
+    const currentLocation = extractLocation(areas as any, city, neighborhood)
     const extractFunc = neighborhood ? extractHoods : extractCities
 
     return extractFunc(areas)

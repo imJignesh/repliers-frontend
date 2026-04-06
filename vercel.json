@@ -1,12 +1,4 @@
 {
-  "functions": {
-    "api/*.js": {
-      "regions": [
-        "iad1"
-      ],
-      "maxDuration": 10
-    }
-  },
   "headers": [
     {
       "source": "/_next/static/(.*)",
@@ -32,15 +24,6 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=86400, s-maxage=31536000, stale-while-revalidate=43200"
-        }
-      ]
-    },
-    {
-      "source": "/fonts/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
         }
       ]
     }

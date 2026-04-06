@@ -1,10 +1,48 @@
 {
-    "functions": {
-        "api/*.js": {
-            "regions": [
-                "iad1"
-            ],
-            "maxDuration": 10
-        }
+  "functions": {
+    "api/*.js": {
+      "regions": [
+        "iad1"
+      ],
+      "maxDuration": 10
     }
+  },
+  "headers": [
+    {
+      "source": "/_next/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/_next/image(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(favicon.ico|logo.svg|logo-footer.svg|iRise-Logo-White.png|pc-partners.png|precondo_main_image.webp|splashscreen.jpg)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, s-maxage=31536000, stale-while-revalidate=43200"
+        }
+      ]
+    },
+    {
+      "source": "/fonts/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ]
 }

@@ -5,12 +5,22 @@ import { type Filters } from 'services/Search'
 import { DaysSelect, FilterButtonGroup, PricePicker, PriceSelect, YearBuiltSelect } from '.'
 
 const bedsItems: [string, number][] = [
-  ['Any', 0],
-  ['Studio', -1],
-  ['1+', 1],
-  ['2+', 2],
-  ['3+', 3],
-  ['4+', 4]
+  ['0 bed', 0],
+  ['1 bed', 1],
+  ['2 bed', 2],
+  ['3+ Beds', 3]
+]
+
+const bathsItems: [string, number][] = [
+  ['1 bath', 1],
+  ['2 bath', 2],
+  ['3+ bath', 3]
+]
+
+const parkingItems: [string, number][] = [
+  ['0 parking', 0],
+  ['1 parking', 1],
+  ['2+ parking', 2]
 ]
 
 const AdvancedFiltersTab = ({
@@ -55,6 +65,7 @@ const AdvancedFiltersTab = ({
         name="minBaths"
         value={minBaths || 0}
         onChange={onChange}
+        items={bathsItems}
       />
       <FilterButtonGroup
         label="Garage"
@@ -68,6 +79,7 @@ const AdvancedFiltersTab = ({
         name="minParkingSpaces"
         value={minParkingSpaces || 0}
         onChange={onChange}
+        items={parkingItems}
       />
       <Box>
         <Typography fontWeight={500}>Price</Typography>

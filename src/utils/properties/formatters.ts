@@ -152,8 +152,8 @@ export const formatMetadata = (
       canonical: host + getSeoUrl(property)
     },
     robots: {
-      index: type !== 'listing',
-      follow: type !== 'listing'
+      index: true,
+      follow: true
     }
   }
 }

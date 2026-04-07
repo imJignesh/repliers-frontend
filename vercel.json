@@ -28,12 +28,6 @@
       ]
     }
   ],
-  "rewrites": [
-    {
-      "source": "/r/_next/(.*)",
-      "destination": "/_next/$1"
-    }
-  ],
   "redirects": [
     {
       "source": "/locations/(.*)",
@@ -54,6 +48,41 @@
       "source": "/search/(.*)",
       "destination": "/r/search/$1",
       "permanent": true
+    },
+    {
+      "source": "/",
+      "destination": "/r",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/r/_next/(.*)",
+      "destination": "/_next/$1"
+    },
+    {
+      "source": "/favicon.ico",
+      "destination": "/favicon.ico"
+    },
+    {
+      "source": "/logo.svg",
+      "destination": "/logo.svg"
+    },
+    {
+      "source": "/logo-footer.svg",
+      "destination": "/logo-footer.svg"
+    },
+    {
+      "source": "/pc-partners.png",
+      "destination": "/pc-partners.png"
+    },
+    {
+      "source": "/precondo_main_image.webp",
+      "destination": "/precondo_main_image.webp"
+    },
+    {
+      "source": "/splashscreen.jpg",
+      "destination": "/splashscreen.jpg"
     }
   ],
   "cleanUrls": true,

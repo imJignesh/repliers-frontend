@@ -38,7 +38,6 @@ const AdvancedFiltersTab = ({
     maxPrice,
     minBaths,
     minBeds,
-    minGarageSpaces,
     minParkingSpaces,
     listingStatus,
     soldWithin,
@@ -66,12 +65,6 @@ const AdvancedFiltersTab = ({
         value={minBaths || 0}
         onChange={onChange}
         items={bathsItems}
-      />
-      <FilterButtonGroup
-        label="Garage"
-        name="minGarageSpaces"
-        value={minGarageSpaces || 0}
-        onChange={onChange}
       />
 
       <FilterButtonGroup

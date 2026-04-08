@@ -46,8 +46,7 @@ export const getSeoUrl = (
 
   // if using buildingId, use it instead of mlsNumber
 
-  const seoUrlPath =
-    (addr ? `${addr}-${mlsNumber}` : mlsNumber) + (boardId ? `-${boardId}` : '')
+  const seoUrlPath = addr ? `${addr}-${mlsNumber}` : mlsNumber
 
   const queryString = startImage ? `?startImage=${startImage}` : ''
 

@@ -54,8 +54,8 @@
       "destination": "/pc-partners.png"
     },
     {
-      "source": "/listings-sitemap.xml",
-      "destination": "/listings-sitemap.xml"
+      "source": "/listings.xml",
+      "destination": "/listings.xml"
     },
     {
       "source": "/precondo_main_image.webp",

@@ -134,16 +134,7 @@ const RequestInfoForm = () => {
           error={formTouched && !validPhone}
           helperText={formTouched && !validPhone ? 'Required field ' : ''}
         />
-        <TextField
-          rows={3}
-          multiline
-          fullWidth
-          name="message"
-          label="Message"
-          placeholder="I'm interested in this property"
-          value={values.message}
-          onChange={handleInputChange}
-        />
+
 
         <Button
           fullWidth

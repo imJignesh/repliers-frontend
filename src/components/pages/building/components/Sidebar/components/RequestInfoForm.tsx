@@ -134,23 +134,7 @@ const RequestInfoForm = () => {
               helperText={formTouched && !validPhone ? 'Required field ' : ''}
             />
           </Grid>
-          <Grid size={2}>
-            <TextField
-              rows={3}
-              multiline
-              fullWidth
-              name="message"
-              label="Message"
-              value={values.message}
-              onChange={handleInputChange}
-              error={formTouched && !values.message}
-              helperText={
-                formTouched && !values.message
-                  ? 'Message should not be empty'
-                  : ''
-              }
-            />
-          </Grid>
+
         </Grid>
 
         <Button

@@ -31,9 +31,8 @@ const getFormData = (profile: any) => {
 const RequestInfoForm = () => {
   const { profile } = useUser()
   const { showSnackbar } = useSnackbar()
-  const {
-    property: { address, mlsNumber, listPrice }
-  } = useProperty()
+  const { property } = useProperty()
+  const { address, mlsNumber, listPrice } = property
   const [loading, setLoading] = useState(false)
   const [formTouched, setFormTouched] = useState(false)
 

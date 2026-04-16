@@ -48,9 +48,8 @@ const AppointmentForm = () => {
     const [formTouched, setFormTouched] = useState(false)
     const [values, setValues] = useState(getFormData(profile))
 
-    const {
-        property: { address, mlsNumber, listPrice }
-    } = useProperty()
+    const { property } = useProperty()
+    const { address, mlsNumber, listPrice } = property
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target

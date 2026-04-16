@@ -24,6 +24,7 @@ import useSnackbar from 'hooks/useSnackbar'
 import { extractErrorMessage } from 'utils/errors'
 import { formatPhoneNumber, formatPhoneNumberAsYouType } from 'utils/formatters'
 import { sanitizePhoneNumber } from 'utils/properties/sanitizers'
+import { joinNonEmpty } from 'utils/strings'
 import { validateEmail, validatePhone } from 'utils/validators'
 
 import AgreementText from './AgreementText'
@@ -98,7 +99,11 @@ const AppointmentForm = () => {
             listing_price: listPrice,
             price: listPrice,
             listing_neighbourhood: address?.neighborhood,
-            listing_city: address?.city
+            listing_city: address?.city,
+            mls_municipality: address?.district || address?.area,
+            contact_source: joinNonEmpty([address?.streetNumber, address?.streetName]),
+            beds: property.details?.numBedrooms,
+            baths: property.details?.numBathrooms
         })
             .then(() => {
                 showSnackbar('Appointment booked successfully!', 'success')
@@ -115,6 +120,11 @@ const AppointmentForm = () => {
     return (
         <form onSubmit={(e) => { e.preventDefault(); handleSubmit() }} autoComplete="off">
             <input type="hidden" name="price" value={listPrice || ''} />
+            <input type="hidden" name="mls_municipality" value={address?.district || address?.area || ''} />
+            <input type="hidden" name="contact_source" value={joinNonEmpty([address?.streetNumber, address?.streetName]) || ''} />
+            <input type="hidden" name="beds" value={property?.details?.numBedrooms || ''} />
+            <input type="hidden" name="baths" value={property?.details?.numBathrooms || ''} />
+            <input type="hidden" name="neighbourhood" value={address?.neighborhood || ''} />
             <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <Stack spacing={2}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>

@@ -32,6 +32,11 @@ export type LeadRequest = {
   listing_city?: string
   message?: string
   price?: string
+  beds?: string
+  baths?: string
+  mls_municipality?: string
+  contact_source?: string
+  neighbourhood?: string
 }
 
 export type AppointmentRequest = {
@@ -47,6 +52,11 @@ export type AppointmentRequest = {
   listing_neighbourhood?: string
   listing_city?: string
   price?: string
+  beds?: string
+  baths?: string
+  mls_municipality?: string
+  contact_source?: string
+  neighbourhood?: string
 }
 
 export type ContactScheduleMethod = 'InPerson' | 'LiveVideo'

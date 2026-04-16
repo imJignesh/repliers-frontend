@@ -121,7 +121,7 @@ const PropertyPageContent = ({
               {(property as any).building?.name && (
                 <Link
                   component={NextLink}
-                  href={`/building/${(property as any).building.slug}`}
+                  href={`/r/building/${(property as any).building.slug}`}
                   color="text.primary"
                   underline="hover"
                 >

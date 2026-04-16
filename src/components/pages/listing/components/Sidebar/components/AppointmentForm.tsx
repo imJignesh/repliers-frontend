@@ -101,8 +101,8 @@ const AppointmentForm = () => {
             listing_city: address?.city,
             mls_municipality: address?.district || address?.area,
             contact_source: joinNonEmpty([address?.streetNumber, address?.streetName]),
-            beds: property.details?.numBedrooms,
-            baths: property.details?.numBathrooms
+            beds: property?.details?.numBedrooms,
+            baths: property?.details?.numBathrooms
         })
             .then(() => {
                 showSnackbar('Appointment booked successfully!', 'success')

@@ -7,6 +7,7 @@ import { GlobalStyles } from '@mui/material'
 import content from '@configs/content'
 import globalStyles from '@configs/theme/global'
 import TrackingInline from '@templates/TrackingInline'
+import Script from 'next/script'
 
 import { APISearch } from 'services/API'
 import { fetchFeatureOptions } from 'utils/features'
@@ -60,6 +61,12 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
           featureOptions={options}
           locations={locations}
         >
+          {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && (
+            <Script
+              src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
+              strategy="afterInteractive"
+            />
+          )}
           <GlobalStyles styles={globalStyles} />
           {children}
         </Providers>

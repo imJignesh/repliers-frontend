@@ -7,6 +7,7 @@ import Grid from '@mui/material/Grid2'
 
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
+import { executeRecaptcha } from 'utils/recaptcha'
 
 import { APIContact } from 'services/API'
 import { useProperty } from 'providers/PropertyProvider'
@@ -69,7 +70,7 @@ const RequestInfoForm = () => {
     if (!formValid) return
     setLoading(true)
 
-    let recaptcha_token = ''
+    const recaptcha_token = await executeRecaptcha('lead_submission')
 
     const { first_name, last_name, email, phone, message } = values
 

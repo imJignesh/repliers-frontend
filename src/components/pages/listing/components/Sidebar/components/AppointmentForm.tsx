@@ -20,6 +20,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
+import { executeRecaptcha } from 'utils/recaptcha'
 
 import { APIContact } from 'services/API'
 import { useProperty } from 'providers/PropertyProvider'
@@ -90,7 +91,7 @@ const AppointmentForm = () => {
         if (!formValid) return
         setLoading(true)
 
-        let recaptcha_token = ''
+        const recaptcha_token = await executeRecaptcha('appointment_submission')
 
         const { first_name, last_name, email, phone, date, time, is_open } = values
         const currentUrl = typeof window !== 'undefined' ? window.location.href : ''

@@ -29,17 +29,20 @@ const PropertyContext = createContext<PropertyContextProps | undefined>(
 
 const PropertyProvider = ({
   children,
-  property
+  property,
+  disableBlur = false
 }: {
   children: React.ReactNode
   property: Property
+  disableBlur?: boolean
 }) => {
   const authenticated = useAuthenticated()
   const features = useFeatures()
   const { mlsNumber, boardId, comparables } = property
   const soldProperty = sold(property)
   const blurred =
-    (features.blurRestrictedProperty && restricted(property) && !authenticated) || !authenticated
+    !disableBlur &&
+    ((features.blurRestrictedProperty && restricted(property) && !authenticated) || !authenticated)
 
   const [similarProperties, setSimilarProperties] = useState<Property[]>(
     soldProperty && comparables?.length ? comparables : []

@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import queryString from 'query-string'
 
-import { Stack } from '@mui/material'
+import { Box, Stack } from '@mui/material'
 
 import { useProperty } from 'providers/PropertyProvider'
 import useBreakpoints from 'hooks/useBreakpoints'
@@ -67,13 +67,13 @@ const PropertyGallery = () => {
             <DesktopGallery active={activeIndex} onChange={handleChange} />
           )}
 
-          {authenticated && (
+          <Box sx={{ position: 'relative' }}>
             <ThumbnailsRibbon
               active={activeThumbnailIndex}
               onClick={handleChange}
             />
-          )}
-          {!authenticated && <GalleryLockOverlay />}
+            {!authenticated && <GalleryLockOverlay />}
+          </Box>
         </>
       ) : (
         <ThumbnailsSkeleton />

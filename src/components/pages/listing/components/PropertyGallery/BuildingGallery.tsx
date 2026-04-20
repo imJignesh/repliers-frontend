@@ -62,12 +62,9 @@ const BuildingGallery = ({
                     aspectRatio: {
                         xs: '3/2',
                         sm: '2.4/1',
-                        md: !authenticated ? '3/1' : '16/9'
+                        md: '16/9'
                     },
-                    maxHeight: { md: 400 },
-                    ...(!authenticated && {
-                        '& img': { filter: `blur(${propsConfig.blurredImageRadius}px)` }
-                    })
+                    maxHeight: { md: 400 }
                 }}
             >
                 {!activeImageUrl ? (
@@ -82,100 +79,97 @@ const BuildingGallery = ({
                         src={activeImageUrl}
                     />
                 )}
-                {!authenticated && <GalleryLockOverlay />}
             </Box>
 
             {/* Content Section */}
-            {authenticated && (
-                <Stack
-                    spacing={3}
-                    sx={{
-                        flex: 1,
-                        justifyContent: 'center',
-                        px: { xs: 2, md: 4 }, // Padding around the content
-                    }}
-                >
-                    <Box>
-                        <Typography variant="h1" sx={{ fontSize: { xs: '1.8rem', md: '2.5rem' }, fontWeight: 700, lineHeight: 1.2, mb: 1 }}>
-                            {building?.name || formatBuildingAddress(property.address)}
-                        </Typography>
+            <Stack
+                spacing={3}
+                sx={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    px: { xs: 2, md: 4 }, // Padding around the content
+                }}
+            >
+                <Box>
+                    <Typography variant="h1" sx={{ fontSize: { xs: '1.8rem', md: '2.5rem' }, fontWeight: 700, lineHeight: 1.2, mb: 1 }}>
+                        {building?.name || formatBuildingAddress(property.address)}
+                    </Typography>
 
-                        <Typography variant="h2" color="text.secondary" sx={{ fontSize: '1.1rem', fontWeight: 500, mb: 2 }}>
-                            {(() => {
-                                const primaryAddr = formatBuildingAddress(property.address);
-                                const otherAddrs = (building?.secondary_addresses || []).filter((addr: string) => {
-                                    const normalizedAddr = addr.toLowerCase();
-                                    const normalizedPrimary = primaryAddr.toLowerCase();
-                                    return normalizedAddr !== normalizedPrimary &&
-                                        (!normalizedAddr.includes(property.address.streetNumber?.toLowerCase() || '') ||
-                                            !normalizedAddr.includes(property.address.streetName?.toLowerCase() || ''));
-                                });
+                    <Typography variant="h2" color="text.secondary" sx={{ fontSize: '1.1rem', fontWeight: 500, mb: 2 }}>
+                        {(() => {
+                            const primaryAddr = formatBuildingAddress(property.address);
+                            const otherAddrs = (building?.secondary_addresses || []).filter((addr: string) => {
+                                const normalizedAddr = addr.toLowerCase();
+                                const normalizedPrimary = primaryAddr.toLowerCase();
+                                return normalizedAddr !== normalizedPrimary &&
+                                    (!normalizedAddr.includes(property.address.streetNumber?.toLowerCase() || '') ||
+                                        !normalizedAddr.includes(property.address.streetName?.toLowerCase() || ''));
+                            });
 
-                                if (otherAddrs.length > 0) {
-                                    return `${primaryAddr} & ${otherAddrs.join(' & ')}, ${property.address.city}`;
-                                }
-                                return `${primaryAddr}, ${property.address.city}`;
-                            })()}
-                        </Typography>
-                    </Box>
+                            if (otherAddrs.length > 0) {
+                                return `${primaryAddr} & ${otherAddrs.join(' & ')}, ${property.address.city}`;
+                            }
+                            return `${primaryAddr}, ${property.address.city}`;
+                        })()}
+                    </Typography>
+                </Box>
 
-                    <Stack spacing={2} direction="row">
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={() => handleScroll('active-listings')}
-                            sx={{ borderRadius: 2, textTransform: 'none', px: 3 }}
-                        >
-                            <span className='pr-2 d-inline-block fw-bold '>{activeCount}</span> &nbsp;For Sale
-                        </Button>
-                        <Button
-                            variant="outlined"
-                            onClick={() => handleScroll('history')}
-                            sx={{ borderRadius: 2, textTransform: 'none', px: 3 }}
-                        >
-                            <span className='pr-2 d-inline-block fw-bold '>{historyCount}</span> &nbsp;Price History
-                        </Button>
-                    </Stack>
-
-                    <Stack spacing={3} direction="row" alignItems="center">
-                        <Typography
-                            variant="body1"
-                            sx={{
-                                cursor: 'pointer',
-                                textDecoration: 'underline',
-                                color: 'text.secondary',
-                                '&:hover': { color: 'primary.main' }
-                            }}
-                            onClick={() => handleScroll('features')}
-                        >
-                            Features
-                        </Typography>
-                        <Typography
-                            variant="body1"
-                            sx={{
-                                cursor: 'pointer',
-                                textDecoration: 'underline',
-                                color: 'text.secondary',
-                                '&:hover': { color: 'primary.main' }
-                            }}
-                            onClick={() => {
-                                const element = document.getElementById('contact-section');
-                                if (element) {
-                                    element.scrollIntoView({ behavior: 'smooth' });
-                                    element.classList.remove('highlight-form');
-                                    void element.offsetWidth; // trigger reflow
-                                    element.classList.add('highlight-form');
-                                    setTimeout(() => {
-                                        element.classList.remove('highlight-form');
-                                    }, 1500);
-                                }
-                            }}
-                        >
-                            Request more info
-                        </Typography>
-                    </Stack>
+                <Stack spacing={2} direction="row">
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleScroll('active-listings')}
+                        sx={{ borderRadius: 2, textTransform: 'none', px: 3 }}
+                    >
+                        <span className='pr-2 d-inline-block fw-bold '>{activeCount}</span> &nbsp;For Sale
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        onClick={() => handleScroll('history')}
+                        sx={{ borderRadius: 2, textTransform: 'none', px: 3 }}
+                    >
+                        <span className='pr-2 d-inline-block fw-bold '>{historyCount}</span> &nbsp;Price History
+                    </Button>
                 </Stack>
-            )}
+
+                <Stack spacing={3} direction="row" alignItems="center">
+                    <Typography
+                        variant="body1"
+                        sx={{
+                            cursor: 'pointer',
+                            textDecoration: 'underline',
+                            color: 'text.secondary',
+                            '&:hover': { color: 'primary.main' }
+                        }}
+                        onClick={() => handleScroll('features')}
+                    >
+                        Features
+                    </Typography>
+                    <Typography
+                        variant="body1"
+                        sx={{
+                            cursor: 'pointer',
+                            textDecoration: 'underline',
+                            color: 'text.secondary',
+                            '&:hover': { color: 'primary.main' }
+                        }}
+                        onClick={() => {
+                            const element = document.getElementById('contact-section');
+                            if (element) {
+                                element.scrollIntoView({ behavior: 'smooth' });
+                                element.classList.remove('highlight-form');
+                                void element.offsetWidth; // trigger reflow
+                                element.classList.add('highlight-form');
+                                setTimeout(() => {
+                                    element.classList.remove('highlight-form');
+                                }, 1500);
+                            }
+                        }}
+                    >
+                        Request more info
+                    </Typography>
+                </Stack>
+            </Stack>
         </Stack>
     )
 }

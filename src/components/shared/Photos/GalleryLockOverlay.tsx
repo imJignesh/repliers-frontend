@@ -31,56 +31,52 @@ const GalleryLockOverlay = () => {
         backdropFilter: 'blur(4px)',
       }}
     >
-      <Box
+      <Button
+        variant="contained"
+        size="large"
+        onClick={handleScrollToForm}
         sx={{
-          p: { xs: 3, md: 4 },
-          textAlign: 'center',
-          borderRadius: 4,
+          py: 1.5,
+          px: 4,
+          fontSize: '1rem',
+          fontWeight: 700,
+          borderRadius: 2,
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
+          textTransform: 'none',
+          transition: 'transform 0.2s',
           maxWidth: 400,
           width: '90%',
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(10px)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
-          border: '1px solid rgba(255, 255, 255, 0.3)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
+          '&:hover': {
+            transform: 'translateY(-2px)',
+          },
         }}
       >
-        <Typography
-          variant="h6"
+        <Box
           sx={{
-            fontWeight: 800,
-            color: 'text.primary',
-            mb: 3,
-            lineHeight: 1.3,
-            fontSize: { xs: '1.1rem', md: '1.25rem' },
-            letterSpacing: '-0.01em',
-            textTransform: 'uppercase',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            width: '100%',
+            color: 'white'
           }}
         >
-          UNLOCK ALL CONDO LISTINGS AND INVENTORY SITEWIDE
-        </Typography>
-        <Button
-          variant="contained"
-          size="large"
-          fullWidth
-          onClick={handleScrollToForm}
-          sx={{
-            py: 1.5,
-            fontSize: '1rem',
-            fontWeight: 700,
-            borderRadius: 2,
-            boxShadow: '0 10px 20px -10px rgba(var(--mui-palette-primary-mainChannel), 0.5)',
-            transition: 'transform 0.2s',
-            '&:hover': {
-              transform: 'translateY(-2px)',
-            },
-          }}
-        >
-          REGISTER TO VIEW PHOTOS
-        </Button>
-      </Box>
+          <Typography variant="body1" sx={{ fontWeight: 700, color: 'inherit' }}>
+            Unlock all Photos and Listings Sitewide
+          </Typography>
+          <Typography 
+            variant="caption" 
+            sx={{ 
+              fontWeight: 400, 
+              opacity: 0.9,
+              fontSize: '0.75rem',
+              mt: 0.5,
+              color: 'inherit'
+            }}
+          >
+            TRREB Requirement to View MLS Listings
+          </Typography>
+        </Box>
+      </Button>
     </Box>
   )
 }

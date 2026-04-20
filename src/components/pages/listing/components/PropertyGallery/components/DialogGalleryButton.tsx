@@ -8,6 +8,7 @@ import propsConfig from '@configs/properties'
 import { useDialog } from 'providers/DialogProvider'
 import { useFeatures } from 'providers/FeaturesProvider'
 import { useProperty } from 'providers/PropertyProvider'
+import { useAuthenticated } from 'hooks/useAuthenticated'
 
 const buttonSpacing = '25%'
 
@@ -41,9 +42,10 @@ const DialogGalleryButton = ({
       showFullscreenGallery({ images, active })
     }
   }
+  const authenticated = useAuthenticated()
   const pdpGallery = features.pdpFullscreenGallery || features.pdpGridGallery
 
-  if (!pdpGallery) return null
+  if (!pdpGallery || !authenticated) return null
 
   return (
     <Box

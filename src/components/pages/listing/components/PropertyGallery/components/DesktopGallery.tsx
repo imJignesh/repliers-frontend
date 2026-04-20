@@ -15,6 +15,7 @@ import { ImagePlaceholder } from 'components/atoms'
 
 import { useFeatures } from 'providers/FeaturesProvider'
 import { useProperty } from 'providers/PropertyProvider'
+import { useAuthenticated } from 'hooks/useAuthenticated'
 import { getCDNPath } from 'utils/urls'
 
 import { DialogGalleryButton } from '.'
@@ -28,6 +29,7 @@ const DesktopGallery = ({
 }) => {
   const features = useFeatures()
   const { property, blurred } = useProperty()
+  const authenticated = useAuthenticated()
   const { images } = property
 
   const emptyGallery = !images.length
@@ -79,11 +81,7 @@ const DesktopGallery = ({
         position: 'relative',
         bgcolor: 'background.default',
         aspectRatio: { sm: '3/2', md: blurred ? '3/1' : 'auto' },
-        maxHeight: { md: 400 },
-        ...(blurred && {
-          pointerEvents: 'none',
-          '& img': { filter: `blur(${propsConfig.blurredImageRadius}px)` }
-        })
+        maxHeight: { md: 400 }
       }}
       onTouchEnd={toggleControls}
       onMouseEnter={() => setShowControls(true)}
@@ -149,7 +147,7 @@ const DesktopGallery = ({
                   transition: 'opacity 0.2s ease-in'
                 }}
               />
-              {images.length > 1 && (
+              {images.length > 1 && authenticated && (
                 <GalleryControls
                   show={showControls}
                   onNext={handleNextClick}

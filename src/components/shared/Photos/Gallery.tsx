@@ -61,11 +61,9 @@ const Gallery = React.memo(
     const lockSlide = `lock:${firstImage[0]}`
 
     // determine images for carousel
-    if (!carouselActive) {
+    if (!carouselActive || blurred) {
       images = firstImage
-    } else if (blurred && !sizeMap) {
-      images = [firstImage[0], lockSlide]
-    } else if (sizeMap || (blurred && !sizeMap)) {
+    } else if (sizeMap) {
       images = firstImage
     }
 

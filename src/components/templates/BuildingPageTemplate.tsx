@@ -55,7 +55,7 @@ const BuildingPageTemplate = ({ property, history }: { property: ApiQueryRespons
 
   return (
     <PageTemplate>
-      <PropertyProvider property={p}>
+      <PropertyProvider property={p} disableBlur={true}>
         <PropertyDetailsProvider property={p}>
           <Box
             sx={{

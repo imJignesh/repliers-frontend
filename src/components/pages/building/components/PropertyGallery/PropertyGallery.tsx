@@ -67,14 +67,10 @@ const PropertyGallery = () => {
             <DesktopGallery active={activeIndex} onChange={handleChange} />
           )}
 
-          {authenticated ? (
-            <ThumbnailsRibbon
-              active={activeThumbnailIndex}
-              onClick={handleChange}
-            />
-          ) : (
-            <GalleryLockOverlay />
-          )}
+          <ThumbnailsRibbon
+            active={activeThumbnailIndex}
+            onClick={handleChange}
+          />
         </>
       ) : (
         <ThumbnailsSkeleton />

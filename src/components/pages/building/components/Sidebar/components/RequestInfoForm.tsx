@@ -5,6 +5,9 @@ import React, { useState } from 'react'
 import { Button, Stack, TextField } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 
+import Cookies from 'js-cookie'
+import { useRouter } from 'next/navigation'
+
 import { APIContact } from 'services/API'
 import { useProperty } from 'providers/PropertyProvider'
 import { useUser } from 'providers/UserProvider'
@@ -31,6 +34,7 @@ const getFormData = (form: any, message: string) => {
 
 const RequestInfoForm = () => {
   const { profile } = useUser()
+  const router = useRouter()
   const { showSnackbar } = useSnackbar()
   const {
     property: { address, mlsNumber, listPrice }
@@ -76,7 +80,9 @@ const RequestInfoForm = () => {
       listing_city: address?.city
     })
       .then(() => {
+        Cookies.set('rauthenticated', 'true', { expires: 365 })
         showSnackbar('You can view all prices and sales history now.', 'success')
+        router.refresh()
       })
       .catch((e) => {
         showSnackbar(extractErrorMessage(e), 'error')

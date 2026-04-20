@@ -17,6 +17,9 @@ import {
 } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
+import Cookies from 'js-cookie'
+import { useRouter } from 'next/navigation'
+
 import { APIContact } from 'services/API'
 import { useProperty } from 'providers/PropertyProvider'
 import { useUser } from 'providers/UserProvider'
@@ -43,6 +46,7 @@ const getFormData = (profile: any) => {
 
 const AppointmentForm = () => {
     const { profile } = useUser()
+    const router = useRouter()
     const { showSnackbar } = useSnackbar()
     const [loading, setLoading] = useState(false)
     const [formTouched, setFormTouched] = useState(false)
@@ -105,7 +109,9 @@ const AppointmentForm = () => {
             baths: property?.details?.numBathrooms
         })
             .then(() => {
+                Cookies.set('rauthenticated', 'true', { expires: 365 })
                 showSnackbar('Appointment booked successfully!', 'success')
+                router.refresh()
             })
             .catch((e) => {
                 showSnackbar(extractErrorMessage(e), 'error')

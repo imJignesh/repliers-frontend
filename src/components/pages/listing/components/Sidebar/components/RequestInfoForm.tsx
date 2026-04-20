@@ -5,6 +5,9 @@ import React, { useState } from 'react'
 import { Button, Stack, TextField } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 
+import Cookies from 'js-cookie'
+import { useRouter } from 'next/navigation'
+
 import { APIContact } from 'services/API'
 import { useProperty } from 'providers/PropertyProvider'
 import { useUser } from 'providers/UserProvider'
@@ -33,6 +36,7 @@ const RequestInfoForm = () => {
   const { showSnackbar } = useSnackbar()
   const { property } = useProperty()
   const { address, mlsNumber, listPrice } = property
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [formTouched, setFormTouched] = useState(false)
 
@@ -83,7 +87,9 @@ const RequestInfoForm = () => {
       baths: property?.details?.numBathrooms
     })
       .then(() => {
+        Cookies.set('rauthenticated', 'true', { expires: 365 })
         showSnackbar('Thank you! Your request has been sent.', 'success')
+        router.refresh()
       })
       .catch((e) => {
         showSnackbar(extractErrorMessage(e), 'error')

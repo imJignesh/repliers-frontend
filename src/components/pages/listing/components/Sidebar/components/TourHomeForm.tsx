@@ -21,6 +21,9 @@ import {
 } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
+import Cookies from 'js-cookie'
+import { useRouter } from 'next/navigation'
+
 import i18nConfig from '@configs/i18n'
 
 import { APIContact, type ContactScheduleMethod } from 'services/API'
@@ -49,6 +52,7 @@ const getFormData = (form: any) => {
 
 const TourHomeForm = () => {
   const { profile } = useUser()
+  const router = useRouter()
   const { showSnackbar } = useSnackbar()
   const [loading, setLoading] = useState(false)
   const [formTouched, setFormTouched] = useState(false)
@@ -111,7 +115,9 @@ const TourHomeForm = () => {
       time: time.format(i18nConfig.timeFormat)
     })
       .then(() => {
+        Cookies.set('rauthenticated', 'true', { expires: 365 })
         showSnackbar('You can view all prices and sales history now.', 'success')
+        router.refresh()
         if (typeof window !== 'undefined') {
           const bookedUrls = JSON.parse(localStorage.getItem('booked_appointments') || '[]')
           if (!bookedUrls.includes(window.location.pathname)) {

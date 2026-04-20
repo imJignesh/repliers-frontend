@@ -4,6 +4,8 @@ import React, { useState } from 'react'
 import dayjs from 'dayjs'
 
 import { Button, Paper, Stack, TextField } from '@mui/material'
+import Cookies from 'js-cookie'
+import { useRouter } from 'next/navigation'
 import Grid from '@mui/material/Grid2'
 import {
   DatePicker,
@@ -38,6 +40,7 @@ const getFormData = (form: any) => {
 
 const ScheduleMeeting = () => {
   const { profile } = useUser()
+  const router = useRouter()
   const { showSnackbar } = useSnackbar()
   const [loading, setLoading] = useState(false)
   const [formTouched, setFormTouched] = useState(false)
@@ -82,7 +85,9 @@ const ScheduleMeeting = () => {
       time: time.format(i18nConfig.timeFormat)
     })
       .then(() => {
+        Cookies.set('rauthenticated', 'true', { expires: 365 })
         showSnackbar('You can view all prices and sales history now.', 'success')
+        router.refresh()
       })
       .catch((e) => showSnackbar((e as ErrorCause)?.cause?.message, 'error'))
       .finally(() => {

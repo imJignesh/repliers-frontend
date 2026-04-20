@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { Box, Paper, Skeleton, Tab, Tabs } from '@mui/material'
+import { Box, Paper, Skeleton, Tab, Tabs, Typography } from '@mui/material'
 
 import { useUser } from 'providers/UserProvider'
 import useClientSide from 'hooks/useClientSide'
@@ -25,12 +25,34 @@ const Sidebar = () => {
         scrollMarginTop: '100px'
       }}
     >
-      <Tabs value={value} variant="fullWidth" onChange={handleChange}>
-        <Tab label={authenticated ? "Book a Viewing" : "REGISTER TO VIEW PHOTOS"} />
-      </Tabs>
       <Box
         sx={{
-          mt: '-1px',
+          p: { xs: 3, md: 3 },
+          textAlign: 'center'
+        }}
+      >
+        <Typography variant="h6" component="h3" sx={{ fontWeight: 700, mb: 0.5, letterSpacing: -0.5 }}>
+          {authenticated ? "Book a Viewing" : "Register to View All Photos"}
+        </Typography>
+        {!authenticated && (
+           <Typography 
+               variant="caption" 
+               color="text.secondary" 
+               sx={{ 
+                   textAlign: 'center', 
+                   display: 'block',
+                   fontWeight: 500,
+                   fontStyle: 'italic',
+                   fontSize: '0.75rem',
+                   lineHeight: 1.2
+               }}
+           >
+               Toronto Real Estate Board Requires Registration for MLS Listings
+           </Typography>
+        )}
+      </Box>
+      <Box
+        sx={{
           borderTop: 1,
           p: { xs: 3, md: 2 },
           borderColor: 'divider'

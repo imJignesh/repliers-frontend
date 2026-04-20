@@ -8,7 +8,8 @@ import {
     Stack,
     TextField,
     Box,
-    MenuItem
+    MenuItem,
+    Typography
 } from '@mui/material'
 import {
     DatePicker,
@@ -30,7 +31,7 @@ import { sanitizePhoneNumber } from 'utils/properties/sanitizers'
 import { joinNonEmpty } from 'utils/strings'
 import { validateEmail, validatePhone } from 'utils/validators'
 
-import AgreementText from './AgreementText'
+
 
 const getFormData = (profile: any) => {
     return {
@@ -40,7 +41,8 @@ const getFormData = (profile: any) => {
         phone: profile?.phone ? formatPhoneNumber(profile.phone) : '',
         date: dayjs().add(1, 'day'),
         time: dayjs().hour(12).minute(0),
-        is_open: false
+        is_open: false,
+        hp_website: '' // Honeypot field
     }
 }
 
@@ -79,10 +81,16 @@ const AppointmentForm = () => {
 
     const formValid = validFirstName && validLastName && validPhone && validEmail && validDate && validTime;
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+        if (values.hp_website) {
+            console.warn('Bot detected via honeypot')
+            return // Skip submission for bots
+        }
         setFormTouched(true)
         if (!formValid) return
         setLoading(true)
+
+        let recaptcha_token = ''
 
         const { first_name, last_name, email, phone, date, time, is_open } = values
         const currentUrl = typeof window !== 'undefined' ? window.location.href : ''
@@ -106,7 +114,8 @@ const AppointmentForm = () => {
             mls_municipality: address?.district || address?.area,
             contact_source: joinNonEmpty([address?.streetNumber, address?.streetName]),
             beds: property?.details?.numBedrooms,
-            baths: property?.details?.numBathrooms
+            baths: property?.details?.numBathrooms,
+            recaptcha_token
         })
             .then(() => {
                 Cookies.set('rauthenticated', 'true', { expires: 365 })
@@ -132,6 +141,7 @@ const AppointmentForm = () => {
             <input type="hidden" name="neighbourhood" value={address?.neighborhood || ''} />
             <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <Stack spacing={2}>
+
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                         {!values.is_open && (
                             <Stack direction="column" spacing={2}>
@@ -227,6 +237,14 @@ const AppointmentForm = () => {
                         helperText={formTouched && !validPhone ? 'Required' : ''}
                     />
 
+                    <TextField
+                        name="hp_website"
+                        fullWidth
+                        sx={{ display: 'none' }}
+                        value={values.hp_website}
+                        onChange={handleInputChange}
+                        autoComplete="off"
+                    />
                     <Button
                         fullWidth
                         size="large"
@@ -237,7 +255,8 @@ const AppointmentForm = () => {
                         Book a Viewing
                     </Button>
 
-                    <AgreementText />
+
+
                 </Stack>
             </LocalizationProvider>
         </form>

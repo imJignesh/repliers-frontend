@@ -37,6 +37,7 @@ export type LeadRequest = {
   mls_municipality?: string
   contact_source?: string
   neighbourhood?: string
+  recaptcha_token?: string
 }
 
 export type AppointmentRequest = {
@@ -57,6 +58,7 @@ export type AppointmentRequest = {
   mls_municipality?: string
   contact_source?: string
   neighbourhood?: string
+  recaptcha_token?: string
 }
 
 export type ContactScheduleMethod = 'InPerson' | 'LiveVideo'

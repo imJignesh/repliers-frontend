@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 
-import { Button, Stack, TextField } from '@mui/material'
+import { Button, Stack, TextField, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 
 import Cookies from 'js-cookie'
@@ -19,7 +19,7 @@ import { sanitizePhoneNumber } from 'utils/properties/sanitizers'
 import { joinNonEmpty } from 'utils/strings'
 import { validateEmail, validatePhone } from 'utils/validators'
 
-import AgreementText from './AgreementText'
+
 
 const getFormData = (profile: any) => {
   return {
@@ -27,7 +27,8 @@ const getFormData = (profile: any) => {
     last_name: profile?.lname || '',
     email: profile?.email || '',
     phone: profile?.phone ? formatPhoneNumber(profile.phone) : '',
-    message: ''
+    message: '',
+    hp_website: '' // Honeypot field
   }
 }
 
@@ -59,10 +60,16 @@ const RequestInfoForm = () => {
 
   const formValid = validFirstName && validLastName && validPhone && validEmail
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (values.hp_website) {
+      console.warn('Bot detected via honeypot')
+      return // Skip submission for bots
+    }
     setFormTouched(true)
     if (!formValid) return
     setLoading(true)
+
+    let recaptcha_token = ''
 
     const { first_name, last_name, email, phone, message } = values
 
@@ -84,7 +91,8 @@ const RequestInfoForm = () => {
       mls_municipality: address?.district || address?.area,
       contact_source: joinNonEmpty([address?.streetNumber, address?.streetName]),
       beds: property?.details?.numBedrooms,
-      baths: property?.details?.numBathrooms
+      baths: property?.details?.numBathrooms,
+      recaptcha_token
     })
       .then(() => {
         Cookies.set('rauthenticated', 'true', { expires: 365 })
@@ -109,6 +117,7 @@ const RequestInfoForm = () => {
       <input type="hidden" name="baths" value={property?.details?.numBathrooms || ''} />
       <input type="hidden" name="neighbourhood" value={address?.neighborhood || ''} />
       <Stack spacing={2}>
+
         <TextField
           fullWidth
           name="first_name"
@@ -149,7 +158,14 @@ const RequestInfoForm = () => {
           helperText={formTouched && !validPhone ? 'Required field ' : ''}
         />
 
-
+        <TextField
+          name="hp_website"
+          fullWidth
+          sx={{ display: 'none' }}
+          value={values.hp_website}
+          onChange={handleInputChange}
+          autoComplete="off"
+        />
         <Button
           fullWidth
           size="large"
@@ -157,10 +173,11 @@ const RequestInfoForm = () => {
           variant="contained"
           onClick={handleSubmit}
         >
-          REGISTER TO VIEW PHOTOS
+          REGISTER NOW
         </Button>
 
-        <AgreementText />
+
+
       </Stack>
     </form>
   )

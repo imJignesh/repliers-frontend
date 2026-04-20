@@ -134,25 +134,19 @@ const Content = ({ property, size }: ContentProps) => {
               <Divider flexItem variant="middle" orientation="vertical" />
             }
           >
-            {restrictedProperty ? (
-              <ScrubbedText replace="beds" />
-            ) : beds.count ? (
+            {beds.count ? (
               <>
                 <IcoBed size={16} color={color} /> {beds.label}
               </>
             ) : null}
 
-            {restrictedProperty ? (
-              <ScrubbedText replace="bath" />
-            ) : baths.count ? (
+            {baths.count ? (
               <>
                 <IcoBath size={16} color={color} /> {baths.label}
               </>
             ) : null}
 
-            {restrictedProperty ? (
-              <ScrubbedText replace="square ft" />
-            ) : sqft.number ? (
+            {sqft.number ? (
               <>
                 <IcoSquare size={13} color={color} />{' '}
                 <span style={{ whiteSpace: 'nowrap' }}>{sqft.label}</span>
@@ -160,15 +154,12 @@ const Content = ({ property, size }: ContentProps) => {
             ) : null}
 
             {land(property) &&
-              lotSize.number &&
-              (restrictedProperty ? (
-                <ScrubbedText replace="0,00 acres" />
-              ) : (
+              lotSize.number && (
                 <>
                   <IcoSquare size={13} color={color} />{' '}
                   <span style={{ whiteSpace: 'nowrap' }}>{lotSize.label}</span>
                 </>
-              ))}
+              )}
           </Stack>
         </Typography>
       </Stack>

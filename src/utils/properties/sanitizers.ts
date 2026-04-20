@@ -8,8 +8,10 @@ import { type PropertyAddress } from 'services/API'
 export const sanitizeScrubbed = (value: string) =>
   String(value).replaceAll(propsConfig.scrubbedDataString, '')
 
-export const sanitizeStreetNumber = (value: string) =>
-  sanitizeScrubbed(String(value)).match(/^0+$/) ? '' : value
+export const sanitizeStreetNumber = (value: string) => {
+  const sanitized = sanitizeScrubbed(String(value))
+  return sanitized === '' || sanitized.match(/^0+$/) ? '' : value
+}
 
 export const sanitizeAddress = (address: PropertyAddress) => {
   const {

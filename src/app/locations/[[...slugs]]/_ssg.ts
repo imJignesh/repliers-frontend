@@ -53,9 +53,32 @@ export const generateCatalogMetadata = async ({
     ? ` Prices starting at ${formatEnglishPrice(listPrice.min)}.`
     : ''
 
+  const variables: Record<string, string> = {
+    count: String(count),
+    catalogTitle,
+    shortLocation,
+    fullLocation,
+    lowestPrice,
+    siteName: content.siteName
+  }
+
+  const interpolate = (template: string) => {
+    return template.replace(
+      /{{(.*?)}}/g,
+      (_, key) => variables[key.trim()] || ''
+    )
+  }
+
+  // @ts-ignore
+  const templates = content.propertyMetadataTemplates?.location || {}
+
   const meta: any = {
-    title: `${count} ${catalogTitle} in ${shortLocation}`,
-    description: `Find ${count} ${catalogTitle} in ${fullLocation}. Visit ${content.siteName} to see photos, prices & neighbourhood info.${lowestPrice}`,
+    title: templates.title
+      ? interpolate(templates.title)
+      : `${count} ${catalogTitle} in ${shortLocation}`,
+    description: templates.description
+      ? interpolate(templates.description)
+      : `Find ${count} ${catalogTitle} in ${fullLocation}. Visit ${content.siteName} to see photos, prices & neighbourhood info.${lowestPrice}`,
     alternates: {
       canonical: host + '/locations/' + slugs.join('/')
     },

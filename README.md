@@ -69,3 +69,14 @@ npm run dev
 ```
 
 Your app should now be running on the default port (3000).
+
+## Customization
+
+### SEO Meta Templates
+
+You can customize the SEO meta templates for listings, buildings, and locations in `src/configs/defaults/content.ts` under the `propertyMetadataTemplates` key.
+
+#### Location SEO Template
+- **Path:** `src/configs/defaults/content.ts` -> `propertyMetadataTemplates.location`
+- **Available Variables:** `{{count}}`, `{{catalogTitle}}`, `{{shortLocation}}`, `{{fullLocation}}`, `{{lowestPrice}}`.
+

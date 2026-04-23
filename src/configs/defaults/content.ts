@@ -65,7 +65,13 @@ const content = {
     },
     building: {
       title: '{{buildingName}} - {{address}}, {{city}} | Precondo',
-      description: 'Find condos for sale at {{buildingName}} located at {{address}}, {{city}}. Browse available units, past sale prices, and full building history on Precondo'
+      description:
+        'Find condos for sale at {{buildingName}} located at {{address}}, {{city}}. Browse available units, past sale prices, and full building history on Precondo'
+    },
+    location: {
+      title: '{{catalogTitle}} in {{shortLocation}} | Precondo',
+      description:
+        'Find {{catalogTitle}} in {{fullLocation}}. Visit Precondo to see photos, prices & neighbourhood info.{{lowestPrice}}'
     }
   },
   estimateMetadata: {

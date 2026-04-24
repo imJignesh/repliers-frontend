@@ -55,10 +55,14 @@ export const generateCatalogMetadata = async ({
 
   const variables: Record<string, string> = {
     count: String(count),
+    listingCount: String(count),
     catalogTitle,
     shortLocation,
     fullLocation,
     lowestPrice,
+    startingPrice: listPrice ? formatEnglishPrice(listPrice.min).replace('$', '') : '',
+    neighborhood: hood || '',
+    city: city || '',
     siteName: content.siteName
   }
 
@@ -72,13 +76,21 @@ export const generateCatalogMetadata = async ({
   // @ts-ignore
   const templates = content.propertyMetadataTemplates?.location || {}
 
+  const title = templates.title
+    ? interpolate(templates.title)
+    : `${count} ${catalogTitle} in ${shortLocation}`
+
+  const description = templates.description
+    ? interpolate(templates.description)
+    : `Find ${count} ${catalogTitle} in ${fullLocation}. Visit ${content.siteName} to see photos, prices & neighbourhood info.${lowestPrice}`
+
   const meta: any = {
-    title: templates.title
-      ? interpolate(templates.title)
-      : `${count} ${catalogTitle} in ${shortLocation}`,
-    description: templates.description
-      ? interpolate(templates.description)
-      : `Find ${count} ${catalogTitle} in ${fullLocation}. Visit ${content.siteName} to see photos, prices & neighbourhood info.${lowestPrice}`,
+    title: title
+      .replace(/\s\s+/g, ' ')
+      .replace(/,\s*\|/g, ' |')
+      .replace(/^, | ,$/g, '')
+      .trim(),
+    description: description.replace(/\s\s+/g, ' ').trim(),
     alternates: {
       canonical: host + '/locations/' + slugs.join('/')
     },

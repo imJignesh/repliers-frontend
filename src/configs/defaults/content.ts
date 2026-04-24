@@ -69,9 +69,9 @@ const content = {
         'Find condos for sale at {{buildingName}} located at {{address}}, {{city}}. Browse available units, past sale prices, and full building history on Precondo'
     },
     location: {
-      title: '{{catalogTitle}} in {{shortLocation}} | Precondo',
+      title: '{{neighborhood}} Condos For Sale, {{city}} | Precondo',
       description:
-        'Find {{catalogTitle}} in {{fullLocation}}. Visit Precondo to see photos, prices & neighbourhood info.{{lowestPrice}}'
+        'Browse {{listingCount}} condos for sale in {{neighborhood}}, {{city}}. See photos, floor plans, prices from ${{startingPrice}} & get listing alerts on Precondo.'
     }
   },
   estimateMetadata: {

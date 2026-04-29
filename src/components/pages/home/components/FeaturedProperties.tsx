@@ -30,6 +30,7 @@ const FeaturedProperties = () => {
     propertyType: 'Condo Apt',
     city: 'Toronto',
     sortBy: 'createdOnDesc',
+    type: 'sale',
     resultsPerPage: 8
   }
 
@@ -37,11 +38,13 @@ const FeaturedProperties = () => {
     brokerage: 'IRISE',
     resultsPerPage: 8,
     status: 'A',
+    type: 'sale',
     sortBy: 'createdOnDesc'
   }
 
   const filterShowcased: Partial<ApiQueryParams> = {
     class: 'condo',
+    type: 'sale',
     minPrice: 1_000_000,
     resultsPerPage: 12
   }

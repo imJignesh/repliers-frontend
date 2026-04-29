@@ -6,21 +6,18 @@ import { getCatalogUrl } from 'utils/urls'
 import GroupTemplate from './GroupTemplate'
 
 const filters = [
-  ['houses', 'for-sale'],
   ['condos', 'for-sale'],
-  ['townhomes', 'for-sale'],
-
-  ['houses', 'for-rent'],
   ['condos', 'for-rent'],
-  ['houses', 'above-800k'],
-
   ['condos', 'above-500k'],
-  ['2-bedrooms', 'houses', 'for-sale'],
-  ['3-bedrooms', 'houses', 'for-sale'],
-
-  ['4-bedrooms', 'houses', 'for-sale'],
-  ['3-bathrooms', 'houses', 'for-sale'],
-  ['3-garages', 'houses', 'for-sale']
+  ['condos', 'above-800k'],
+  ['condos', 'above-1m'],
+  ['1-bedroom', 'condos', 'for-sale'],
+  ['2-bedrooms', 'condos', 'for-sale'],
+  ['3-bedrooms', 'condos', 'for-sale'],
+  ['1-bathroom', 'condos', 'for-sale'],
+  ['2-bathrooms', 'condos', 'for-sale'],
+  ['luxury', 'condos', 'for-sale'],
+  ['premium', 'condos', 'for-sale']
 ]
 
 const formatLabel = (label: string) =>

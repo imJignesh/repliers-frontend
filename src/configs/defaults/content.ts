@@ -4,12 +4,12 @@ import { type ToolbarConfig } from '@templates/Header/components/ToolbarMenu'
 
 const content = {
   siteLogo: {
-    url: 'https://precondo.ca/r/logo.svg',
+    url: 'https://precondo.ca/logo.svg',
     width: 36,
     height: 36
   },
   siteMobileLogo: {
-    url: 'https://precondo.ca/r/logo.svg',
+    url: 'https://precondo.ca/logo.svg',
     width: 36,
     height: 36
   },

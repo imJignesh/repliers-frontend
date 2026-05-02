@@ -38,7 +38,7 @@ const ToolbarMenu = ({ sx }: { sx?: SxProps }) => {
       //   item: 'For Rent'
       // },
       {
-        url: '/r/locations/toronto/new-condos-and-preconstruction',
+        url: 'https://precondo.ca',
         item: 'Pre-Construction'
       },
       {

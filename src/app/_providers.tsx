@@ -1,7 +1,9 @@
 'use client'
-import { type ComponentType, type ReactNode, useMemo } from 'react'
+import { type ComponentType, type ReactNode, useMemo, Suspense } from 'react'
 import { NextIntlClientProvider } from 'next-intl'
 import type React from 'react'
+
+import { TopProgressBar } from 'components/common/TopProgressBar'
 
 import { ThemeProvider } from '@mui/material'
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter'
@@ -86,7 +88,14 @@ const Providers = ({
 
   const ProvidersTree = buildProvidersTree(providers)
 
-  return <ProvidersTree>{children}</ProvidersTree>
+  return (
+    <ProvidersTree>
+      <Suspense fallback={null}>
+        <TopProgressBar />
+      </Suspense>
+      {children}
+    </ProvidersTree>
+  )
 }
 
 export default Providers

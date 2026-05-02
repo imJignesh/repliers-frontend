@@ -4,12 +4,12 @@ import { type ToolbarConfig } from '@templates/Header/components/ToolbarMenu'
 
 const content = {
   siteLogo: {
-    url: 'https://precondo.ca/logo.svg',
+    url: 'https://precondo.ca/r/logo.svg',
     width: 36,
     height: 36
   },
   siteMobileLogo: {
-    url: 'https://precondo.ca/logo.svg',
+    url: 'https://precondo.ca/r/logo.svg',
     width: 36,
     height: 36
   },
@@ -21,7 +21,7 @@ const content = {
   siteSplashscreen: 'https://precondo.ca/r/precondo_main_image.webp',
   loginSplashscreen: 'https://precondo.ca/r/precondo_main_image.webp',
   siteName: 'Precondo',
-  siteDefaultBrokerageName: 'DEFAULT BROKERAGE NAME',
+  siteDefaultBrokerageName: 'IRISE',
   siteKeywords: ['Precondo', 'Precondos for sale in Canada'],
   siteDescription:
     "Welcome to Precondo, your exclusive access to all the new and upcoming condos in Canada. Everything you'll need when it comes to properties for Sale, Rent & Preconstruction Properties!",

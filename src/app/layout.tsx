@@ -51,9 +51,13 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
           name="format-detection"
           content="telephone=no, date=no, email=no, address=no"
         />
+        {/* Preconnect to critical external origins for faster resource loading */}
+        <link rel="preconnect" href="https://cdn.repliers.io" />
+        <link rel="dns-prefetch" href="https://cdn.repliers.io" />
+        <link rel="preconnect" href="https://api.mapbox.com" />
+        <link rel="dns-prefetch" href="https://api.mapbox.com" />
       </head>
       <body>
-        <TrackingInline />
         <Providers
           locale={locale}
           messages={messages}
@@ -61,15 +65,18 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
           featureOptions={options}
           locations={locations}
         >
-          {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && (
-            <Script
-              src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
-              strategy="afterInteractive"
-            />
-          )}
           <GlobalStyles styles={globalStyles} />
           {children}
         </Providers>
+        {/* Tracking scripts loaded after main content */}
+        <TrackingInline />
+        {/* reCAPTCHA deferred to idle time — only needed on form submission */}
+        {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && (
+          <Script
+            src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
+            strategy="lazyOnload"
+          />
+        )}
       </body>
     </html>
   )

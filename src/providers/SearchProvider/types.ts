@@ -18,6 +18,7 @@ export type SavedResponse = {
 
 export type SearchContextType = SavedResponse & {
   loading: boolean
+  setLoading: (loading: boolean) => void
   filters: Partial<Filters>
   setFilter: (key: keyof Filters, value: any) => void
   setFilters: (filters: Partial<Filters>) => void

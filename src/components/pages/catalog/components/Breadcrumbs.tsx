@@ -7,6 +7,8 @@ import defaultLocation from '@configs/location'
 
 import { getCatalogUrl } from 'utils/urls'
 
+import { useSearch } from 'providers/SearchProvider/SearchProvider'
+
 const Breadcrumbs = ({
   area,
   city,
@@ -16,6 +18,7 @@ const Breadcrumbs = ({
   city?: string
   hood?: string
 }) => {
+  const { setLoading } = useSearch()
   const crumbs = [defaultLocation.state, area, city, hood].filter(
     (crumb) => crumb
   )
@@ -25,7 +28,7 @@ const Breadcrumbs = ({
   const crumbsLinks = crumbs.map((crumb, index) => {
     const url = getCatalogUrl(...crumbs.slice(1, index + 1))
     return (
-      <Link key={crumb} href={url}>
+      <Link key={crumb} href={url} onClick={() => setLoading(true)}>
         <Typography fontSize={14} fontWeight={500}>
           {crumb}
         </Typography>

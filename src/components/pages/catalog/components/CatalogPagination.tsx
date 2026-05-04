@@ -7,7 +7,7 @@ import { Pagination, Skeleton, Stack } from '@mui/material'
 
 import searchConfig from '@configs/search'
 
-import useClientSide from 'hooks/useClientSide'
+import { useSearch } from 'providers/SearchProvider/SearchProvider'
 
 // NOTE: WE HAVE TO render <Pagination /> only on client side as it comes
 // screwed up from the server (+ broken states)
@@ -20,10 +20,12 @@ const CatalogPagination = ({
   count: number
 }) => {
   const router = useRouter()
+  const { setLoading } = useSearch()
   const clientSide = useClientSide()
   const pages = Math.ceil(count / searchConfig.pageSize)
 
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
+    setLoading(true)
     router.push(`${window?.location.pathname}?page=${value}`)
   }
 

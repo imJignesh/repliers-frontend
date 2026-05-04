@@ -113,6 +113,7 @@ const SearchProvider = ({
   const contextValue = useMemo(
     () => ({
       loading,
+      setLoading,
       filters: searchFilters,
       setFilter,
       setFilters,

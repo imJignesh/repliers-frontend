@@ -114,7 +114,7 @@ const CatalogFilters = ({
   const { mobile } = useBreakpoints()
   const size = mobile ? 'small' : 'medium'
 
-  const { filters, setFilters, addFilters } = useSearch()
+  const { filters, setFilters, addFilters, setLoading } = useSearch()
   const { listingStatus, listingType, sortBy } = filters
   // Default configurations are now handled in @configs/defaults/filters.ts
 
@@ -312,6 +312,7 @@ const CatalogFilters = ({
     })
 
     if (filtersChanged) {
+      setLoading(true)
       const urlFilters = createFiltersArray(filters)
       const newUrl = getCatalogUrl(city || area, hood, urlFilters)
       router.push(newUrl)
@@ -517,6 +518,7 @@ const CatalogFilters = ({
                 key={region}
                 component={Link}
                 href={getCatalogUrl(region, '', createFiltersArray({}))}
+                onClick={() => setLoading(true)}
                 variant="outlined"
                 sx={{
                   textTransform: 'none',
@@ -603,6 +605,7 @@ const CatalogFilters = ({
                           key={locationName}
                           component={Link}
                           href={getSubLocationUrl(locationName)}
+                          onClick={() => setLoading(true)}
                           variant={normalize(hood) === normalize(locationName) || normalize(city) === normalize(locationName) ? 'contained' : 'outlined'}
                           sx={{
                             padding: 0,
@@ -647,6 +650,7 @@ const CatalogFilters = ({
                               <Button
                                 component={Link}
                                 href={`${routes.listings}/${locationTree.slug}/${group.slug}`}
+                                onClick={() => setLoading(true)}
                                 sx={{
                                   textTransform: 'none',
                                   whiteSpace: 'nowrap',
@@ -763,6 +767,7 @@ const CatalogFilters = ({
                           }
                           clickable
                           onClick={() => {
+                            setLoading(true)
                             const url = `${routes.listings}/${locationTree.slug}/${child.slug}`
                             router.push(url)
                           }}

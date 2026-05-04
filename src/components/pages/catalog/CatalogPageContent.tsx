@@ -22,6 +22,8 @@ import MapOptionsProvider from 'providers/MapOptionsProvider'
 
 import MapService from 'services/Map'
 import CatalogMap from './components/CatalogMap'
+import { SkeletonCard } from '@shared/Property'
+import { useSearch } from 'providers/SearchProvider/SearchProvider'
 
 import {
   Breadcrumbs,
@@ -63,6 +65,66 @@ const CatalogPageContent = ({
   urlFilters: string[]
   searchFilters: Partial<Filters>
 }) => {
+  return (
+    <SearchProvider
+      filters={
+        {
+          ...searchFilters,
+          area,
+          city,
+          neighborhood: hood
+        } as Filters
+      }
+    >
+      <CatalogPageInner
+        page={page}
+        count={count}
+        listings={listings}
+        area={area}
+        hood={hood}
+        city={city}
+        urlFilters={urlFilters}
+        searchFilters={searchFilters}
+        areas={areas}
+        hoods={hoods}
+        cities={cities}
+        location={location}
+      />
+    </SearchProvider>
+  )
+}
+
+const CatalogPageInner = ({
+  page,
+  count,
+  listings,
+  area,
+  hood,
+  city,
+  urlFilters,
+  searchFilters,
+  areas,
+  hoods,
+  cities,
+  location
+}: {
+  listings: Property[]
+  count: number
+  page: number
+
+  area?: string
+  hood?: string
+  city?: string
+
+  areas: ApiBoardArea[]
+  hoods: ApiNeighborhood[]
+  cities: ApiBoardCity[]
+  location?: ApiBoardCity | ApiNeighborhood
+
+  urlFilters: string[]
+  searchFilters: Partial<Filters>
+}) => {
+  const { loading, setLoading } = useSearch()
   const [showMap, setShowMap] = useState(false)
   const [viewMode, setViewMode] = useState<'listings' | 'buildings'>('listings')
   const [locationTree, setLocationTree] = useState<any>(null)
@@ -71,6 +133,10 @@ const CatalogPageContent = ({
   // Theme hooks for responsive detection
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+
+  useEffect(() => {
+    setLoading(false)
+  }, [listings, page, area, city, hood, setLoading])
 
   useEffect(() => {
     const storedMap = localStorage.getItem('repliers_catalog_map_view')
@@ -105,17 +171,7 @@ const CatalogPageContent = ({
   const buildings = locationTree?.buildings || []
 
   return (
-    <SearchProvider
-      filters={
-        {
-          ...searchFilters,
-          area,
-          city,
-          neighborhood: hood
-        } as Filters
-      }
-    >
-      <MapOptionsProvider layout="map" style="map">
+    <MapOptionsProvider layout="map" style="map">
         <Box minHeight="calc(100vh - 72px)">
 
           {/* Header — always full width constrained */}
@@ -192,7 +248,7 @@ const CatalogPageContent = ({
                 }}
               >
                 {viewMode === 'listings' ? (
-                  listings?.length > 0 ? (
+                  listings?.length > 0 || loading ? (
                     <Stack
                       direction="row"
                       flexWrap="wrap"
@@ -208,27 +264,33 @@ const CatalogPageContent = ({
                         },
                       }}
                     >
-                      {listings.map((property, index) => (
-                        <PropertyCard
-                          key={index}
-                          property={property}
-                          showViewOnMap={true}
-                          onViewOnMap={() => {
-                            if (property.map.latitude && property.map.longitude) {
-                              MapService.map?.flyTo({
-                                center: [Number(property.map.longitude), Number(property.map.latitude)],
-                                zoom: 16,
-                              })
-                              MapService.showPopup(property.mlsNumber)
+                      {loading ? (
+                        Array.from({ length: 6 }).map((_, i) => (
+                          <SkeletonCard key={i} />
+                        ))
+                      ) : (
+                        listings.map((property, index) => (
+                          <PropertyCard
+                            key={index}
+                            property={property}
+                            showViewOnMap={true}
+                            onViewOnMap={() => {
+                              if (property.map.latitude && property.map.longitude) {
+                                MapService.map?.flyTo({
+                                  center: [Number(property.map.longitude), Number(property.map.latitude)],
+                                  zoom: 16,
+                                })
+                                MapService.showPopup(property.mlsNumber)
 
-                              // NEW: Scroll to map on mobile when location icon clicked
-                              if (isMobile && mapRef.current) {
-                                mapRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                                // NEW: Scroll to map on mobile when location icon clicked
+                                if (isMobile && mapRef.current) {
+                                  mapRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                                }
                               }
-                            }
-                          }}
-                        />
-                      ))}
+                            }}
+                          />
+                        ))
+                      )}
                     </Stack>
                   ) : (
                     <EmptyCatalogListings />
@@ -273,7 +335,7 @@ const CatalogPageContent = ({
               }}
             >
               {viewMode === 'listings' ? (
-                listings?.length > 0 ? (
+                listings?.length > 0 || loading ? (
                   <Stack
                     direction="row"
                     flexWrap="wrap"
@@ -290,9 +352,15 @@ const CatalogPageContent = ({
                       },
                     }}
                   >
-                    {listings.map((property, index) => (
-                      <PropertyCard key={index} property={property} />
-                    ))}
+                    {loading ? (
+                      Array.from({ length: 8 }).map((_, i) => (
+                        <SkeletonCard key={i} />
+                      ))
+                    ) : (
+                      listings.map((property, index) => (
+                        <PropertyCard key={index} property={property} />
+                      ))
+                    )}
                   </Stack>
                 ) : (
                   <EmptyCatalogListings />
@@ -335,7 +403,6 @@ const CatalogPageContent = ({
 
         </Box>
       </MapOptionsProvider>
-    </SearchProvider>
   )
 }
 

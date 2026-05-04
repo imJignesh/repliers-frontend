@@ -265,7 +265,7 @@ const CatalogPageInner = ({
                       }}
                     >
                       {loading ? (
-                        Array.from({ length: 6 }).map((_, i) => (
+                        Array.from({ length: 12 }).map((_, i) => (
                           <SkeletonCard key={i} />
                         ))
                       ) : (
@@ -293,7 +293,7 @@ const CatalogPageInner = ({
                       )}
                     </Stack>
                   ) : (
-                    <EmptyCatalogListings />
+                    !loading && <EmptyCatalogListings />
                   )
                 ) : (
                   <Stack
@@ -311,10 +311,18 @@ const CatalogPageInner = ({
                       },
                     }}
                   >
-                    {buildings.map((building: any, index: number) => (
-                      <BuildingCard key={index} building={building} />
-                    ))}
-                    {buildings.length === 0 && <EmptyBuildings />}
+                    {loading ? (
+                      Array.from({ length: 12 }).map((_, i) => (
+                        <SkeletonCard key={i} />
+                      ))
+                    ) : (
+                      <>
+                        {buildings.map((building: any, index: number) => (
+                          <BuildingCard key={index} building={building} />
+                        ))}
+                        {buildings.length === 0 && <EmptyBuildings />}
+                      </>
+                    )}
                   </Stack>
                 )}
 
@@ -353,7 +361,7 @@ const CatalogPageInner = ({
                     }}
                   >
                     {loading ? (
-                      Array.from({ length: 8 }).map((_, i) => (
+                      Array.from({ length: 12 }).map((_, i) => (
                         <SkeletonCard key={i} />
                       ))
                     ) : (
@@ -363,7 +371,7 @@ const CatalogPageInner = ({
                     )}
                   </Stack>
                 ) : (
-                  <EmptyCatalogListings />
+                  !loading && <EmptyCatalogListings />
                 )
               ) : (
                 <Stack
@@ -382,10 +390,18 @@ const CatalogPageInner = ({
                     },
                   }}
                 >
-                  {buildings.map((building: any, index: number) => (
-                    <BuildingCard key={index} building={building} />
-                  ))}
-                  {buildings.length === 0 && <EmptyBuildings />}
+                  {loading ? (
+                    Array.from({ length: 12 }).map((_, i) => (
+                      <SkeletonCard key={i} />
+                    ))
+                  ) : (
+                    <>
+                      {buildings.map((building: any, index: number) => (
+                        <BuildingCard key={index} building={building} />
+                      ))}
+                      {buildings.length === 0 && <EmptyBuildings />}
+                    </>
+                  )}
                 </Stack>
               )}
 

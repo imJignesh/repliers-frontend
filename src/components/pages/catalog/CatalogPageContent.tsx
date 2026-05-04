@@ -414,6 +414,15 @@ const CatalogPageInner = ({
           )}
 
           <Box sx={{ mt: 4 }}>
+            {!hood && (
+              <Box sx={{ mb: 4 }}>
+                <HoodsOfCity 
+                  hoods={hoods} 
+                  city={city || area || ''} 
+                  isArea={!!area && !city}
+                />
+              </Box>
+            )}
             <PopularSearches area={area} city={city} hood={hood} />
           </Box>
 

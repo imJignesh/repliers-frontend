@@ -347,7 +347,7 @@ const CatalogFilters = ({
   const getSubLocations = (region: string) => {
     // If we have neighborhoods/cities data for the current selection (Area or City)
     if ((city || area) && hoods.length > 0) {
-      return Array.from(new Set(hoods.map((h) => h.name)))
+      return Array.from(new Set(hoods.filter((h) => h.activeCount > 0).map((h) => h.name)))
     }
     if (!currentCitymap[region] || !currentCitymap[region].items) return []
     return Object.keys(currentCitymap[region].items).filter(
@@ -592,7 +592,7 @@ const CatalogFilters = ({
                   ))
                 ) : (
                   <>
-                    {(!locationTree || isLocationTreeLoading) && getSubLocations(selectedRegion)
+                    {!locationTree && getSubLocations(selectedRegion)
                       .sort((a, b) => {
                         const isAActive = normalize(hood) === normalize(a) || normalize(city) === normalize(a)
                         const isBActive = normalize(hood) === normalize(b) || normalize(city) === normalize(b)

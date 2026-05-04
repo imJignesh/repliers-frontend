@@ -111,7 +111,7 @@ const CatalogHeader = ({
             </Typography>
           </Box>
           <Breadcrumbs area={area} city={city} hood={hood} />
-          <SeoDescription
+          {/* <SeoDescription
             count={count}
             area={area}
             city={city}
@@ -122,7 +122,7 @@ const CatalogHeader = ({
             location={location}
             onLinkFocus={handleLinkFocus}
             onLinkBlur={handleLinkBlur}
-          />
+          /> */}
         </Stack>
 
         {/* <CatalogMap coordinates={coordinates} center={center} /> */}

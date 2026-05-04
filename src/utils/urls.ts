@@ -3,6 +3,7 @@ import queryString from 'query-string'
 import apiConfig from '@configs/api'
 import { stepNames } from '@configs/estimate'
 import routes from '@configs/routes'
+import content from '@configs/content'
 
 import { joinNonEmpty } from 'utils/strings'
 
@@ -20,6 +21,10 @@ export const getYoutubeVideoId = (url: string) => {
 }
 
 export const getProtocolHost = (headers?: Headers | null) => {
+  const siteUrl = content.siteUrl
+  if (process.env.NODE_ENV === 'production') {
+    return siteUrl
+  }
   if (!headers) {
     return 'http://localhost:3000'
   }

@@ -3,6 +3,7 @@ import { type Metadata } from 'next'
 import { type ToolbarConfig } from '@templates/Header/components/ToolbarMenu'
 
 const content = {
+  siteUrl: 'https://precondo.ca',
   siteLogo: {
     url: 'https://precondo.ca/r/logo.svg',
     width: 36,

@@ -4,6 +4,7 @@ import { type Metadata } from 'next'
 import { APILocations } from 'services/API'
 import { StaticPageTemplate } from '@templates'
 import { GroupTemplate } from '@pages/catalog/components'
+import routes from '@configs/routes'
 import { sanitizeUrl } from 'utils/urls'
 
 import { headers } from 'next/headers'
@@ -14,7 +15,10 @@ export const generateMetadata = async (): Promise<Metadata> => {
     return {
         title: 'Find condos for Sale',
         alternates: {
-            canonical: host + '/sitemap'
+            canonical: host + routes.sitemap
+        },
+        openGraph: {
+            url: host + routes.sitemap
         }
     }
 }

@@ -1,6 +1,7 @@
 import pThrottle from 'p-throttle'
 
 import content from '@configs/content'
+import routes from '@configs/routes'
 
 import { type ApiBoardCity } from 'services/API'
 import { formatEnglishPrice } from 'utils/formatters'
@@ -92,7 +93,10 @@ export const generateCatalogMetadata = async ({
       .trim(),
     description: description.replace(/\s\s+/g, ' ').trim(),
     alternates: {
-      canonical: host + '/locations/' + slugs.join('/')
+      canonical: host + routes.listings + (slugs?.length ? '/' + slugs.join('/') : '')
+    },
+    openGraph: {
+      url: host + routes.listings + (slugs?.length ? '/' + slugs.join('/') : '')
     },
     robots: {
       index: true,

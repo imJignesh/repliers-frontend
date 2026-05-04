@@ -6,6 +6,7 @@ import { StaticPageTemplate } from '@templates'
 import { GroupTemplate } from '@pages/catalog/components'
 import { getCatalogUrl, sanitizeUrl } from 'utils/urls'
 import { capitalize } from 'utils/strings'
+import routes from '@configs/routes'
 
 type Props = {
     params: Promise<{ area: string }>
@@ -20,7 +21,10 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
     return {
         title: `Neighborhoods - ${capitalize(area.replace(/-/g, ' '))}`,
         alternates: {
-            canonical: host + `/sitemap/${area}`
+            canonical: host + `${routes.sitemap}/${area}`
+        },
+        openGraph: {
+            url: host + `${routes.sitemap}/${area}`
         }
     }
 }

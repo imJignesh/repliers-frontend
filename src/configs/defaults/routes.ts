@@ -33,6 +33,7 @@ const routes = {
   cookies: '/r/cookies-policy',
   privacy: '/r/privacy-policy',
   terms: '/r/terms-of-use',
+  sitemap: '/r/sitemap',
 
   // will be set to home or dashboard or agent
   loginRedirect: '/r'

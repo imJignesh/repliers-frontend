@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 
 import { PageTemplate } from '@templates'
 import HomePageContent from '@pages/home'
+import routes from '@configs/routes'
 
 import EstimatePage, {
   generateMetadata as generateEstimateMetadata
@@ -28,7 +29,10 @@ export const generateMetadata = async (props: any): Promise<Metadata> => {
   // other pages will be handled inside layout.tsx
   return {
     alternates: {
-      canonical: host
+      canonical: host + routes.home
+    },
+    openGraph: {
+      url: host + routes.home
     }
   }
 }

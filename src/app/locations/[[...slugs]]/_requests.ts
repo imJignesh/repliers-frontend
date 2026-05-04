@@ -40,9 +40,8 @@ export const fetchListings = async ({
   let listPrice = null
 
   const fetchParams = {
-    // area: city,
-    area,
-    city,
+    area: area || city,
+    city: area ? city : '',
     neighborhood: hood,
     // status: 'A',
     pageNum: page,

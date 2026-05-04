@@ -208,7 +208,8 @@ const CatalogFilters = ({
       const precondoUrl = process.env.NEXT_PUBLIC_PRECONDO_URL || 'https://app.precondo.ca'
 
       let buildingsApiUrl = `${precondoUrl}/api/buildings/area/${slug}`;
-      if (localityName) {
+      // Only add locality if it's different from the area/region name to ensure we get all child buildings
+      if (localityName && normalize(localityName) !== normalize(selectedRegion)) {
         buildingsApiUrl = `${precondoUrl}/api/buildings/area/${slug}/locality/${buildingsSlug}`;
       }
 

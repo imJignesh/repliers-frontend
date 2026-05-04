@@ -626,50 +626,88 @@ const CatalogFilters = ({
                         {locationTree.children.filter((group: any) => group.listing_count > 0 || group.building_count > 0).map((group: any) => {
                           const isActive = activeGroupId === group.id
                           return (
-                            <Button
+                            <Stack
                               key={group.id}
-                              // Toggle local state only, no redirect
-                              onClick={() => setActiveGroupId(isActive ? null : group.id)}
-                              variant={isActive ? 'contained' : 'outlined'}
+                              direction="row"
                               sx={{
-                                textTransform: 'none',
-                                whiteSpace: 'nowrap',
                                 flexShrink: 0,
-                                padding: '0 5px 0 10px',
-                                borderRadius: '4px', // More "toggle" like rounded shape
+                                borderRadius: '4px',
+                                border: '1px solid',
                                 borderColor: isActive ? 'primary.main' : 'divider',
                                 bgcolor: isActive ? 'primary.main' : 'background.paper',
                                 color: isActive ? 'white' : 'text.primary',
+                                overflow: 'hidden',
                                 boxShadow: isActive ? 2 : 0,
                                 '&:hover': {
-                                  bgcolor: isActive ? 'primary.dark' : 'rgba(0, 0, 0, 0.04)',
-                                  borderColor: isActive ? 'primary.dark' : 'text.primary',
+                                  borderColor: 'primary.main',
                                 }
                               }}
                             >
-                              {group.name}
-                              <Box
-                                component="span"
+                              <Button
+                                component={Link}
+                                href={`${routes.listings}/${locationTree.slug}/${group.slug}`}
                                 sx={{
-                                  ml: 1,
-                                  px: 0.75,
-                                  py: 0.25,
-                                  borderRadius: '12px',
-                                  fontSize: '0.75rem',
-                                  lineHeight: 1,
-                                  fontWeight: 600,
-                                  bgcolor: isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.06)',
-                                  color: isActive ? 'inherit' : 'text.secondary'
+                                  textTransform: 'none',
+                                  whiteSpace: 'nowrap',
+                                  px: 1.5,
+                                  py: 0.75,
+                                  minWidth: 'auto',
+                                  borderRadius: 0,
+                                  color: 'inherit',
+                                  border: 'none',
+                                  '&:hover': {
+                                    bgcolor: isActive ? 'primary.dark' : 'rgba(0, 0, 0, 0.04)',
+                                    border: 'none'
+                                  }
                                 }}
                               >
-                                {formatCount(group.listing_count > 0 ? group.listing_count : group.building_count)}
-                              </Box>
-                              {isActive ? (
-                                <Box component="span" sx={{ transform: 'rotate(180deg)', display: 'inline-flex', ml: 0.5 }}><KeyboardArrowDownIcon /></Box>
-                              ) : (
-                                <Box component="span" sx={{ display: 'inline-flex', ml: 0.5 }}><KeyboardArrowDownIcon /></Box>
-                              )}
-                            </Button>
+                                {group.name}
+                                <Box
+                                  component="span"
+                                  sx={{
+                                    ml: 1,
+                                    px: 0.75,
+                                    py: 0.25,
+                                    borderRadius: '12px',
+                                    fontSize: '0.75rem',
+                                    lineHeight: 1,
+                                    fontWeight: 600,
+                                    bgcolor: isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.06)',
+                                    color: isActive ? 'inherit' : 'text.secondary'
+                                  }}
+                                >
+                                  {formatCount(group.listing_count > 0 ? group.listing_count : group.building_count)}
+                                </Box>
+                              </Button>
+                              <Box
+                                sx={{
+                                  width: '1px',
+                                  bgcolor: isActive ? 'rgba(255, 255, 255, 0.3)' : 'divider'
+                                }}
+                              />
+                              <Button
+                                size="small"
+                                onClick={() => setActiveGroupId(isActive ? null : group.id)}
+                                sx={{
+                                  minWidth: 'auto',
+                                  px: 0.5,
+                                  borderRadius: 0,
+                                  color: 'inherit',
+                                  border: 'none',
+                                  '&:hover': {
+                                    bgcolor: isActive ? 'primary.dark' : 'rgba(0, 0, 0, 0.04)',
+                                    border: 'none'
+                                  }
+                                }}
+                              >
+                                <KeyboardArrowDownIcon
+                                  sx={{
+                                    transform: isActive ? 'rotate(180deg)' : 'none',
+                                    transition: 'transform 0.2s'
+                                  }}
+                                />
+                              </Button>
+                            </Stack>
                           )
                         })}
                       </>

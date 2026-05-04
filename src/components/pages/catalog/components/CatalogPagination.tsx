@@ -8,6 +8,7 @@ import { Pagination, Skeleton, Stack } from '@mui/material'
 import searchConfig from '@configs/search'
 
 import { useSearch } from 'providers/SearchProvider/SearchProvider'
+import useClientSide from 'hooks/useClientSide'
 
 // NOTE: WE HAVE TO render <Pagination /> only on client side as it comes
 // screwed up from the server (+ broken states)

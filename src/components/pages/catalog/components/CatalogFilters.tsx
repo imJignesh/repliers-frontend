@@ -526,6 +526,7 @@ const CatalogFilters = ({
                   px: 2,
                   py: 0.5,
                   minHeight: 32,
+                  flex: 1,
                   flexShrink: 0,
                   borderColor: 'divider',
                   color: 'text.primary',
@@ -615,6 +616,7 @@ const CatalogFilters = ({
                             minHeight: 32,
                             textTransform: 'none',
                             whiteSpace: 'nowrap',
+                            flex: 1,
                             flexShrink: 0,
                             borderRadius: '4px',
                             borderColor: 'primary.light',
@@ -638,6 +640,7 @@ const CatalogFilters = ({
                               key={group.id}
                               direction="row"
                               sx={{
+                                flex: 1,
                                 flexShrink: 0,
                                 borderRadius: '4px',
                                 border: '1px solid',

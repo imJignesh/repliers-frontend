@@ -1,19 +1,10 @@
+import { SxProps, Theme } from '@mui/material'
 import { Box, Button, Typography } from '@mui/material'
 
-const GalleryLockOverlay = () => {
-  const handleScrollToForm = (e: React.MouseEvent) => {
-    e.preventDefault()
-    const element = document.getElementById('contact-section')
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' })
-      element.classList.remove('highlight-form')
-      void element.offsetWidth // trigger reflow
-      element.classList.add('highlight-form')
-      setTimeout(() => {
-        element.classList.remove('highlight-form')
-      }, 1500)
-    }
-  }
+import { useScrollToContact } from 'hooks/useScrollToContact'
+
+const GalleryLockOverlay = ({ sx }: { sx?: SxProps<Theme> }) => {
+  const scrollToContact = useScrollToContact()
 
   return (
     <Box
@@ -29,12 +20,13 @@ const GalleryLockOverlay = () => {
         justifyContent: 'center',
         background: 'rgba(0, 0, 0, 0.2)',
         backdropFilter: 'blur(4px)',
+        ...sx
       }}
     >
       <Button
         variant="contained"
         size="large"
-        onClick={handleScrollToForm}
+        onClick={scrollToContact}
         sx={{
           py: 1.5,
           px: 4,

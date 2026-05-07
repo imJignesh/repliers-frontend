@@ -67,13 +67,20 @@ const PropertyGallery = () => {
             <DesktopGallery active={activeIndex} onChange={handleChange} />
           )}
 
-          <Box sx={{ position: 'relative' }}>
-            <ThumbnailsRibbon
-              active={activeThumbnailIndex}
-              onClick={handleChange}
+          <ThumbnailsRibbon
+            active={activeThumbnailIndex}
+            onClick={handleChange}
+          />
+          {!authenticated && (
+            <GalleryLockOverlay
+              sx={{
+                width: 'auto',
+                left: { xs: -16, sm: -24, md: 0 },
+                right: { xs: -16, sm: -24, md: 0 },
+                borderRadius: { xs: 0, md: 2 }
+              }}
             />
-            {!authenticated && <GalleryLockOverlay />}
-          </Box>
+          )}
         </>
       ) : (
         <ThumbnailsSkeleton />

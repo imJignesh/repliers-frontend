@@ -11,11 +11,11 @@ import useClientSide from 'hooks/useClientSide'
 
 import {
   DesktopGallery,
-  GalleryLockOverlay,
   MobileGallery,
   ThumbnailsRibbon,
   ThumbnailsSkeleton
 } from './components'
+import { GalleryLockOverlay } from '@shared/Photos'
 import { useAuthenticated } from 'hooks/useAuthenticated'
 
 const PropertyGallery = () => {
@@ -71,6 +71,16 @@ const PropertyGallery = () => {
             active={activeThumbnailIndex}
             onClick={handleChange}
           />
+          {!authenticated && (
+            <GalleryLockOverlay
+              sx={{
+                width: 'auto',
+                left: { xs: -16, sm: -24, md: 0 },
+                right: { xs: -16, sm: -24, md: 0 },
+                borderRadius: { xs: 0, md: 2 }
+              }}
+            />
+          )}
         </>
       ) : (
         <ThumbnailsSkeleton />

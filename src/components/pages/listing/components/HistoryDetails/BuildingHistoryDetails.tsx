@@ -9,6 +9,7 @@ import routes from '@configs/routes'
 import { scrubbed, active as isActive } from 'utils/properties'
 import { HistoryItem } from '.'
 import { useAuthenticated } from 'hooks/useAuthenticated'
+import { useScrollToContact } from 'hooks/useScrollToContact'
 
 // Helper to convert Property to HistoryItemType
 const getListingData = (property: Property): HistoryItemType => ({
@@ -25,6 +26,7 @@ const getListingData = (property: Property): HistoryItemType => ({
 })
 
 const BuildingHistoryDetails = ({ history = [] }: { history?: Property[] }) => {
+    const scrollToContact = useScrollToContact()
     // Filter out scrubbed entries and count them
     const visibleHistory = history.filter(item => {
         const pType = item.details?.propertyType?.toLowerCase() || ''
@@ -78,7 +80,7 @@ const BuildingHistoryDetails = ({ history = [] }: { history?: Property[] }) => {
                 {!authenticated && (
                     <Alert severity="info" sx={{ mb: 4, borderRadius: 2, '& .MuiAlert-message': { width: '100%' } }}>
                         <Typography variant="body2">
-                            Real estate boards require you to be signed in to access price history. <Link href={'/register'} style={{ fontWeight: 'bold', color: 'inherit', textDecoration: 'underline' }}>Sign up</Link> or <Link href={routes.login} style={{ fontWeight: 'bold', color: 'inherit', textDecoration: 'underline' }}>Log in</Link>
+                            Real estate boards require you to be signed in to access price history. <Link href="#" onClick={scrollToContact} style={{ fontWeight: 'bold', color: 'inherit', textDecoration: 'underline' }}>Sign up</Link> or <Link href="#" onClick={scrollToContact} style={{ fontWeight: 'bold', color: 'inherit', textDecoration: 'underline' }}>Log in</Link>
                         </Typography>
                     </Alert>
                 )}

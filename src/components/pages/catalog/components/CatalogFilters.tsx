@@ -523,7 +523,9 @@ const CatalogFilters = ({
                 sx={{
                   textTransform: 'none',
                   borderRadius: '4px',
-                  px: 3,
+                  px: 2,
+                  py: 0.5,
+                  minHeight: 32,
                   flexShrink: 0,
                   borderColor: 'divider',
                   color: 'text.primary',
@@ -608,7 +610,9 @@ const CatalogFilters = ({
                           onClick={() => setLoading(true)}
                           variant={normalize(hood) === normalize(locationName) || normalize(city) === normalize(locationName) ? 'contained' : 'outlined'}
                           sx={{
-                            padding: 0,
+                            px: 1.5,
+                            py: 0.5,
+                            minHeight: 32,
                             textTransform: 'none',
                             whiteSpace: 'nowrap',
                             flexShrink: 0,
@@ -655,8 +659,8 @@ const CatalogFilters = ({
                                   textTransform: 'none',
                                   whiteSpace: 'nowrap',
                                   px: 1.5,
-                                  py: 0.75,
-                                  minWidth: 'auto',
+                                  py: 0.5,
+                                  minHeight: 32,
                                   borderRadius: 0,
                                   color: 'inherit',
                                   border: 'none',
@@ -773,6 +777,7 @@ const CatalogFilters = ({
                           }}
                           sx={{
                             borderRadius: '4px',
+                            height: 28,
                             bgcolor: isChildActive ? 'primary.main' : 'white',
                             color: isChildActive ? 'white' : 'text.primary',
                             border: '1px solid',

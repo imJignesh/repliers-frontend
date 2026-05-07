@@ -128,6 +128,7 @@ const CatalogPageInner = ({
   const [showMap, setShowMap] = useState(false)
   const [viewMode, setViewMode] = useState<'listings' | 'buildings'>('listings')
   const [locationTree, setLocationTree] = useState<any>(null)
+  const [isReady, setIsReady] = useState(false)
   const mapRef = useRef<HTMLDivElement>(null)
 
   // Theme hooks for responsive detection
@@ -135,6 +136,7 @@ const CatalogPageInner = ({
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   useEffect(() => {
+    setIsReady(true)
     setLoading(false)
   }, [listings, page, area, city, hood, setLoading])
 
@@ -248,7 +250,7 @@ const CatalogPageInner = ({
                 }}
               >
                 {viewMode === 'listings' ? (
-                  listings?.length > 0 || loading ? (
+                  listings?.length > 0 || loading || !isReady ? (
                     <Stack
                       direction="row"
                       flexWrap="wrap"
@@ -264,7 +266,7 @@ const CatalogPageInner = ({
                         },
                       }}
                     >
-                      {loading ? (
+                      {loading || !isReady ? (
                         Array.from({ length: 12 }).map((_, i) => (
                           <SkeletonCard key={i} />
                         ))
@@ -314,7 +316,7 @@ const CatalogPageInner = ({
                     {buildings.map((building: any, index: number) => (
                       <BuildingCard key={index} building={building} />
                     ))}
-                    {buildings.length === 0 && <EmptyBuildings />}
+                    {(buildings.length === 0 && isReady) && <EmptyBuildings />}
                   </Stack>
                 )}
 
@@ -335,7 +337,7 @@ const CatalogPageInner = ({
               }}
             >
               {viewMode === 'listings' ? (
-                listings?.length > 0 || loading ? (
+                listings?.length > 0 || loading || !isReady ? (
                   <Stack
                     direction="row"
                     flexWrap="wrap"
@@ -352,7 +354,7 @@ const CatalogPageInner = ({
                       },
                     }}
                   >
-                    {loading ? (
+                    {loading || !isReady ? (
                       Array.from({ length: 12 }).map((_, i) => (
                         <SkeletonCard key={i} />
                       ))
@@ -385,7 +387,7 @@ const CatalogPageInner = ({
                   {buildings.map((building: any, index: number) => (
                     <BuildingCard key={index} building={building} />
                   ))}
-                  {buildings.length === 0 && <EmptyBuildings />}
+                  {(buildings.length === 0 && isReady) && <EmptyBuildings />}
                 </Stack>
               )}
 

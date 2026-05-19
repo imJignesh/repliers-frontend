@@ -399,9 +399,9 @@ const CatalogPageInner = ({
           </Container>
         )}
 
-        {/* <Box sx={{ mt: 4 }}>
-            <PopularSearches area={area} city={city} hood={hood} />
-          </Box> */}
+        <Box sx={{ mt: 4 }}>
+          <PopularSearches area={area} city={city} hood={hood} />
+        </Box>
 
       </Box>
     </MapOptionsProvider>

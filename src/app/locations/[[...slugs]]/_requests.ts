@@ -25,13 +25,13 @@ export type CatalogItem = ApiBoardCity & {
 export const fetchListings = async ({
   area = '',
   city = '',
-  hood = '' as string | string[],
+  hood = '',
   filters = {},
   page = 1
 }: {
   area?: string
   city?: string
-  hood?: string | string[]
+  hood?: string
   page?: number
   filters?: Partial<Filters>
 }) => {
@@ -93,8 +93,8 @@ export const fetchLocations = async (
       const target = normalize(city);
       const matchedArea = mapped.find(a => a.cities.some(c => normalize(c.name) === target));
       if (neighborhood) {
-          // just return the area containing it for now, 
-          // or filter the tree further if really mapping is needed.
+        // just return the area containing it for now, 
+        // or filter the tree further if really mapping is needed.
       }
       return matchedArea ? [matchedArea] : [];
     }

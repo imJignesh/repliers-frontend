@@ -1,6 +1,5 @@
 import React from 'react'
 import Link from 'next/link'
-import { getCatalogUrl } from 'utils/urls'
 
 import routes from '@configs/routes'
 
@@ -17,17 +16,18 @@ const OptionArea = ({
   props: React.HTMLAttributes<HTMLLIElement>
   option: AutosuggestionOption
 }) => {
-  const { source, parent } = option
-  const { name } = source as any
-  const { name: parentName } = (parent as any) || {}
-
-  const areaUrl = (parentName && parentName.toLowerCase() !== name.toLowerCase())
-    ? getCatalogUrl(parentName, name)
-    : getCatalogUrl(name)
+  const params = new URLSearchParams()
+  params.set('q', `${getAreaLabel(option)}`)
+  const areaUrl = `${routes.area}/?${params}`
 
   return (
     <OptionItem {...props} badge="Location">
-      <Link href={areaUrl}>
+      <Link
+        href={areaUrl}
+        onClick={(e) => {
+          e.preventDefault()
+        }}
+      >
         {getAreaLabel(option)}
       </Link>
     </OptionItem>

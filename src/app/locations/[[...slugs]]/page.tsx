@@ -129,58 +129,14 @@ const LocationsCatalogPage = async (props: {
   }
 
   // extract the correct neighborhood name from the list of areas
-  let queryHood: string | string[] = hood || '';
   if (hood && city) {
     const location = extractLocation(finalAreas, city, hood)
     if (location && 'name' in location) {
       hood = location.name
-      queryHood = location.name
-    }
-
-    try {
-      const citySlug = city.toLowerCase().replace(/\s+/g, '-');
-      const precondoUrl = process.env.NEXT_PUBLIC_PRECONDO_URL || 'https://app.precondo.ca';
-      const res = await fetch(`${precondoUrl}/api/locations/area/${citySlug}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && data.data) {
-          const targetSlug = hood.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-          const findGroup = (nodes: any[]): any => {
-            for (const node of nodes) {
-              if (node.slug === targetSlug || node.name.toLowerCase() === hood!.toLowerCase()) return node;
-              if (node.children) {
-                const found = findGroup(node.children);
-                if (found) return found;
-              }
-            }
-            return null;
-          };
-          const group = findGroup(data.data.children || []);
-          if (group && group.children && group.children.length > 0) {
-            const getLeafNames = (nodes: any[]): string[] => {
-              let names: string[] = [];
-              for (const node of nodes) {
-                if (node.type === 'locality' || !node.children || node.children.length === 0) {
-                  names.push(node.name);
-                } else {
-                  names = names.concat(getLeafNames(node.children));
-                }
-              }
-              return names;
-            };
-            const leafNames = getLeafNames(group.children);
-            if (leafNames.length > 0) {
-              queryHood = leafNames;
-            }
-          }
-        }
-      }
-    } catch(e) {
-      console.error('Error fetching precondo location tree for repliers hood mapping', e);
     }
   }
 
-  console.log({ filters, boardId, listingId, localAddress, area, city, hood, queryHood })
+  console.log({ filters, boardId, listingId, localAddress, area, city, hood })
 
   // render property page component if listingId is present and emulate its old url format
   if (listingId) {
@@ -196,7 +152,7 @@ const LocationsCatalogPage = async (props: {
   const { listings, count } = await fetchListings({
     area,
     city,
-    hood: queryHood,
+    hood,
     filters: searchFilters,
     page
   })

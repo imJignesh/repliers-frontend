@@ -174,130 +174,83 @@ const CatalogPageInner = ({
 
   return (
     <MapOptionsProvider layout="map" style="map">
-        <Box minHeight="calc(100vh - 72px)">
+      <Box minHeight="calc(100vh - 72px)">
 
-          {/* Header — always full width constrained */}
+        {/* Header — always full width constrained */}
+        <Container maxWidth="xl" sx={{ pt: { xs: 0, sm: 0 } }}>
+          <CatalogHeader
+            count={count}
+            area={area}
+            city={city}
+            hood={hood}
+            areas={areas}
+            cities={cities}
+            hoods={hoods}
+            location={location}
+          />
+        </Container>
+
+        {/* Filters bar — always full width constrained */}
+        <Box sx={{ boxShadow: count > 0 ? 1 : 0 }}>
           <Container maxWidth="xl" sx={{ pt: { xs: 0, sm: 0 } }}>
-            <CatalogHeader
+            <CatalogFilters
               count={count}
               area={area}
               city={city}
               hood={hood}
               areas={areas}
-              cities={cities}
               hoods={hoods}
-              location={location}
+              searchFilters={searchFilters}
+              showMap={showMap}
+              onToggleMap={handleToggleMap}
+              viewMode={viewMode}
+              setViewMode={handleSetViewMode}
+              onLocationTreeChange={setLocationTree}
             />
           </Container>
+        </Box>
 
-          {/* Filters bar — always full width constrained */}
-          <Box sx={{ boxShadow: count > 0 ? 1 : 0 }}>
-            <Container maxWidth="xl" sx={{ pt: { xs: 0, sm: 0 } }}>
-              <CatalogFilters
-                count={count}
-                area={area}
-                city={city}
-                hood={hood}
-                areas={areas}
-                hoods={hoods}
-                searchFilters={searchFilters}
-                showMap={showMap}
-                onToggleMap={handleToggleMap}
-                viewMode={viewMode}
-                setViewMode={handleSetViewMode}
-                onLocationTreeChange={setLocationTree}
-              />
-            </Container>
-          </Box>
-
-          {showMap ? (
-            /* ── MAP MODE: Responsive Layout ── */
+        {showMap ? (
+          /* ── MAP MODE: Responsive Layout ── */
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', md: 'row' },
+              // height: { md: 'calc(100vh - 140px)' }, 
+            }}
+          >
+            {/* 1. MAP PANEL (Top on Mobile, Right on Desktop) */}
             <Box
+              ref={mapRef}
               sx={{
-                display: 'flex',
-                flexDirection: { xs: 'column', md: 'row' },
-                // height: { md: 'calc(100vh - 140px)' }, 
+                width: { xs: '100%', md: '50%' },
+                height: { xs: '50vh', md: '100vh' }, // Fixed height on mobile
+                position: { md: 'sticky' },
+                top: { md: 0 },
+                flexShrink: 0,
+                order: { xs: 1, md: 2 }, // Order: 1st on mobile, 2nd on desktop
               }}
             >
-              {/* 1. MAP PANEL (Top on Mobile, Right on Desktop) */}
-              <Box
-                ref={mapRef}
-                sx={{
-                  width: { xs: '100%', md: '50%' },
-                  height: { xs: '50vh', md: '100vh' }, // Fixed height on mobile
-                  position: { md: 'sticky' },
-                  top: { md: 0 },
-                  flexShrink: 0,
-                  order: { xs: 1, md: 2 }, // Order: 1st on mobile, 2nd on desktop
-                }}
-              >
-                <CatalogMap listings={listings} />
-              </Box>
+              <CatalogMap listings={listings} />
+            </Box>
 
-              {/* 2. LISTINGS PANEL (Bottom on Mobile, Left on Desktop) */}
-              <Box
-                sx={{
-                  width: { xs: '100%', md: '50%' },
-                  height: { xs: 'auto', md: '100%' },
-                  overflowY: 'auto',
-                  p: { xs: 1, sm: 2 },
-                  borderRight: { md: '1px solid' },
-                  borderColor: { md: 'divider' },
-                  order: { xs: 2, md: 1 }, // Order: 2nd on mobile, 1st on desktop
-                  /* Hide scrollbar cross-browser */
-                  scrollbarWidth: 'none',
-                  '&::-webkit-scrollbar': { display: 'none' },
-                }}
-              >
-                {viewMode === 'listings' ? (
-                  listings?.length > 0 || loading || !isReady ? (
-                    <Stack
-                      direction="row"
-                      flexWrap="wrap"
-                      justifyContent="center"
-                      gap={{ xs: 1.5, sm: 2 }}
-                      sx={{
-                        '& > *': {
-                          width: {
-                            xs: '100%',
-                            sm: 'calc(50% - 8px)',
-                            md: 'calc(50% - 8px)', // 2 columns in split view
-                          },
-                        },
-                      }}
-                    >
-                      {loading || !isReady ? (
-                        Array.from({ length: 12 }).map((_, i) => (
-                          <SkeletonCard key={i} />
-                        ))
-                      ) : (
-                        listings.map((property, index) => (
-                          <PropertyCard
-                            key={index}
-                            property={property}
-                            showViewOnMap={true}
-                            onViewOnMap={() => {
-                              if (property.map.latitude && property.map.longitude) {
-                                MapService.map?.flyTo({
-                                  center: [Number(property.map.longitude), Number(property.map.latitude)],
-                                  zoom: 16,
-                                })
-                                MapService.showPopup(property.mlsNumber)
-
-                                // NEW: Scroll to map on mobile when location icon clicked
-                                if (isMobile && mapRef.current) {
-                                  mapRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                                }
-                              }
-                            }}
-                          />
-                        ))
-                      )}
-                    </Stack>
-                  ) : (
-                    <EmptyCatalogListings />
-                  )
-                ) : (
+            {/* 2. LISTINGS PANEL (Bottom on Mobile, Left on Desktop) */}
+            <Box
+              sx={{
+                width: { xs: '100%', md: '50%' },
+                height: { xs: 'auto', md: '100%' },
+                overflowY: 'auto',
+                p: { xs: 1, sm: 2 },
+                borderRight: { md: '1px solid' },
+                borderColor: { md: 'divider' },
+                order: { xs: 2, md: 1 }, // Order: 2nd on mobile, 1st on desktop
+                /* Hide scrollbar cross-browser */
+                scrollbarWidth: 'none',
+                '&::-webkit-scrollbar': { display: 'none' },
+              }}
+            >
+              {viewMode === 'listings' ? (
+                listings?.length > 0 || loading || !isReady ? (
                   <Stack
                     direction="row"
                     flexWrap="wrap"
@@ -308,48 +261,7 @@ const CatalogPageInner = ({
                         width: {
                           xs: '100%',
                           sm: 'calc(50% - 8px)',
-                          md: 'calc(50% - 8px)',
-                        },
-                      },
-                    }}
-                  >
-                    {buildings.map((building: any, index: number) => (
-                      <BuildingCard key={index} building={building} />
-                    ))}
-                    {(buildings.length === 0 && isReady) && <EmptyBuildings />}
-                  </Stack>
-                )}
-
-                {viewMode === 'listings' && (
-                  <Stack spacing={2} alignItems="center" py={4}>
-                    <CatalogPagination page={page} count={count} />
-                  </Stack>
-                )}
-              </Box>
-            </Box>
-          ) : (
-            /* ── LIST MODE: full width, no map ── */
-            <Container
-              maxWidth="xl"
-              sx={{
-                px: { xs: 1, sm: 2, md: 3 },
-                pt: { xs: 2, sm: 3, md: 4 },
-              }}
-            >
-              {viewMode === 'listings' ? (
-                listings?.length > 0 || loading || !isReady ? (
-                  <Stack
-                    direction="row"
-                    flexWrap="wrap"
-                    justifyContent="center"
-                    gap={{ xs: 1.5, sm: 2, md: 3 }}
-                    sx={{
-                      '& > *': {
-                        width: {
-                          xs: '100%',
-                          sm: 'calc(50% - 8px)',
-                          md: 'calc(33.333% - 11px)',
-                          lg: 'calc(25% - 12px)',
+                          md: 'calc(50% - 8px)', // 2 columns in split view
                         },
                       },
                     }}
@@ -360,7 +272,25 @@ const CatalogPageInner = ({
                       ))
                     ) : (
                       listings.map((property, index) => (
-                        <PropertyCard key={index} property={property} />
+                        <PropertyCard
+                          key={index}
+                          property={property}
+                          showViewOnMap={true}
+                          onViewOnMap={() => {
+                            if (property.map.latitude && property.map.longitude) {
+                              MapService.map?.flyTo({
+                                center: [Number(property.map.longitude), Number(property.map.latitude)],
+                                zoom: 16,
+                              })
+                              MapService.showPopup(property.mlsNumber)
+
+                              // NEW: Scroll to map on mobile when location icon clicked
+                              if (isMobile && mapRef.current) {
+                                mapRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                              }
+                            }
+                          }}
+                        />
                       ))
                     )}
                   </Stack>
@@ -372,14 +302,13 @@ const CatalogPageInner = ({
                   direction="row"
                   flexWrap="wrap"
                   justifyContent="center"
-                  gap={{ xs: 1.5, sm: 2, md: 3 }}
+                  gap={{ xs: 1.5, sm: 2 }}
                   sx={{
                     '& > *': {
                       width: {
                         xs: '100%',
                         sm: 'calc(50% - 8px)',
-                        md: 'calc(33.333% - 11px)',
-                        lg: 'calc(25% - 12px)',
+                        md: 'calc(50% - 8px)',
                       },
                     },
                   }}
@@ -396,15 +325,86 @@ const CatalogPageInner = ({
                   <CatalogPagination page={page} count={count} />
                 </Stack>
               )}
-            </Container>
-          )}
-
-          <Box sx={{ mt: 4 }}>
-            <PopularSearches area={area} city={city} hood={hood} />
+            </Box>
           </Box>
+        ) : (
+          /* ── LIST MODE: full width, no map ── */
+          <Container
+            maxWidth="xl"
+            sx={{
+              px: { xs: 1, sm: 2, md: 3 },
+              pt: { xs: 2, sm: 3, md: 4 },
+            }}
+          >
+            {viewMode === 'listings' ? (
+              listings?.length > 0 || loading || !isReady ? (
+                <Stack
+                  direction="row"
+                  flexWrap="wrap"
+                  justifyContent="center"
+                  gap={{ xs: 1.5, sm: 2, md: 3 }}
+                  sx={{
+                    '& > *': {
+                      width: {
+                        xs: '100%',
+                        sm: 'calc(50% - 8px)',
+                        md: 'calc(33.333% - 11px)',
+                        lg: 'calc(25% - 12px)',
+                      },
+                    },
+                  }}
+                >
+                  {loading || !isReady ? (
+                    Array.from({ length: 12 }).map((_, i) => (
+                      <SkeletonCard key={i} />
+                    ))
+                  ) : (
+                    listings.map((property, index) => (
+                      <PropertyCard key={index} property={property} />
+                    ))
+                  )}
+                </Stack>
+              ) : (
+                <EmptyCatalogListings />
+              )
+            ) : (
+              <Stack
+                direction="row"
+                flexWrap="wrap"
+                justifyContent="center"
+                gap={{ xs: 1.5, sm: 2, md: 3 }}
+                sx={{
+                  '& > *': {
+                    width: {
+                      xs: '100%',
+                      sm: 'calc(50% - 8px)',
+                      md: 'calc(33.333% - 11px)',
+                      lg: 'calc(25% - 12px)',
+                    },
+                  },
+                }}
+              >
+                {buildings.map((building: any, index: number) => (
+                  <BuildingCard key={index} building={building} />
+                ))}
+                {(buildings.length === 0 && isReady) && <EmptyBuildings />}
+              </Stack>
+            )}
 
-        </Box>
-      </MapOptionsProvider>
+            {viewMode === 'listings' && (
+              <Stack spacing={2} alignItems="center" py={4}>
+                <CatalogPagination page={page} count={count} />
+              </Stack>
+            )}
+          </Container>
+        )}
+
+        {/* <Box sx={{ mt: 4 }}>
+            <PopularSearches area={area} city={city} hood={hood} />
+          </Box> */}
+
+      </Box>
+    </MapOptionsProvider>
   )
 }
 

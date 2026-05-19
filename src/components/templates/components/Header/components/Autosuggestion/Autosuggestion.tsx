@@ -33,8 +33,6 @@ import useClientSide from 'hooks/useClientSide'
 import useDebouncedEffect from 'hooks/useDebouncedEffect'
 import {
   calcBoundsAtZoom,
-  calcZoomLevel,
-  getCenter,
   getCoords,
   getMapUrl,
   getZoom,
@@ -42,6 +40,7 @@ import {
   toMapboxPoint
 } from 'utils/map'
 import { getSeoUrl } from 'utils/properties'
+import { getCatalogUrl } from 'utils/urls'
 
 import OptionAddress from './components/OptionAddress'
 import OptionArea from './components/OptionArea'
@@ -307,35 +306,15 @@ const Autosuggestion = ({
     setOpen(false)
     setAreaLoading(true)
 
-    const query = getAreaLabel(option)
-    const bounds = await SearchService.fetchBoundsForArea(query)
-    if (!bounds) {
-      setAreaLoading(false)
-      return
-    }
+    const { source, parent } = option
+    const { name } = source as any
+    const { name: parentName } = (parent as any) || {}
 
-    const center = getCenter(bounds)
+    const areaUrl = (parentName && parentName.toLowerCase() !== name.toLowerCase())
+      ? getCatalogUrl(parentName, name)
+      : getCatalogUrl(name)
 
-    if (map) {
-      // calculate zoom level based on bounds and current map size
-      const zoom = calcZoomLevel(map, bounds)
-      const mapboxBounds = toMapboxBounds(bounds)
-
-      setSearchString(query)
-      setPosition({ zoom, center }) // save last focused result
-      map.fitBounds(mapboxBounds, {
-        // NOTE: How did it happen NOBODY (!) read the Mapbox documentation
-        // and figure out the native way to add bounds paddings ???
-        // padding: { top: 50, bottom: 50, left: 50, right: 50 },
-      })
-      const updatedUrl = updateQueryParam(query)
-      router.replace(updatedUrl)
-    } else {
-      // no map available, use default area zoom level
-      const zoom = defaultAreaZoom
-      const coordsUrl = getMapUrl({ zoom, center, query })
-      router.push(coordsUrl)
-    }
+    router.push(areaUrl)
 
     setTimeout(() => {
       setAreaLoading(false)

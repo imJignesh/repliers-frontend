@@ -146,14 +146,14 @@ export const parseListingType = (filters: string[]) =>
       case 'houses':
       case 'home':
       case 'homes':
-        return 'condo'
+        return 'residential'
       // aliases
       case 'condos':
       case 'apartment':
       case 'apartments':
         return 'condo'
       case 'townhomes':
-        return 'condo'
+        return 'townhome'
     }
     // strict match
     if (listingTypes.includes(cur as ListingType)) {

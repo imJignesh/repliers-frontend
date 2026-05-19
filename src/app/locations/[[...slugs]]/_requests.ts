@@ -25,13 +25,13 @@ export type CatalogItem = ApiBoardCity & {
 export const fetchListings = async ({
   area = '',
   city = '',
-  hood = '',
+  hood = '' as string | string[],
   filters = {},
   page = 1
 }: {
   area?: string
   city?: string
-  hood?: string
+  hood?: string | string[]
   page?: number
   filters?: Partial<Filters>
 }) => {

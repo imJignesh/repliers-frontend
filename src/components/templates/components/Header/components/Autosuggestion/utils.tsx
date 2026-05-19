@@ -27,9 +27,13 @@ export const getBuildingLabel = (option: any) => {
 export const getAreaLabel = (option: AutosuggestionOption) => {
   const { source, parent } = option
   const { name } = source as ApiNeighborhood
-  const { name: parentName } = (parent as ApiBoardCity) || {}
+  const { name: parentName } = (parent as any) || {}
 
-  return joinNonEmpty([name, parentName])
+  const parts = parentName && parentName.toLowerCase() !== name.toLowerCase() 
+    ? [name, parentName] 
+    : [name]
+
+  return joinNonEmpty(parts)
 }
 
 export const getAddressLabel = (option: AutosuggestionOption) => {

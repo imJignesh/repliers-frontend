@@ -28,7 +28,8 @@ const createTrieSearch = (locations: ApiLocations) => {
           items.push({
             type: 'city',
             class: areaClass.name,
-            source: city
+            source: city,
+            parent: area
           })
           if (city.neighborhoods) {
             city.neighborhoods.forEach((neighborhood) => {

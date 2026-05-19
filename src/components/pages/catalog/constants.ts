@@ -39,6 +39,7 @@ export const popularCities = [
   'Barrhaven',
   'Stittsville',
   // ['ottawa', 'Bells Corners'],
+  //
   ['ottawa', 'Blackburn Hamlet'],
   ['ottawa', 'Hunt Club'],
   ['ottawa', 'Morgans Grant'],

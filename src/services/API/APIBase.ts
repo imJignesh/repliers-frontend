@@ -43,9 +43,21 @@ class APIBase {
 
   async fetchRaw(request: string, options?: RequestInit): Promise<Response> {
     const headers = await this.getHeaders()
+    const fullUrl = this.getAbsoluteUrl(request)
+    console.log('[APIBase] fetchRaw request:', request, 'fullUrl:', fullUrl)
+
+    if (typeof window === 'undefined') {
+      try {
+        const fs = await import('fs')
+        fs.appendFileSync(
+          'console_debug.log',
+          `[${new Date().toISOString()}] fetchRaw: ${request} | fullUrl: ${fullUrl}\n`
+        )
+      } catch (e) {}
+    }
 
     try {
-      const response = await fetch(this.getAbsoluteUrl(request), {
+      const response = await fetch(fullUrl, {
         ...options,
         headers,
         credentials: 'include'
@@ -55,6 +67,16 @@ class APIBase {
       }
       return response
     } catch (error: any) {
+      console.error('[APIBase] fetchRaw CATCH ERROR:', error.message, error.stack || error)
+      if (typeof window === 'undefined') {
+        try {
+          const fs = await import('fs')
+          fs.appendFileSync(
+            'console_debug.log',
+            `[${new Date().toISOString()}] fetchRaw CATCH ERROR: ${error.message} | stack: ${error.stack}\n`
+          )
+        } catch (e) {}
+      }
       if (error.message === '401') {
         console.error('Authorization header is invalid or expired.')
         clearToken()

@@ -16,7 +16,8 @@ const HomeDescription = () => {
   } = useProperty()
 
   // WARN: multiline formatter returns non-empty string for any type of input
-  const formattedDescription = formatMultiLineText(description || '')
+  const isHtml = (description || '').trim().startsWith('<')
+  const formattedDescription = isHtml ? description : formatMultiLineText(description || '')
 
   return (
     <Stack spacing={3} id="description" sx={{ mt: '-33px', pt: 4 }}>

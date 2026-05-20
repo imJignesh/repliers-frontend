@@ -74,14 +74,28 @@ export const sanitizeUrl = (url: string) =>
   )
 
 export const getCatalogUrl = (
-  city: string = '',
-  hood: string = '',
-  filters: string[] = []
+  ...args: Array<string | string[]>
 ) => {
-  const cityUrl = city ? `/${sanitizeUrl(city.replace('-', ' '))}` : ''
-  const hoodUrl = hood ? `/${sanitizeUrl(hood)}` : ''
+  const locations: string[] = []
+  let filters: string[] = []
+
+  args.forEach((arg) => {
+    if (Array.isArray(arg)) {
+      filters = arg
+    } else if (typeof arg === 'string' && arg) {
+      locations.push(arg)
+    }
+  })
+
+  const locationPath = locations
+    .map((loc, i) => {
+      const sanitized = i === 0 ? loc.replace('-', ' ') : loc
+      return `/${sanitizeUrl(sanitized)}`
+    })
+    .join('')
+
   const filterUrl = filters.length ? `/${filters.join('-')}` : ''
-  return `${routes.listings}${cityUrl}${hoodUrl}${filterUrl}`
+  return `${routes.listings}${locationPath}${filterUrl}`
 }
 
 type EstimateUrlParams = {

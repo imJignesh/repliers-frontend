@@ -30,6 +30,7 @@ import {
   CatalogFilters,
   CatalogHeader,
   CatalogPagination,
+  CitiesOfRegion,
   FiltersList,
   HoodsOfCity,
   PopularSearches
@@ -58,7 +59,7 @@ const CatalogPageContent = ({
   city?: string
 
   areas: ApiBoardArea[]
-  hoods: ApiNeighborhood[]
+  hoods: any[]  // ApiNeighborhood[] or nested city items with neighborhoods
   cities: ApiBoardCity[]
   location?: ApiBoardCity | ApiNeighborhood
 
@@ -117,7 +118,7 @@ const CatalogPageInner = ({
   city?: string
 
   areas: ApiBoardArea[]
-  hoods: ApiNeighborhood[]
+  hoods: any[]  // ApiNeighborhood[] or nested city items with neighborhoods
   cities: ApiBoardCity[]
   location?: ApiBoardCity | ApiNeighborhood
 
@@ -399,9 +400,7 @@ const CatalogPageInner = ({
           </Container>
         )}
 
-        <Box sx={{ mt: 4 }}>
-          <PopularSearches area={area} city={city} hood={hood} />
-        </Box>
+
 
       </Box>
     </MapOptionsProvider>

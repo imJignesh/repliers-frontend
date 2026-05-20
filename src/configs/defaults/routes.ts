@@ -37,7 +37,7 @@ const rawRoutes = {
   listing: '/r/listing', // [...id]
   building: '/r/building', // [...id]
   listings: '/r/locations',
-  // estimate: '/r/estimate',
+  estimate: '/r/estimate',
   dashboard: '/r/dashboard',
   favorites: '/r/favorites',
   saveSearch: '/r/saved-searches',
@@ -57,6 +57,8 @@ const rawRoutes = {
   privacy: '/r/privacy-policy',
   terms: '/r/terms-of-use',
   sitemap: '/r/sitemap',
+  accessibility: '/r/accessibility-statement',
+  dmca: '/r/dmca-notice',
 
   // will be set to home or dashboard or agent
   loginRedirect: '/r'

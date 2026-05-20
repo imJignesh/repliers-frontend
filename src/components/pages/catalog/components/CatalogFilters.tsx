@@ -279,12 +279,12 @@ const CatalogFilters = ({
 
     if (sort && sort !== 'createdOnDesc') urlFilters.push('sort-' + sort)
 
-    if (f.minPrice) urlFilters.push(`above - ${f.minPrice} `)
-    if (f.maxPrice) urlFilters.push(`below - ${f.maxPrice} `)
-    if (f.minBeds) urlFilters.push(`${f.minBeds} -bed`)
-    if (f.minBaths) urlFilters.push(`${f.minBaths} -bath`)
-    if (f.minGarageSpaces) urlFilters.push(`${f.minGarageSpaces} -garage`)
-    if (f.minParkingSpaces) urlFilters.push(`${f.minParkingSpaces} -parking`)
+    if (f.minPrice) urlFilters.push(`above-${f.minPrice}`)
+    if (f.maxPrice) urlFilters.push(`below-${f.maxPrice}`)
+    if (f.minBeds) urlFilters.push(`${f.minBeds}-bed`)
+    if (f.minBaths) urlFilters.push(`${f.minBaths}-bath`)
+    if (f.minGarageSpaces) urlFilters.push(`${f.minGarageSpaces}-garage`)
+    if (f.minParkingSpaces) urlFilters.push(`${f.minParkingSpaces}-parking`)
 
     return urlFilters
   }

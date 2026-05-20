@@ -74,12 +74,13 @@ export const sanitizeUrl = (url: string) =>
   )
 
 export const getCatalogUrl = (
-  ...args: Array<string | string[]>
+  ...args: Array<string | string[] | undefined>
 ) => {
   const locations: string[] = []
   let filters: string[] = []
 
   args.forEach((arg) => {
+    if (!arg) return
     if (Array.isArray(arg)) {
       filters = arg
     } else if (typeof arg === 'string' && arg) {

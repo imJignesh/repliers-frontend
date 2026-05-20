@@ -125,7 +125,7 @@ const LocationsCatalogPage = async (props: {
         }
 
         if (foundHood) {
-          city = foundCity;
+          city = foundCity || '';
           hood = foundHood;
         } else {
           city = slug2 || '';

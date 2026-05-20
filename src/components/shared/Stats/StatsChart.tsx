@@ -22,7 +22,7 @@ import {
   yAxisProps
 } from '@shared/Stats'
 
-import { type AxisDomain } from 'recharts'
+type AxisDomain = any
 
 import {
   formatEnglishPrice,

@@ -94,7 +94,7 @@ const SearchProvider = ({
     let response
     try {
       setLoading(true)
-      response = await SearchService.fetch(params)
+      response = await SearchService.fetch(params, { cancelGroup: 'search' })
     } finally {
       setLoading(false)
     }

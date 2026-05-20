@@ -6,7 +6,7 @@ import type {
 } from 'services/API'
 import type { Filters } from 'services/Search'
 
-export const listingStatuses = ['active', 'rent', 'sold'] as const
+export const listingStatuses = ['active', 'rent', 'sold', 'all'] as const
 
 export type ListingStatus = (typeof listingStatuses)[number]
 
@@ -64,7 +64,7 @@ export const listingFields: Array<ListingFields> = [
   'boardId'
 ]
 
-export type PropertyClass = 'condo'
+export type PropertyClass = 'condo' | 'residential'
 
 export const aiQuality = [
   ['Excellent', 'excellent'],

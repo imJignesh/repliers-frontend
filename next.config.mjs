@@ -15,12 +15,8 @@ const loggingConfig =
     }
     : {}
 
-const isProd = currentEnv === 'production'
-
 const nextConfig = {
-  basePath: isProd ? '/r' : undefined,
-  assetPrefix: isProd ? '/r' : undefined,
-  trailingSlash: isProd ? true : false,
+  assetPrefix: '/r',
   pageExtensions: ['tsx', 'ts', 'jsx', 'js', 'mdx', 'md'],
 
   // Note: 'eslint' and 'typescript' ignore keys are handled differently in v16.
@@ -33,6 +29,7 @@ const nextConfig = {
     ignoreBuildErrors: true
   },
 
+  trailingSlash: false,
   reactStrictMode: true,
   images: {
     unoptimized: true,

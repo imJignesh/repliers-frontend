@@ -1,10 +1,10 @@
-import {
-  type ApiQueryParamsAllowedFields,
-  type Property,
-  type PropertyInsightFeature,
-  type QualitativeInsightValue
+import type {
+  ApiQueryParamsAllowedFields,
+  Property,
+  PropertyInsightFeature,
+  QualitativeInsightValue
 } from 'services/API'
-import { type Filters } from 'services/Search'
+import type { Filters } from 'services/Search'
 
 export const listingStatuses = ['active', 'rent', 'sold'] as const
 

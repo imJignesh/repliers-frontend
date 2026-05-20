@@ -1,4 +1,27 @@
-const routes = {
+const isLocalhost = () => {
+  if (typeof window !== 'undefined') {
+    return (
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1'
+    )
+  }
+  const precondoUrl = process.env.NEXT_PUBLIC_PRECONDO_URL || ''
+  return (
+    process.env.NODE_ENV === 'development' ||
+    precondoUrl.includes('localhost') ||
+    precondoUrl.includes('127.0.0.1')
+  )
+}
+
+const getRoute = (path: string) => {
+  if (isLocalhost()) {
+    if (path === '/r') return '/'
+    if (path.startsWith('/r/')) return path.substring(2)
+  }
+  return path
+}
+
+const rawRoutes = {
   home: '/r',
   login: '/r/login',
 
@@ -39,6 +62,16 @@ const routes = {
   loginRedirect: '/r'
 }
 
-export type Routes = Record<keyof typeof routes, string>
+export type Routes = Record<keyof typeof rawRoutes, string>
+
+const routes = new Proxy(rawRoutes, {
+  get(target, prop) {
+    const val = target[prop as keyof typeof rawRoutes]
+    if (typeof val === 'string') {
+      return getRoute(val)
+    }
+    return val
+  }
+}) as unknown as Routes
 
 export default routes

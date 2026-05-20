@@ -73,13 +73,20 @@ const LocationsCatalogPage = async (props: {
   // Pass empty neighborhood to fetch all neighborhoods in the city for loose matching later
   const fetchAreas = await fetchLocations(urlCity, '')
   const dynamicAreasData = await APILocations.fetchAreas()
+
+  // Build ApiBoardArea[] from the nested cities structure returned by /areas
   const formattedAreas: ApiBoardArea[] = dynamicAreasData.map((a: any) => ({
     name: a.name,
-    cities: a.neighborhoods.map((name: string) => ({
-      name,
+    cities: (a.cities ?? []).map((c: any) => ({
+      name: c.name,
       activeCount: 0,
       location: { lat: 0, lng: 0 },
-      state: 'ON'
+      state: 'ON',
+      neighborhoods: (c.neighborhoods ?? []).map((name: string) => ({
+        name,
+        activeCount: 0,
+        location: { lat: 0, lng: 0 }
+      }))
     }))
   }))
 
@@ -169,25 +176,40 @@ const LocationsCatalogPage = async (props: {
     byCount
   )
 
-  let neighborhoods: any[] = []
+  // Fetch area direct children: for an area returns [{name, neighborhoods}], for a city returns string[]
+  let hoods: any[] = []
   const targetForNeighborhoods = city || area
   if (targetForNeighborhoods) {
-    const dynamicNeighborhoods = await APILocations.fetchAreaNeighborhoods(
-      targetForNeighborhoods
-    )
-    neighborhoods = dynamicNeighborhoods.map((name) => ({
-      name,
-      activeCount: 0,
-      location: { lat: 0, lng: 0 }
-    }))
-  }
+    const dynamicData = await APILocations.fetchAreaNeighborhoods(targetForNeighborhoods)
 
-  const hoods =
-    neighborhoods.length
-      ? neighborhoods
-      : (city && currentLocation
+    if (dynamicData.length > 0) {
+      if (typeof dynamicData[0] === 'string') {
+        // City-level: flat neighborhood names
+        hoods = (dynamicData as string[]).map((name) => ({
+          name,
+          activeCount: 0,
+          location: { lat: 0, lng: 0 }
+        }))
+      } else {
+        // Area-level: nested [{name, neighborhoods}] — use city names as hoods
+        hoods = (dynamicData as any[]).map((c) => ({
+          name: c.name,
+          activeCount: 0,
+          location: { lat: 0, lng: 0 },
+          neighborhoods: (c.neighborhoods ?? []).map((n: string) => ({
+            name: n,
+            activeCount: 0,
+            location: { lat: 0, lng: 0 }
+          }))
+        }))
+      }
+    } else {
+      // Fallback to computed data from areas
+      hoods = city && currentLocation
         ? (currentLocation as ApiBoardCity).neighborhoods || []
-        : (currentArea ? currentArea.cities : []))
+        : (currentArea ? currentArea.cities : [])
+    }
+  }
 
   return (
     <PageTemplate>

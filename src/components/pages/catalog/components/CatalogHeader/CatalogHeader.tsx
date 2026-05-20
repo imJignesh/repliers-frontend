@@ -38,7 +38,7 @@ const CatalogHeader = ({
   hood?: string
   areas: ApiBoardArea[]
   cities: ApiBoardCity[]
-  hoods: ApiNeighborhood[]
+  hoods: any[]
   location?: ApiBoardCity | ApiNeighborhood
 }) => {
   const {

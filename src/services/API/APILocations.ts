@@ -1,8 +1,14 @@
 import APIBase from './APIBase'
 
-export type Area = {
+export type AreaCity = {
     name: string
     neighborhoods: string[]
+}
+
+export type Area = {
+    name: string
+    cities: AreaCity[]       // grouped by city (Downtown, Etobicoke, etc.)
+    neighborhoods: string[]  // flat list of all descendants (backward compat)
 }
 
 class APILocations extends APIBase {
@@ -15,10 +21,10 @@ class APILocations extends APIBase {
         }
     }
 
-    async fetchAreaNeighborhoods(area: string): Promise<string[]> {
+    async fetchAreaNeighborhoods(area: string): Promise<AreaCity[] | string[]> {
         try {
             const slug = area.toLowerCase().replace(/[\s\u2011]+/g, '-')
-            return await this.fetchJSON<string[]>(`/area/${slug}`)
+            return await this.fetchJSON<AreaCity[] | string[]>(`/area/${slug}`)
         } catch (error) {
             console.error(`[APILocations] error fetching neighborhoods for ${area}`, error)
             return []

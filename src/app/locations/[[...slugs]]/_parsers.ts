@@ -10,10 +10,18 @@ import { capitalize } from 'utils/strings'
 import { compoundPrefixes, filterPrefixes, filterSuffixes } from './_constants'
 
 export const filter = (segment: string) => {
-  return (
-    filterPrefixes.some((prefix) => segment.includes(prefix)) ||
-    filterSuffixes.some((suffix) => segment.includes(suffix))
+  // Use exact/prefix matching rather than substring `includes()` to avoid
+  // location names like "allandale" being caught by the "all" prefix check.
+  const matchesPrefix = filterPrefixes.some((prefix) => {
+    // Prefixes ending in '-' are genuine prefixes (e.g. 'for-', 'sort-', 'above-', 'below-')
+    if (prefix.endsWith('-')) return segment.startsWith(prefix)
+    // Otherwise match the full token or the token followed by a dash
+    return segment === prefix || segment.startsWith(prefix + '-')
+  })
+  const matchesSuffix = filterSuffixes.some((suffix) =>
+    segment === suffix || segment.endsWith('-' + suffix)
   )
+  return matchesPrefix || matchesSuffix
 }
 
 const usZipRegex = /^\d{5}(-\d{4})?$/

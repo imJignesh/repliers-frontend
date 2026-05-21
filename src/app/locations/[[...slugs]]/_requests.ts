@@ -39,17 +39,46 @@ export const fetchListings = async ({
   let count = 0
   let listPrice = null
 
-  const fetchParams = {
+  // When a specific neighborhood (hood) is given, the Repliers API's `neighborhood`
+  // param does a fuzzy/substring match — e.g. "Allandale" also matches
+  // "Allandale Centre", returning hundreds of wrong results.
+  // Instead, fetch the exact MLS numbers for this neighborhood from the
+  // Locations service and filter by those IDs for a precise result.
+  let mlsNumbers: string[] = []
+  if (hood) {
+    try {
+      const { APILocations } = await import('services/API')
+      // Backend returns strings like "123 Main St W1234567 1" — extract the MLS number (2nd-last token)
+      const rawEntries = await APILocations.fetchNeighborhoodListings(hood)
+      console.log('[fetchListings] hood:', hood, '→ rawEntries:', rawEntries)
+      mlsNumbers = rawEntries
+        .map((entry: string) => {
+          const parts = entry.trim().split(/\s+/)
+          // Format: "{address tokens...} {mlsNumber} {boardId}"
+          return parts.length >= 2 ? parts[parts.length - 2] : ''
+        })
+        .filter(Boolean)
+      console.log('[fetchListings] resolved mlsNumbers:', mlsNumbers)
+    } catch (e) {
+      console.error('[fetchListings] could not fetch neighborhood listings', hood, e)
+    }
+  }
+
+  const fetchParams: Record<string, any> = {
     area: area || city,
     city: area ? city : '',
-    neighborhood: hood,
-    // status: 'A',
+    // Only pass neighborhood when we have no exact IDs (fallback)
+    ...(hood && mlsNumbers.length === 0 ? { neighborhood: hood } : {}),
+    // When we have exact IDs, pass them so the API returns only those listings
+    ...(mlsNumbers.length > 0 ? { mlsNumber: mlsNumbers } : {}),
     pageNum: page,
     resultsPerPage: searchConfig.pageSize,
     boardId: searchConfig.defaultBoardId,
     ...getListingFields(),
     ...filters
   }
+
+  console.log('[fetchListings] final fetchParams keys:', Object.keys(fetchParams), 'mlsNumber count:', mlsNumbers.length)
 
   try {
     const response = await SearchService.fetch(fetchParams)
@@ -64,6 +93,8 @@ export const fetchListings = async ({
 
   return { listings, count, listPrice }
 }
+
+
 
 export const fetchLocations = async (
   city = '',

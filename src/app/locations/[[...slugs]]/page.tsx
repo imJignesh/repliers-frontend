@@ -143,7 +143,14 @@ const LocationsCatalogPage = async (props: {
     }
   }
 
-  console.log({ filters, boardId, listingId, localAddress, area, city, hood })
+  // Debug: write to file since console.log goes to terminal only
+  try {
+    const fs = await import('fs')
+    fs.appendFileSync('console_debug.log',
+      `[${new Date().toISOString()}] [page] PARSED: urlArea="${urlArea}" urlCity="${urlCity}" urlHood="${urlHood}" unknowns=${JSON.stringify(unknowns)}\n` +
+      `[${new Date().toISOString()}] [page] RESOLVED: area="${area}" city="${city}" hood="${hood}"\n`
+    )
+  } catch(e) {}
 
   // render property page component if listingId is present and emulate its old url format
   if (listingId) {

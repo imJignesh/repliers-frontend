@@ -10,28 +10,31 @@ import { capitalize } from 'utils/strings'
 import routes from '@configs/routes'
 
 type Props = {
-    params: Promise<{ area: string, neighborhood: string }>
+    params: Promise<{ area: string, slugs: string[] }>
 }
 
 import { headers } from 'next/headers'
 import { getProtocolHost } from 'utils/urls'
 
 export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
-    const { area, neighborhood } = await params
+    const { area, slugs } = await params
+    const neighborhood = slugs[slugs.length - 1]
+    const slugPath = slugs.join('/')
     const host = getProtocolHost(await headers())
     return {
         title: `Listings & Buildings - ${capitalize(neighborhood.replace(/-/g, ' '))}`,
         alternates: {
-            canonical: host + `${routes.sitemap}/${area}/${neighborhood}`
+            canonical: host + `${routes.sitemap}/${area}/${slugPath}`
         },
         openGraph: {
-            url: host + `${routes.sitemap}/${area}/${neighborhood}`
+            url: host + `${routes.sitemap}/${area}/${slugPath}`
         }
     }
 }
 
 const NeighborhoodSitemapPage = async ({ params }: Props) => {
-    const { area, neighborhood } = await params
+    const { area, slugs } = await params
+    const neighborhood = slugs[slugs.length - 1]
 
     // Fetch data for the neighborhood
     const [listings, buildings, areas] = await Promise.all([

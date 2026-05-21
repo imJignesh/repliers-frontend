@@ -41,7 +41,7 @@ const PopularSearches = ({
 
     return {
       name: `${formattedFilters} in ${regionName}`,
-      link: getCatalogUrl(city || area || '', hood, filterItems)
+      link: getCatalogUrl(area, city, hood, filterItems)
     }
   })
 

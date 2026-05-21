@@ -1,5 +1,6 @@
 import React from 'react'
 import { type Metadata } from 'next'
+import { Stack } from '@mui/material'
 
 import { APILocations } from 'services/API'
 import { StaticPageTemplate } from '@templates'
@@ -38,31 +39,43 @@ const AreaSitemapPage = async ({ params }: Props) => {
     const areaName = currentArea ? currentArea.name : capitalize(area.replace(/-/g, ' '))
 
     const rawNeighborhoods = await APILocations.fetchAreaNeighborhoods(area)
-    const neighborhoodNames: string[] = []
 
-    rawNeighborhoods.forEach((item) => {
-        if (typeof item === 'string') {
-            neighborhoodNames.push(item)
-        } else if (item && typeof item === 'object') {
-            if (Array.isArray(item.neighborhoods)) {
-                neighborhoodNames.push(...item.neighborhoods)
-            } else if (item.name) {
-                neighborhoodNames.push(item.name)
-            }
-        }
-    })
-
-    const uniqueNeighborhoods = Array.from(new Set(neighborhoodNames)).sort((a, b) => a.localeCompare(b))
+    // Check if rawNeighborhoods is nested (array of CityWithNeighborhoods objects)
+    const isNested = rawNeighborhoods.length > 0 &&
+        typeof rawNeighborhoods[0] === 'object' &&
+        rawNeighborhoods[0] !== null &&
+        'neighborhoods' in rawNeighborhoods[0]
 
     return (
         <StaticPageTemplate title={`Neighborhoods of ${areaName}`}>
-            <GroupTemplate
-                title={`Browse ${areaName} areas or search all ${areaName} condos`}
-                items={uniqueNeighborhoods.map((hood) => ({
-                    name: hood,
-                    link: `/r/sitemap/${area}/${sanitizeUrl(hood)}`
-                }))}
-            />
+            {isNested ? (
+                <Stack spacing={4}>
+                    {(rawNeighborhoods as any[]).map((cityItem, index) => {
+                        const cityName = cityItem.name
+                        const neighborhoods = (cityItem.neighborhoods || []) as string[]
+                        if (!neighborhoods.length) return null
+
+                        return (
+                            <GroupTemplate
+                                key={index}
+                                title={cityName}
+                                items={neighborhoods.map((hood) => ({
+                                    name: hood,
+                                    link: `${routes.sitemap}/${area}/${sanitizeUrl(cityName)}/${sanitizeUrl(hood)}`
+                                }))}
+                            />
+                        )
+                    })}
+                </Stack>
+            ) : (
+                <GroupTemplate
+                    title={`Browse ${areaName} areas or search all ${areaName} condos`}
+                    items={(rawNeighborhoods as string[]).map((hood) => ({
+                        name: hood,
+                        link: `${routes.sitemap}/${area}/${sanitizeUrl(hood)}`
+                    }))}
+                />
+            )}
         </StaticPageTemplate>
     )
 }

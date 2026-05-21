@@ -314,7 +314,7 @@ const CatalogFilters = ({
     if (filtersChanged) {
       setLoading(true)
       const urlFilters = createFiltersArray(filters)
-      const newUrl = getCatalogUrl(city || area, hood, urlFilters)
+      const newUrl = getCatalogUrl(area, city, hood, urlFilters)
       router.push(newUrl)
     }
   }, [filters, searchFilters, city, hood, area, clientSide, router])
@@ -332,7 +332,9 @@ const CatalogFilters = ({
 
   const getSubLocationUrl = (locationName: string) => {
     const filters = createFiltersArray({})
-    if (city) {
+    if (area && city) {
+      return getCatalogUrl(area, city, locationName, filters)
+    } else if (city) {
       // We are in a city, clicking a neighborhood (Level 2)
       return getCatalogUrl(city, locationName, filters)
     } else if (area) {
@@ -544,7 +546,7 @@ const CatalogFilters = ({
           <Stack spacing={1}>
             <Box
               component={Link}
-              href={city && hood ? getCatalogUrl(city, '', createFiltersArray({})) : '#'}
+              href={city && hood ? getCatalogUrl(area, city, '', createFiltersArray({})) : '#'}
               sx={{
                 display: 'flex',
                 alignItems: 'center',
@@ -773,7 +775,7 @@ const CatalogFilters = ({
                           clickable
                           onClick={() => {
                             setLoading(true)
-                            const url = `${routes.listings}/${locationTree.slug}/${child.slug}`
+                            const url = `${routes.listings}/${locationTree.slug}/${activeGroup.slug}/${child.slug}`
                             router.push(url)
                           }}
                           sx={{

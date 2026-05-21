@@ -466,12 +466,15 @@ const CatalogFilters = ({
         </Stack>
         <Box
           sx={{
-            minWidth: { md: 218 },
-            alignContent: 'end',
-            textAlign: 'right'
+            flex: 1,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
           }}
         >
-          <ListingsCounter count={count} />
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            {count} {viewMode === 'buildings' ? 'buildings' : 'listings'} found
+          </Typography>
         </Box>
         <Box
           sx={{

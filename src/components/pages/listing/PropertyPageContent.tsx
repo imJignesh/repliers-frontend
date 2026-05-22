@@ -3,8 +3,15 @@
 import React, { useEffect } from 'react'
 import NextLink from 'next/link'
 
-import { Box, Container, Stack, Typography, Breadcrumbs, Link } from '@mui/material'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
+import {
+  Box,
+  Breadcrumbs,
+  Container,
+  Link,
+  Stack,
+  Typography
+} from '@mui/material'
 
 import { DetailsContainer } from '@shared/Containers'
 import {
@@ -15,21 +22,26 @@ import {
 } from '@shared/Dialogs'
 
 import { useFeatures } from 'providers/FeaturesProvider'
-import MapOptionsProvider from 'providers/MapOptionsProvider'
+// import MapOptionsProvider from 'providers/MapOptionsProvider'
 import { useProperty } from 'providers/PropertyProvider'
 import { useUser } from 'providers/UserProvider'
 import useAnalytics from 'hooks/useAnalytics'
+import { scrubbed } from 'utils/properties'
+
+import { formatShortAddress } from '../../../utils/properties/formatters'
+import { getCatalogUrl } from '../../../utils/urls'
 
 import {
   AppliancesDetails,
+  BuildingInfo,
   ExteriorDetails,
   FeaturesDetails,
   HistoryDetails,
   HomeDescription,
   HomeHeaderInfo,
-  HomeMap,
+  // HomeMap,
   NavigationBar,
-  NeighborhoodDetails,
+  // NeighborhoodDetails,
   PropertyGallery,
   RoomsDetails,
   Sidebar,
@@ -37,11 +49,9 @@ import {
   SummaryDetails
 } from './components'
 
-import { formatShortAddress } from '../../../utils/properties/formatters'
-import { getCatalogUrl } from '../../../utils/urls'
-
 const PropertyPageContent = ({
   embedded = false,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   mapType = 'interactive'
 }: {
   embedded?: boolean
@@ -52,6 +62,8 @@ const PropertyPageContent = ({
   const features = useFeatures()
   const { similarProperties, property } = useProperty()
   const { address } = property
+  const building = (property as { building?: { name: string; slug: string } })
+    .building
 
   useEffect(() => {
     trackEvent('view_property_page', {
@@ -60,12 +72,12 @@ const PropertyPageContent = ({
     })
   }, [])
 
-  if (features.pdpMapProvider === 'google') {
-    // eslint-disable-next-line no-param-reassign
-    mapType = 'static'
-    // WARN: Google Maps only supports static maps for now.
-    // Should be extended in the future.
-  }
+  // if (features.pdpMapProvider === 'google') {
+  //   // eslint-disable-next-line no-param-reassign
+  //   mapType = 'static'
+  //   // WARN: Google Maps only supports static maps for now.
+  //   // Should be extended in the future.
+  // }
 
   return (
     <Stack spacing={2} pb={4}>
@@ -84,7 +96,10 @@ const PropertyPageContent = ({
           direction={{ xs: 'column', md: 'row' }}
         >
           <Stack spacing={2} sx={{ flex: 1, width: '100%' }}>
-            <Typography variant="h1" style={{ fontSize: '1.7rem', margin: 0, lineHeight: 1 }}>
+            <Typography
+              variant="h1"
+              style={{ fontSize: '1.7rem', margin: 0, lineHeight: 1 }}
+            >
               {formatShortAddress(address)}
             </Typography>
 
@@ -118,14 +133,14 @@ const PropertyPageContent = ({
                   {address.neighborhood}
                 </Link>
               )}
-              {(property as any).building?.name && (
+              {building?.name && !scrubbed(building.name) && (
                 <Link
                   component={NextLink}
-                  href={`/r/building/${(property as any).building.slug}`}
+                  href={`/r/building/${building.slug}`}
                   color="text.primary"
                   underline="hover"
                 >
-                  {(property as any).building.name}
+                  {building.name}
                 </Link>
               )}
             </Breadcrumbs>
@@ -133,6 +148,7 @@ const PropertyPageContent = ({
             <HomeHeaderInfo />
             <DetailsContainer>
               <Stack spacing={{ xs: 4, sm: 6 }}>
+                <BuildingInfo />
                 <HomeDescription />
 
                 {/* {mapType === 'static' ? (
@@ -151,7 +167,6 @@ const PropertyPageContent = ({
             <ExteriorDetails />
             <RoomsDetails />
             {/* <NeighborhoodDetails /> */}
-
           </Stack>
 
           {features.pdpSidebar && !agentRole && (

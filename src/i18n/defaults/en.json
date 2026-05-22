@@ -107,6 +107,7 @@
       "soldDate": "Sold Date",
       "listingUpdatedOn": "Listing Updated On",
       "yearBuilt": "Year Built",
+      "age": "Age",
       "builderModel": "Builder / Model",
       "lotSize": "Lot Size",
       "totalBeds": "Total Beds",

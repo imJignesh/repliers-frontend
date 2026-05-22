@@ -33,7 +33,10 @@ import {
   mapperSpecialAssessment,
   mapperTaxesYear,
   mapperTotalBeds,
-  mapperTotalParking
+  mapperTotalParking,
+  formatYearBuiltValue,
+  isAgeRange,
+  mapperYearBuilt
 } from './mappers'
 
 describe('mapperCategory', () => {
@@ -310,7 +313,7 @@ describe('mapperTotalParking', () => {
     } as unknown as Property
 
     const result = mapperTotalParking(property)
-    expect(result).toBe('2 + 2')
+    expect(result).toBe('2')
   })
 
   it('should return numParkingSpaces, if numGarageSpaces is not present', () => {
@@ -451,7 +454,7 @@ describe('mapperConstructionYearBuilt', () => {
     } as unknown as Property
 
     const result = mapperConstructionYearBuilt(property)
-    expect(result).toBe('1956 Approx')
+    expect(result).toEqual({ label: 'pdp.fields.yearBuilt', value: '1956 Approx' })
   })
 
   it('should return yearBuilt if AgeDescription is not present', () => {
@@ -461,7 +464,7 @@ describe('mapperConstructionYearBuilt', () => {
     } as unknown as Property
 
     const result = mapperConstructionYearBuilt(property)
-    expect(result).toBe('2000')
+    expect(result).toEqual({ label: 'pdp.fields.yearBuilt', value: '2000' })
   })
 
   it('should return null if yearBuilt is not present', () => {
@@ -481,7 +484,54 @@ describe('mapperConstructionYearBuilt', () => {
     } as unknown as Property
 
     const result = mapperConstructionYearBuilt(property)
-    expect(result).toBe('2000')
+    expect(result).toEqual({ label: 'pdp.fields.yearBuilt', value: '2000' })
+  })
+
+  it('should return pdp.fields.age label and formatted value if yearBuilt is an age range', () => {
+    const property = {
+      details: { yearBuilt: '0-5' },
+      raw: { AgeDescription: 'Approx' }
+    } as unknown as Property
+
+    const result = mapperConstructionYearBuilt(property)
+    expect(result).toEqual({ label: 'pdp.fields.age', value: '0-5 years Approx' })
+  })
+})
+
+describe('isAgeRange', () => {
+  it('should identify age range formats correctly', () => {
+    expect(isAgeRange('0-5')).toBe(true)
+    expect(isAgeRange('16-30')).toBe(true)
+    expect(isAgeRange('100+')).toBe(true)
+    expect(isAgeRange('New')).toBe(true)
+    expect(isAgeRange('2000')).toBe(false)
+    expect(isAgeRange(null)).toBe(false)
+  })
+})
+
+describe('formatYearBuiltValue', () => {
+  it('should format age ranges with years suffix and keep calendar years intact', () => {
+    expect(formatYearBuiltValue('0-5')).toBe('0-5 years')
+    expect(formatYearBuiltValue('100+')).toBe('100+ years')
+    expect(formatYearBuiltValue('New')).toBe('New')
+    expect(formatYearBuiltValue('2005')).toBe('2005')
+    expect(formatYearBuiltValue(null)).toBeNull()
+  })
+})
+
+describe('mapperYearBuilt', () => {
+  it('should return mapped yearBuilt with correct dynamic label', () => {
+    const prop1 = { details: { yearBuilt: '0-5' } } as unknown as Property
+    expect(mapperYearBuilt(prop1)).toEqual({
+      label: 'pdp.fields.age',
+      value: '0-5 years'
+    })
+
+    const prop2 = { details: { yearBuilt: '2015' } } as unknown as Property
+    expect(mapperYearBuilt(prop2)).toEqual({
+      label: 'pdp.fields.yearBuilt',
+      value: '2015'
+    })
   })
 })
 

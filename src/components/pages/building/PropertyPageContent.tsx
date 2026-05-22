@@ -2,8 +2,16 @@
 
 import React, { useEffect } from 'react'
 import NextLink from 'next/link'
-import { Box, Container, Stack, Typography, Breadcrumbs, Link } from '@mui/material'
+
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
+import {
+  Box,
+  Breadcrumbs,
+  Container,
+  Link,
+  Stack,
+  Typography
+} from '@mui/material'
 
 import { DetailsContainer } from '@shared/Containers'
 import {
@@ -18,6 +26,10 @@ import MapOptionsProvider from 'providers/MapOptionsProvider'
 import { useProperty } from 'providers/PropertyProvider'
 import { useUser } from 'providers/UserProvider'
 import useAnalytics from 'hooks/useAnalytics'
+import { scrubbed } from 'utils/properties'
+
+import { formatShortAddress } from '../../../utils/properties/formatters'
+import { getCatalogUrl } from '../../../utils/urls'
 
 import {
   AppliancesDetails,
@@ -36,9 +48,6 @@ import {
   SummaryDetails
 } from './components'
 
-import { formatShortAddress } from '../../../utils/properties/formatters'
-import { getCatalogUrl } from '../../../utils/urls'
-
 const PropertyPageContent = ({
   embedded = false,
   mapType = 'interactive'
@@ -51,6 +60,8 @@ const PropertyPageContent = ({
   const features = useFeatures()
   const { similarProperties, property } = useProperty()
   const { address } = property
+  const building = (property as { building?: { name: string; slug: string } })
+    .building
 
   useEffect(() => {
     trackEvent('view_property_page', {
@@ -114,12 +125,12 @@ const PropertyPageContent = ({
                   {address.neighborhood}
                 </Link>
               )}
-              {(property as any).building?.name && (
+              {building?.name && !scrubbed(building.name) && (
                 <Typography
                   color="text.primary"
                   sx={{ fontWeight: 500, fontSize: '0.95rem' }}
                 >
-                  {(property as any).building.name}
+                  {building.name}
                 </Typography>
               )}
             </Breadcrumbs>

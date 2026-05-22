@@ -17,9 +17,16 @@ const resolvePath = (obj: any, path: string) => {
 function createResolver(items: ResolverItem[], property: Property) {
   return items.map(({ label, path, fn }) => {
     if (fn) {
+      const resolved = fn(property, path ? resolvePath(property, path) : undefined)
+      if (resolved && typeof resolved === 'object' && 'value' in resolved) {
+        return {
+          label: resolved.label || label,
+          value: resolved.value
+        }
+      }
       return {
         label,
-        value: fn(property, path ? resolvePath(property, path) : undefined)
+        value: resolved
       }
     }
     if (path) {

@@ -28,7 +28,7 @@ class APIBase {
         if (cookieHeader) {
           headers.append('Cookie', cookieHeader)
         }
-      } catch (e) {
+      } catch {
         // SSR context where next/headers might not be available or fails
       }
     }
@@ -44,17 +44,8 @@ class APIBase {
   async fetchRaw(request: string, options?: RequestInit): Promise<Response> {
     const headers = await this.getHeaders()
     const fullUrl = this.getAbsoluteUrl(request)
+    // eslint-disable-next-line no-console
     console.log('[APIBase] fetchRaw request:', request, 'fullUrl:', fullUrl)
-
-    if (typeof window === 'undefined') {
-      try {
-        const fs = await import('fs')
-        fs.appendFileSync(
-          'console_debug.log',
-          `[${new Date().toISOString()}] fetchRaw: ${request} | fullUrl: ${fullUrl}\n`
-        )
-      } catch (e) {}
-    }
 
     try {
       const response = await fetch(fullUrl, {
@@ -67,16 +58,11 @@ class APIBase {
       }
       return response
     } catch (error: any) {
-      console.error('[APIBase] fetchRaw CATCH ERROR:', error.message, error.stack || error)
-      if (typeof window === 'undefined') {
-        try {
-          const fs = await import('fs')
-          fs.appendFileSync(
-            'console_debug.log',
-            `[${new Date().toISOString()}] fetchRaw CATCH ERROR: ${error.message} | stack: ${error.stack}\n`
-          )
-        } catch (e) {}
-      }
+      console.error(
+        '[APIBase] fetchRaw CATCH ERROR:',
+        error.message,
+        error.stack || error
+      )
       if (error.message === '401') {
         console.error('Authorization header is invalid or expired.')
         clearToken()
@@ -89,7 +75,6 @@ class APIBase {
   async fetchJSON<T>(request: string, options?: RequestInit): Promise<T> {
     let response: Response | null = null
     // there are few queries that has custom abort signal
-
 
     if (options?.signal) {
       response = await this.fetchRaw(request, options)

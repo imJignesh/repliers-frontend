@@ -3,14 +3,20 @@ import type React from 'react'
 
 import content from '@configs/content'
 import routes from '@configs/routes'
-import { Property404Template, PropertyPageTemplate } from '@templates'
+import { Property404Template } from '@templates'
+
+import BuildingPageTemplate from 'components/templates/BuildingPageTemplate'
 
 import { formatMetadata } from 'utils/properties'
 import { getProtocolHost } from 'utils/urls'
 
 import { type Params, type SearchParams } from './types'
-import { fetchNearbies, fetchProperty, parseSlug, fetchBuilding, fetchBuildingHistory } from './utils'
-import BuildingPageTemplate from 'components/templates/BuildingPageTemplate'
+import {
+  fetchBuilding,
+  fetchBuildingHistory,
+  fetchNearbies,
+  parseSlug
+} from './utils'
 
 type PropertyPageProps = {
   params: Params
@@ -22,10 +28,26 @@ export const generateMetadata = async (props: PropertyPageProps) => {
   const searchParams = await props.searchParams
   const params = await props.params
   const host = getProtocolHost(await headers())
-  const { boardId, streetName, streetNumber, slug, streetSuffix, streetDirection, buildingName: slugBuildingName } = parseSlug(params, searchParams)
+  const {
+    boardId,
+    streetName,
+    streetNumber,
+    slug,
+    streetSuffix,
+    streetDirection,
+    buildingName: slugBuildingName
+  } = parseSlug(params, searchParams)
   try {
-    const property = await fetchBuilding(boardId, streetName, streetNumber, slug, streetSuffix, streetDirection)
+    const property = await fetchBuilding(
+      boardId,
+      streetName,
+      streetNumber,
+      slug,
+      streetSuffix,
+      streetDirection
+    )
     const buildName = property.building?.name || slugBuildingName || ''
+    const canonicalSlug = property.building?.slug || slug
     const p = property?.listings?.[0]
     if (!p) {
       if (property?.building || slugBuildingName) {
@@ -42,23 +64,29 @@ export const generateMetadata = async (props: PropertyPageProps) => {
           }
         } as any
 
-        const metadata: any = formatMetadata(mockProperty, host, { type: 'building', buildingName: buildName })
+        const metadata: any = formatMetadata(mockProperty, host, {
+          type: 'building',
+          buildingName: buildName
+        })
         metadata.alternates = {
-          canonical: host + routes.building + '/' + slug
+          canonical: host + routes.building + '/' + canonicalSlug
         }
-        metadata.openGraph.url = host + routes.building + '/' + slug
+        metadata.openGraph.url = host + routes.building + '/' + canonicalSlug
 
         return metadata
       }
       return content.missingPropertyMetadata
     }
 
-    const metadata: any = formatMetadata(p, host, { type: 'building', buildingName: buildName })
+    const metadata: any = formatMetadata(p, host, {
+      type: 'building',
+      buildingName: buildName
+    })
 
     metadata.alternates = {
-      canonical: host + routes.building + '/' + slug
+      canonical: host + routes.building + '/' + canonicalSlug
     }
-    metadata.openGraph.url = host + routes.building + '/' + slug
+    metadata.openGraph.url = host + routes.building + '/' + canonicalSlug
 
     return metadata
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -76,7 +104,10 @@ export const generateMetadata = async (props: PropertyPageProps) => {
         }
       } as any
 
-      const metadata: any = formatMetadata(mockProperty, host, { type: 'building', buildingName: slugBuildingName })
+      const metadata: any = formatMetadata(mockProperty, host, {
+        type: 'building',
+        buildingName: slugBuildingName
+      })
       metadata.alternates = {
         canonical: host + routes.building + '/' + slug
       }
@@ -90,14 +121,37 @@ export const generateMetadata = async (props: PropertyPageProps) => {
 const PropertyPage = async (props: PropertyPageProps) => {
   const searchParams = await props.searchParams
   const params = await props.params
-  const { boardId, streetName, streetNumber, slug, streetSuffix, streetDirection, buildingName: slugBuildingName } = parseSlug(params, searchParams)
+  const {
+    boardId,
+    streetName,
+    streetNumber,
+    slug,
+    streetSuffix,
+    streetDirection,
+    buildingName: slugBuildingName
+  } = parseSlug(params, searchParams)
   const listingName = params.listingName?.[0] || ''
 
   try {
-    let [property, history] = await Promise.all([
-      fetchBuilding(boardId, streetName, streetNumber, slug, streetSuffix, streetDirection),
-      fetchBuildingHistory(boardId, streetName, streetNumber, slug, streetSuffix, streetDirection)
+    const [fetchedProperty, history] = await Promise.all([
+      fetchBuilding(
+        boardId,
+        streetName,
+        streetNumber,
+        slug,
+        streetSuffix,
+        streetDirection
+      ),
+      fetchBuildingHistory(
+        boardId,
+        streetName,
+        streetNumber,
+        slug,
+        streetSuffix,
+        streetDirection
+      )
     ])
+    let property = fetchedProperty
 
     if (!property?.listings?.length && !property?.building) {
       if (slugBuildingName) {

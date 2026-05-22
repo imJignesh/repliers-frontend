@@ -6,13 +6,17 @@ import CatalogPageContent from '@pages/catalog'
 import { generateMetadata as generatePropertyMetadata } from 'app/listing/[[...listingName]]/page'
 import PropertyPage from 'app/listing/[[...listingName]]/page'
 
-import { APILocations, type ApiBoardArea, type ApiBoardCity } from 'services/API'
+import {
+  type ApiBoardArea,
+  type ApiBoardCity,
+  APILocations
+} from 'services/API'
 
 import { parseUrlFilters, parseUrlParams } from './_parsers'
+import { beautify } from './_parsers'
 import { fetchListings, fetchLocations } from './_requests'
 import { generateCatalogMetadata } from './_ssg'
 import { extractCities, extractLocation } from './_utils'
-import { beautify } from './_parsers'
 
 // catalog pages CANT BE STATICALLY GENERATED (SSG)
 // because we need a token cookie to fetch listings from the client side
@@ -97,39 +101,43 @@ const LocationsCatalogPage = async (props: {
   let city = urlCity
   let hood = urlHood
 
-  const normalize = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const normalize = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '')
 
   if (!area) {
-    const asArea = finalAreas.find((a) => normalize(a.name) === normalize(city));
+    const asArea = finalAreas.find((a) => normalize(a.name) === normalize(city))
     if (asArea) {
-      area = asArea.name;
+      area = asArea.name
 
-      const slug2 = hood;
-      const asCity = asArea.cities?.find((c: any) => normalize(c.name || c) === normalize(slug2));
+      const slug2 = hood
+      const asCity = asArea.cities?.find(
+        (c: any) => normalize(c.name || c) === normalize(slug2)
+      )
 
       if (asCity) {
-        city = typeof asCity === 'string' ? asCity : asCity.name;
-        hood = unknowns.length > 0 ? beautify(unknowns.shift() as string) : '';
+        city = typeof asCity === 'string' ? asCity : asCity.name
+        hood = unknowns.length > 0 ? beautify(unknowns.shift() as string) : ''
       } else {
-        let foundCity = null;
-        let foundHood = null;
+        let foundCity = null
+        let foundHood = null
         if (asArea.cities) {
           for (const c of asArea.cities) {
-            const h = c.neighborhoods?.find((n: any) => normalize(n.name || n) === normalize(slug2));
+            const h = c.neighborhoods?.find(
+              (n: any) => normalize(n.name || n) === normalize(slug2)
+            )
             if (h) {
-              foundCity = c.name;
-              foundHood = typeof h === 'string' ? h : h.name;
-              break;
+              foundCity = c.name
+              foundHood = typeof h === 'string' ? h : h.name
+              break
             }
           }
         }
 
         if (foundHood) {
-          city = foundCity || '';
-          hood = foundHood;
+          city = foundCity || ''
+          hood = foundHood
         } else {
-          city = slug2 || '';
-          hood = unknowns.length > 0 ? beautify(unknowns.shift() as string) : '';
+          city = slug2 || ''
+          hood = unknowns.length > 0 ? beautify(unknowns.shift() as string) : ''
         }
       }
     }
@@ -142,15 +150,6 @@ const LocationsCatalogPage = async (props: {
       hood = location.name
     }
   }
-
-  // Debug: write to file since console.log goes to terminal only
-  try {
-    const fs = await import('fs')
-    fs.appendFileSync('console_debug.log',
-      `[${new Date().toISOString()}] [page] PARSED: urlArea="${urlArea}" urlCity="${urlCity}" urlHood="${urlHood}" unknowns=${JSON.stringify(unknowns)}\n` +
-      `[${new Date().toISOString()}] [page] RESOLVED: area="${area}" city="${city}" hood="${hood}"\n`
-    )
-  } catch(e) {}
 
   // render property page component if listingId is present and emulate its old url format
   if (listingId) {
@@ -179,15 +178,17 @@ const LocationsCatalogPage = async (props: {
   const currentLocation = city
     ? extractLocation(finalAreas, city, hood)
     : undefined
-  const citiesList = extractCities(currentArea ? [currentArea] : finalAreas).sort(
-    byCount
-  )
+  const citiesList = extractCities(
+    currentArea ? [currentArea] : finalAreas
+  ).sort(byCount)
 
   // Fetch area direct children: for an area returns [{name, neighborhoods}], for a city returns string[]
   let hoods: any[] = []
   const targetForNeighborhoods = city || area
   if (targetForNeighborhoods) {
-    const dynamicData = await APILocations.fetchAreaNeighborhoods(targetForNeighborhoods)
+    const dynamicData = await APILocations.fetchAreaNeighborhoods(
+      targetForNeighborhoods
+    )
 
     if (dynamicData.length > 0) {
       if (typeof dynamicData[0] === 'string') {
@@ -212,9 +213,12 @@ const LocationsCatalogPage = async (props: {
       }
     } else {
       // Fallback to computed data from areas
-      hoods = city && currentLocation
-        ? (currentLocation as ApiBoardCity).neighborhoods || []
-        : (currentArea ? currentArea.cities : [])
+      hoods =
+        city && currentLocation
+          ? (currentLocation as ApiBoardCity).neighborhoods || []
+          : currentArea
+            ? currentArea.cities
+            : []
     }
   }
 

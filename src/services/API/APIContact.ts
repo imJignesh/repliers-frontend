@@ -116,14 +116,14 @@ class APIContact extends APIBase {
   // New methods for sync backend
   // Note: These might need a different base URL eventually
   captureLead(body: LeadRequest) {
-    return this.fetchJSON('/contact/leads', {
+    return this.fetchJSON('/leads', {
       method: 'POST',
       body: JSON.stringify(body)
     })
   }
 
   captureAppointment(body: AppointmentRequest) {
-    return this.fetchJSON('/contact/appointments', {
+    return this.fetchJSON('/appointments', {
       method: 'POST',
       body: JSON.stringify(body)
     })

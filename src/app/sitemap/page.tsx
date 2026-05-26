@@ -29,7 +29,7 @@ const SitemapPage = async () => {
     return (
         <StaticPageTemplate title="Find condos for Sale">
             <GroupTemplate
-                title={`Areas | ${areas.length}`}
+                title={`Areas (${areas.length})`}
                 items={areas.sort((a, b) => a.name.localeCompare(b.name)).map((area) => ({
                     name: area.name,
                     link: `${routes.sitemap}/${sanitizeUrl(area.name)}`

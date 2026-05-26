@@ -59,7 +59,7 @@ const NeighborhoodSitemapPage = async ({ params }: Props) => {
             <Stack spacing={6}>
                 {buildings.length > 0 && (
                     <GroupTemplate
-                        title={`Buildings in ${neighborhoodName} | ${buildings.length}`}
+                        title={`Buildings in ${neighborhoodName} (${buildings.length})`}
                         items={buildings
                             .sort((a, b) => {
                                 const nameA = typeof a === 'string' ? a : a.name
@@ -81,24 +81,58 @@ const NeighborhoodSitemapPage = async ({ params }: Props) => {
                 )}
                 {listings.length > 0 && (
                     <GroupTemplate
-                        title={`Listings in ${neighborhoodName} | ${listings.length}`}
+                        title={`Listings in ${neighborhoodName} (${listings.length})`}
                         items={listings.sort((a, b) => a.localeCompare(b)).map((listing) => {
-                            // Example input: "(F3-- F6) Vienna-Rd-Tillsonburg X12670468 2"
+                            // Example input: "1208, 65, Ellen, St, Barrie, L4N 3A5 S12888060 1"
                             const parts = listing.split(' ')
                             // Removing the last two parts (ID and Board) for the display name
                             const addressString = parts.slice(0, -2).join(' ')
 
-                            // Anchor display: replace () with # and clean up inside
-                            let displayName = addressString
-                                .toLowerCase()
-                                .replace(/\(([^)]+)\)/g, (match, p1) => '#' + p1.replace(/[\s-]+/g, '___DASH___'))
-                                .replace(/-/g, ' ')
+                            // Determine short display name (unit and street names only)
+                            let displayName = ''
+                            if (addressString.includes(',')) {
+                                const addressParts = addressString.split(',').map(s => s.trim()).filter(Boolean)
+                                if (addressParts.length >= 3) {
+                                    // Remove last two parts (city and postal code/province)
+                                    const shortParts = addressParts.slice(0, -2)
+                                    if (shortParts.length >= 4) {
+                                        // Format unit number nicely
+                                        let unit = shortParts[0]
+                                        if (/^\d+$/.test(unit)) {
+                                            unit = `#${unit}`
+                                        }
+                                        const street = shortParts.slice(1).join(' ')
+                                        displayName = `${unit} ${street}`
+                                    } else {
+                                        displayName = shortParts.join(' ')
+                                    }
+                                } else {
+                                    displayName = addressParts.join(' ')
+                                }
 
-                            displayName = capitalize(displayName)
-                                .replace(/___DASH___/g, '-')
-                                .split(' ')
-                                .map(word => word.startsWith('#') ? word.toUpperCase() : word)
-                                .join(' ')
+                                displayName = capitalize(displayName.toLowerCase())
+                                    .split(' ')
+                                    .map(word => word.startsWith('#') ? word.toUpperCase() : word)
+                                    .join(' ')
+                            } else {
+                                // Fallback for legacy dashed format: replace () with # and clean up dashes/spaces
+                                let cleanAddr = addressString
+                                    .toLowerCase()
+                                    .replace(/\(([^)]+)\)/g, (match, p1) => '#' + p1.replace(/[\s-]+/g, '___DASH___'))
+                                    .replace(/-/g, ' ')
+
+                                displayName = capitalize(cleanAddr)
+                                    .replace(/___DASH___/g, '-')
+                                    .split(' ')
+                                    .map(word => word.startsWith('#') ? word.toUpperCase() : word)
+                                    .join(' ')
+
+                                // Strip city name from the end if present
+                                const cityName = slugs.length > 1 ? capitalize(slugs[0].replace(/-/g, ' ')) : ''
+                                if (cityName && displayName.endsWith(cityName)) {
+                                    displayName = displayName.substring(0, displayName.length - cityName.length).replace(/,\s*$/, '').trim()
+                                }
+                            }
 
                             // Link: remove brackets and content from the full string for the slug
                             const cleanListing = listing.replace(/\([^)]*\)/g, '').trim()

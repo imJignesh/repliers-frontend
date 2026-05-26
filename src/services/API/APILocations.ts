@@ -21,10 +21,11 @@ class APILocations extends APIBase {
         }
     }
 
-    async fetchAreaNeighborhoods(area: string): Promise<AreaCity[] | string[]> {
+    async fetchAreaNeighborhoods(area: string, withCounts: boolean = false): Promise<any[]> {
         try {
             const slug = area.toLowerCase().replace(/[\s\u2011]+/g, '-')
-            return await this.fetchJSON<AreaCity[] | string[]>(`/area/${slug}`)
+            const query = withCounts ? '?with_counts=1' : ''
+            return await this.fetchJSON<any[]>(`/area/${slug}${query}`)
         } catch (error) {
             console.error(`[APILocations] error fetching neighborhoods for ${area}`, error)
             return []

@@ -1,6 +1,8 @@
 import React from 'react'
 import { type Metadata } from 'next'
-import { Stack } from '@mui/material'
+import { Box, Stack } from '@mui/material'
+import ApartmentIcon from '@mui/icons-material/Apartment'
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted'
 
 import { APILocations } from 'services/API'
 import { Page404Template, StaticPageTemplate } from '@templates'
@@ -38,7 +40,7 @@ const AreaSitemapPage = async ({ params }: Props) => {
     // Fetch data in parallel including slug validation
     const [areas, rawNeighborhoods, slugValidation] = await Promise.all([
         APILocations.fetchAreas(),
-        APILocations.fetchAreaNeighborhoods(area),
+        APILocations.fetchAreaNeighborhoods(area, true),
         APILocations.validateSlugs(rawLocationSlugs)
     ])
 
@@ -60,16 +62,33 @@ const AreaSitemapPage = async ({ params }: Props) => {
                 <Stack spacing={4}>
                     {(rawNeighborhoods as any[]).map((cityItem, index) => {
                         const cityName = cityItem.name
-                        const neighborhoods = (cityItem.neighborhoods || []) as string[]
-                        if (!neighborhoods.length) return null
+                        const neighborhoods = (cityItem.neighborhoods || []) as any[]
+                        const filteredNeighborhoods = neighborhoods.filter(
+                            (hood) => (Number(hood.building_count) || 0) > 0 || (Number(hood.listing_count) || 0) > 0
+                        )
+                        if (!filteredNeighborhoods.length) return null
 
                         return (
                             <GroupTemplate
                                 key={index}
                                 title={cityName}
-                                items={neighborhoods.map((hood) => ({
-                                    name: hood,
-                                    link: `${routes.sitemap}/${area}/${sanitizeUrl(cityName)}/${sanitizeUrl(hood)}`
+                                items={filteredNeighborhoods.map((hood) => ({
+                                    name: (
+                                        <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '8px', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
+                                            <Box component="span">{hood.name}</Box>
+                                            <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: '12px' }}>
+                                                <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#999', fontSize: 11 }}>
+                                                    <ApartmentIcon sx={{ fontSize: 13, color: '#999' }} />
+                                                    {hood.building_count}
+                                                </Box>
+                                                <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#999', fontSize: 11 }}>
+                                                    <FormatListBulletedIcon sx={{ fontSize: 13, color: '#999' }} />
+                                                    {hood.listing_count}
+                                                </Box>
+                                            </Box>
+                                        </Box>
+                                    ),
+                                    link: `${routes.sitemap}/${area}/${sanitizeUrl(cityName)}/${sanitizeUrl(hood.name)}`
                                 }))}
                             />
                         )
@@ -78,10 +97,26 @@ const AreaSitemapPage = async ({ params }: Props) => {
             ) : (
                 <GroupTemplate
                     title={`Browse ${areaName} areas or search all ${areaName} condos`}
-                    items={(rawNeighborhoods as string[]).map((hood) => ({
-                        name: hood,
-                        link: `${routes.sitemap}/${area}/${sanitizeUrl(hood)}`
-                    }))}
+                    items={(rawNeighborhoods as any[])
+                        .filter((hood) => (Number(hood.building_count) || 0) > 0 || (Number(hood.listing_count) || 0) > 0)
+                        .map((hood) => ({
+                            name: (
+                                <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '8px', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
+                                    <Box component="span">{hood.name}</Box>
+                                    <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: '12px' }}>
+                                        <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#999', fontSize: 11 }}>
+                                            <ApartmentIcon sx={{ fontSize: 13, color: '#999' }} />
+                                            {hood.building_count}
+                                        </Box>
+                                        <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#999', fontSize: 11 }}>
+                                            <FormatListBulletedIcon sx={{ fontSize: 13, color: '#999' }} />
+                                            {hood.listing_count}
+                                        </Box>
+                                    </Box>
+                                </Box>
+                            ),
+                            link: `${routes.sitemap}/${area}/${sanitizeUrl(hood.name)}`
+                        }))}
                 />
             )}
         </StaticPageTemplate>

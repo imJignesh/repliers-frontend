@@ -7,21 +7,57 @@ import { type Filters } from 'services/Search'
 import { toSafeNumber } from 'utils/formatters'
 import { capitalize } from 'utils/strings'
 
-import { compoundPrefixes, filterPrefixes, filterSuffixes } from './_constants'
+import { compoundPrefixes, filterSuffixes } from './_constants'
+
+const allowedTypes = new Set([
+  'houses', 'condos', 'townhomes',
+  'semiDetached', 'multiFamily', 'land', 'business', 'commercial'
+])
+
+const allowedStatuses = new Set([
+  'for-rent', 'sold', 'all'
+])
+
+const allowedSorts = new Set([
+  'createdOnAsc', 'createdOnDesc', 'updatedOnAsc', 'updatedOnDesc',
+  'listPriceAsc', 'listPriceDesc', 'random', 'soldDateAsc', 'soldDateDesc',
+  'soldPriceAsc', 'soldPriceDesc', 'distanceAsc', 'distanceDes',
+  'qualityAsc', 'qualityDesc'
+])
+
+const priceRegex = /^\$?\d+(?:,\d+)*(?:\.\d+)?[km]?$/i
+const bedBathGarageParkingRegex = /^\d+(?:\.\d+)?\+?-(?:bed|beds|bedroom|bedrooms|bath|baths|bathroom|bathrooms|garage|garages|parking|parkings)$/i
+
+const isValidFilter = (f: string): boolean => {
+  if (allowedTypes.has(f)) return true
+  if (allowedStatuses.has(f)) return true
+
+  if (f.startsWith('sort-')) {
+    const sortKey = f.substring(5)
+    return allowedSorts.has(sortKey)
+  }
+
+  if (f.startsWith('above-')) {
+    const price = f.substring(6)
+    return priceRegex.test(price)
+  }
+
+  if (f.startsWith('below-')) {
+    const price = f.substring(6)
+    return priceRegex.test(price)
+  }
+
+  if (bedBathGarageParkingRegex.test(f)) {
+    return true
+  }
+
+  return false
+}
 
 export const filter = (segment: string) => {
-  // Use exact/prefix matching rather than substring `includes()` to avoid
-  // location names like "allandale" being caught by the "all" prefix check.
-  const matchesPrefix = filterPrefixes.some((prefix) => {
-    // Prefixes ending in '-' are genuine prefixes (e.g. 'for-', 'sort-', 'above-', 'below-')
-    if (prefix.endsWith('-')) return segment.startsWith(prefix)
-    // Otherwise match the full token or the token followed by a dash
-    return segment === prefix || segment.startsWith(prefix + '-')
-  })
-  const matchesSuffix = filterSuffixes.some((suffix) =>
-    segment === suffix || segment.endsWith('-' + suffix)
-  )
-  return matchesPrefix || matchesSuffix
+  const parsed = parseFiltersSegment(segment)
+  if (!parsed.length) return false
+  return parsed.every(isValidFilter)
 }
 
 const usZipRegex = /^\d{5}(-\d{4})?$/

@@ -7,7 +7,8 @@ import { type ApiBoardCity } from 'services/API'
 import { formatEnglishPrice } from 'utils/formatters'
 import { sanitizeUrl } from 'utils/urls'
 
-import { parseUrlFilters, parseUrlParams } from './_parsers'
+import { APILocations } from 'services/API'
+import { filter as isFilterSegment, parseUrlFilters, parseUrlParams } from './_parsers'
 import { fetchListings, fetchLocations } from './_requests'
 import {
   extractCities,
@@ -32,6 +33,29 @@ export const generateCatalogMetadata = async ({
   const host = getProtocolHost(await headers())
   const page = Number(searchParams.page) || 1
   const { slugs } = params
+
+  const listingIdRegex = /^(.*)-(\d{5,8})(-(\d{1,3}))?$/
+  const usZipRegex = /^\d{5}(-\d{4})?$/
+  const canadianPostalRegex = /^[A-Za-z]\d[A-Za-z][- ]\d[A-Za-z]\d$/
+  const isListingId = (s: string) => listingIdRegex.test(s)
+  const isZipCode = (s: string) => usZipRegex.test(s) || canadianPostalRegex.test(s)
+
+  const rawLocationSlugs = (slugs ?? []).filter(
+    (seg) => !isFilterSegment(seg) && !isListingId(seg) && !isZipCode(seg)
+  )
+
+  const slugValidation = rawLocationSlugs.length
+    ? await APILocations.validateSlugs(rawLocationSlugs)
+    : {}
+
+  const hasInvalidSlug = rawLocationSlugs.some((slug) => slug in slugValidation && slugValidation[slug] === null)
+  if (hasInvalidSlug) {
+    return {
+      title: 'Page not found',
+      description: 'The requested page was not found.',
+      robots: 'noindex, nofollow'
+    }
+  }
 
   const {
     filters,

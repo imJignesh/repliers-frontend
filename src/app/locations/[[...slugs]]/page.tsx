@@ -12,7 +12,7 @@ import {
   APILocations
 } from 'services/API'
 
-import { parseUrlFilters, parseUrlParams } from './_parsers'
+import { filter as isFilterSegment, parseUrlFilters, parseUrlParams } from './_parsers'
 import { beautify } from './_parsers'
 import { fetchListings, fetchLocations } from './_requests'
 import { generateCatalogMetadata } from './_ssg'
@@ -73,13 +73,37 @@ const LocationsCatalogPage = async (props: {
     unknowns
   } = parseUrlParams(slugs)
 
+  // ─── Slug validation ────────────────────────────────────────────────────────
+  // Extract the raw URL segments that are location slugs (not filters / listing
+  // IDs / zip codes).  Each must exist in the Laravel location tree; if any is
+  // unknown we return a 404 immediately — before fetching any listing data.
+  // Validation runs in parallel with the area/area-data fetches below.
+  const listingIdRegex = /^(.*)-(\d{5,8})(-(\d{1,3}))?$/
+  const usZipRegex = /^\d{5}(-\d{4})?$/
+  const canadianPostalRegex = /^[A-Za-z]\d[A-Za-z][- ]\d[A-Za-z]\d$/
+  const isListingId = (s: string) => listingIdRegex.test(s)
+  const isZipCode = (s: string) => usZipRegex.test(s) || canadianPostalRegex.test(s)
+
+  const rawLocationSlugs = (slugs ?? []).filter(
+    (seg) => !isFilterSegment(seg) && !isListingId(seg) && !isZipCode(seg)
+  )
+
   // Fetch data needed for identification
   // Pass empty neighborhood to fetch all neighborhoods in the city for loose matching later
-  const fetchAreas = await fetchLocations(urlCity, '')
-  const dynamicAreasData = await APILocations.fetchAreas()
+  const [fetchAreas, dynamicAreasData, slugValidation] = await Promise.all([
+    fetchLocations(urlCity, ''),
+    APILocations.fetchAreas(),
+    rawLocationSlugs.length
+      ? APILocations.validateSlugs(rawLocationSlugs)
+      : Promise.resolve({} as Record<string, string | null>)
+  ])
+
+  // 404 if any location segment is unknown to the database
+  const hasInvalidSlug = rawLocationSlugs.some((slug) => slug in slugValidation && slugValidation[slug] === null)
+  if (hasInvalidSlug) return <Page404Template />
 
   // Build ApiBoardArea[] from the nested cities structure returned by /areas
-  const formattedAreas: ApiBoardArea[] = dynamicAreasData.map((a: any) => ({
+  const formattedAreas: ApiBoardArea[] = (dynamicAreasData as any[]).map((a: any) => ({
     name: a.name,
     cities: (a.cities ?? []).map((c: any) => ({
       name: c.name,

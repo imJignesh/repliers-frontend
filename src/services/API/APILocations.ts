@@ -51,6 +51,27 @@ class APILocations extends APIBase {
         }
     }
 
+    /**
+     * Validate that a set of location slugs exist in the active location tree.
+     *
+     * Returns a map of slug → type ("area" | "city" | "locality") or null when
+     * the slug is not found in the database. A null value means the slug is
+     * invalid and the page should render a 404.
+     */
+    async validateSlugs(slugs: string[]): Promise<Record<string, string | null>> {
+        if (!slugs.length) return {}
+        try {
+            const q = encodeURIComponent(slugs.join(','))
+            return await this.fetchJSON<Record<string, string | null>>(
+                `/locations/validate?slugs=${q}`
+            )
+        } catch (error) {
+            console.error('[APILocations] error validating slugs', slugs, error)
+            // On network error, fail open (don't 404 legitimate pages)
+            return {}
+        }
+    }
+
     async fetchAutosuggestions(q: string): Promise<any> {
         try {
             return await this.fetchJSON<any>(`/search?q=${encodeURIComponent(q)}`)

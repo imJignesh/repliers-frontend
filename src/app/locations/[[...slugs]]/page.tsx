@@ -1,4 +1,5 @@
 import { features } from 'features'
+import { permanentRedirect } from 'next/navigation'
 
 import { Page404Template, PageTemplate } from '@templates'
 import CatalogPageContent from '@pages/catalog'
@@ -88,15 +89,23 @@ const LocationsCatalogPage = async (props: {
     (seg) => !isFilterSegment(seg) && !isListingId(seg) && !isZipCode(seg)
   )
 
+  const currentPath = '/locations' + (slugs?.length ? '/' + slugs.join('/') : '')
+
   // Fetch data needed for identification
   // Pass empty neighborhood to fetch all neighborhoods in the city for loose matching later
-  const [fetchAreas, dynamicAreasData, slugValidation] = await Promise.all([
+  const [fetchAreas, dynamicAreasData, slugValidation, redirectInfo] = await Promise.all([
     fetchLocations(urlCity, ''),
     APILocations.fetchAreas(),
     rawLocationSlugs.length
       ? APILocations.validateSlugs(rawLocationSlugs)
-      : Promise.resolve({} as Record<string, string | null>)
+      : Promise.resolve({} as Record<string, string | null>),
+    APILocations.lookupRedirect(currentPath)
   ])
+
+  // If redirect exists in the database, redirect permanently
+  if (redirectInfo?.destination) {
+    permanentRedirect(redirectInfo.destination)
+  }
 
   // 404 if any location segment is unknown to the database
   const hasInvalidSlug = rawLocationSlugs.some((slug) => slug in slugValidation && slugValidation[slug] === null)

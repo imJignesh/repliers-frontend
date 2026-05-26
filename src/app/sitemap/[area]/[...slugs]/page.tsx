@@ -3,7 +3,7 @@ import { type Metadata } from 'next'
 import { Stack, Container, Typography } from '@mui/material'
 
 import { APILocations } from 'services/API'
-import { StaticPageTemplate } from '@templates'
+import { Page404Template, StaticPageTemplate } from '@templates'
 import { GroupTemplate } from '@pages/catalog/components'
 import { sanitizeUrl } from 'utils/urls'
 import { capitalize } from 'utils/strings'
@@ -36,12 +36,18 @@ const NeighborhoodSitemapPage = async ({ params }: Props) => {
     const { area, slugs } = await params
     const neighborhood = slugs[slugs.length - 1]
 
-    // Fetch data for the neighborhood
-    const [listings, buildings, areas] = await Promise.all([
+    const rawLocationSlugs = [area, ...(slugs ?? [])]
+
+    // Fetch data for the neighborhood in parallel including slug validation
+    const [listings, buildings, areas, slugValidation] = await Promise.all([
         APILocations.fetchNeighborhoodListings(neighborhood),
         APILocations.fetchNeighborhoodBuildings(neighborhood),
-        APILocations.fetchAreas()
+        APILocations.fetchAreas(),
+        APILocations.validateSlugs(rawLocationSlugs)
     ])
+
+    const hasInvalidSlug = rawLocationSlugs.some((slug) => slug in slugValidation && slugValidation[slug] === null)
+    if (hasInvalidSlug) return <Page404Template />
 
     // Resolve names for titles
     const currentArea = areas.find(a => sanitizeUrl(a.name) === area)

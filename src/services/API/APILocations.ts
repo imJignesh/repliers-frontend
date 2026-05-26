@@ -72,6 +72,24 @@ class APILocations extends APIBase {
         }
     }
 
+    /**
+     * Look up a redirect destination for a given source URL path.
+     *
+     * Returns the redirect object with source and destination, or null if no redirect exists.
+     */
+    async lookupRedirect(sourcePath: string): Promise<{ source: string; destination: string } | null> {
+        if (!sourcePath) return null
+        try {
+            return await this.fetchJSON<{ source: string; destination: string } | null>(
+                `/redirects/lookup?source=${encodeURIComponent(sourcePath)}`
+            )
+        } catch (error) {
+            console.error('[APILocations] error looking up redirect for', sourcePath, error)
+            // On error, fail open (don't break legitimate pages)
+            return null
+        }
+    }
+
     async fetchAutosuggestions(q: string): Promise<any> {
         try {
             return await this.fetchJSON<any>(`/search?q=${encodeURIComponent(q)}`)

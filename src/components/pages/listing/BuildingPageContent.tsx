@@ -116,7 +116,7 @@ const BuildingPageContent = ({
                   }
                 }}
               >
-                {address.area && address.area !== address.city && (
+                {address.area && (
                   <Link
                     component={NextLink}
                     href={getCatalogUrl(address.area)}
@@ -129,7 +129,7 @@ const BuildingPageContent = ({
                 {address.city && (
                   <Link
                     component={NextLink}
-                    href={address.area && address.area !== address.city ? getCatalogUrl(address.area, address.city) : getCatalogUrl(address.city)}
+                    href={address.area ? getCatalogUrl(address.area, address.city) : getCatalogUrl(address.city)}
                     color="text.secondary"
                     underline="hover"
                   >
@@ -139,7 +139,7 @@ const BuildingPageContent = ({
                 {address.neighborhood && (
                   <Link
                     component={NextLink}
-                    href={address.area && address.area !== address.city ? getCatalogUrl(address.area, address.city, address.neighborhood) : getCatalogUrl(address.city, address.neighborhood)}
+                    href={address.area ? getCatalogUrl(address.area, address.city, address.neighborhood) : getCatalogUrl(address.city, address.neighborhood)}
                     color="text.primary"
                     underline="hover"
                   >

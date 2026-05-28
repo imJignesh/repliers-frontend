@@ -167,7 +167,10 @@ const NeighborhoodSitemapPage = async ({ params }: Props) => {
 
                             // Link: remove brackets and content from the full string for the slug
                             const cleanListing = listing.replace(/\([^)]*\)/g, '').trim()
-                            const linkSlug = cleanListing.toLowerCase().replace(/\s+/g, '-').replace(/-+/g, '-')
+                            const linkSlug = cleanListing.toLowerCase()
+                                .replace(/[^a-z0-9\s-]/g, '') // Remove commas and non-alphanumeric chars except space/dash
+                                .replace(/\s+/g, '-')
+                                .replace(/-+/g, '-')
 
                             return {
                                 name: displayName,

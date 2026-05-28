@@ -45,12 +45,15 @@ export const fetchListings = async ({
   // Instead, fetch the exact MLS numbers for this neighborhood from the
   // Locations service and filter by those IDs for a precise result.
   let mlsNumbers: string[] = []
-  if (hood) {
+  const target = hood || city || area
+  if (target) {
     try {
       const { APILocations } = await import('services/API')
-      // Backend returns strings like "123 Main St W1234567 1" — extract the MLS number (2nd-last token)
-      const rawEntries = await APILocations.fetchNeighborhoodListings(hood, city, area)
-      console.log('[fetchListings] hood:', hood, '→ rawEntries:', rawEntries)
+      const targetCity = hood ? city : undefined
+      const targetArea = (hood || city) ? area : undefined
+      // Fetch exact database-backed MLS numbers for this location (area, city, or neighborhood)
+      const rawEntries = await APILocations.fetchNeighborhoodListings(target, targetCity, targetArea)
+      console.log('[fetchListings] target:', target, '→ rawEntries:', rawEntries)
       mlsNumbers = rawEntries
         .map((entry: string) => {
           const parts = entry.trim().split(/\s+/)
@@ -60,17 +63,14 @@ export const fetchListings = async ({
         .filter(Boolean)
       console.log('[fetchListings] resolved mlsNumbers:', mlsNumbers)
     } catch (e) {
-      console.error('[fetchListings] could not fetch neighborhood listings', hood, e)
+      console.error('[fetchListings] could not fetch database listings for', target, e)
     }
   }
 
   const fetchParams: Record<string, any> = {
     area: area || city,
     city: area ? city : '',
-    // Only pass neighborhood when we have no exact IDs (fallback)
-    ...(hood && mlsNumbers.length === 0 ? { neighborhood: hood } : {}),
-    // When we have exact IDs, pass them so the API returns only those listings
-    ...(mlsNumbers.length > 0 ? { mlsNumber: mlsNumbers } : {}),
+    mlsNumber: mlsNumbers.length > 0 ? mlsNumbers : ['NONE'],
     pageNum: page,
     resultsPerPage: searchConfig.pageSize,
     boardId: searchConfig.defaultBoardId,

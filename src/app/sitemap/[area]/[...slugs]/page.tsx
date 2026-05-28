@@ -19,10 +19,22 @@ import { getProtocolHost } from 'utils/urls'
 export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
     const { area, slugs } = await params
     const neighborhood = slugs[slugs.length - 1]
+    const parentCity = slugs.length > 1 ? slugs[slugs.length - 2] : undefined
     const slugPath = slugs.join('/')
     const host = getProtocolHost(await headers())
+
+    const [listings, buildings, areas] = await Promise.all([
+        APILocations.fetchNeighborhoodListings(neighborhood, parentCity, area),
+        APILocations.fetchNeighborhoodBuildings(neighborhood, parentCity, area),
+        APILocations.fetchAreas()
+    ])
+
+    const currentArea = areas.find(a => sanitizeUrl(a.name) === area)
+    const areaName = currentArea ? currentArea.name : capitalize(area.replace(/-/g, ' '))
+    const neighborhoodName = capitalize(neighborhood.replace(/-/g, ' '))
+
     return {
-        title: `Listings & Buildings - ${capitalize(neighborhood.replace(/-/g, ' '))}`,
+        title: `${neighborhoodName}, ${areaName} (${listings.length} Listings & ${buildings.length} Buildings)`,
         alternates: {
             canonical: host + `${routes.sitemap}/${area}/${slugPath}`
         },
@@ -55,8 +67,26 @@ const NeighborhoodSitemapPage = async ({ params }: Props) => {
     const areaName = currentArea ? currentArea.name : capitalize(area.replace(/-/g, ' '))
     const neighborhoodName = capitalize(neighborhood.replace(/-/g, ' '))
 
+    const breadcrumbs = [
+        { label: 'Sitemap', link: routes.sitemap as string | undefined },
+        { label: areaName, link: `${routes.sitemap}/${area}` as string | undefined }
+    ]
+
+    slugs.forEach((slug, idx) => {
+        const isLast = idx === slugs.length - 1
+        const label = capitalize(slug.replace(/-/g, ' '))
+        const link = `${routes.sitemap}/${area}/${slugs.slice(0, idx + 1).join('/')}`
+        breadcrumbs.push({
+            label,
+            link: isLast ? undefined : link
+        })
+    })
+
     return (
-        <StaticPageTemplate title={`${neighborhoodName}, ${areaName}`}>
+        <StaticPageTemplate
+            title={`${neighborhoodName}, ${areaName}`}
+            breadcrumbs={breadcrumbs}
+        >
             <Stack spacing={6}>
                 {buildings.length > 0 && (
                     <GroupTemplate

@@ -3,12 +3,16 @@ import APIBase from './APIBase'
 export type AreaCity = {
     name: string
     neighborhoods: string[]
+    building_count?: number
+    listing_count?: number
 }
 
 export type Area = {
     name: string
     cities: AreaCity[]       // grouped by city (Downtown, Etobicoke, etc.)
     neighborhoods: string[]  // flat list of all descendants (backward compat)
+    building_count?: number
+    listing_count?: number
 }
 
 class APILocations extends APIBase {

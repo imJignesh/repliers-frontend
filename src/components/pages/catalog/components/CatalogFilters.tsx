@@ -221,6 +221,7 @@ const CatalogFilters = ({
           if (locationDataFull.success) {
             const locationData = locationDataFull.data
             locationData.buildingsSlug = buildingsSlug
+            locationData.buildingsTotal = buildingsList.total ?? (Array.isArray(buildingsList) ? buildingsList.length : 0)
 
             const buildings = buildingsList.data || (Array.isArray(buildingsList) ? buildingsList : [])
 

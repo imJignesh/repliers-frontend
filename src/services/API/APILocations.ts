@@ -32,20 +32,28 @@ class APILocations extends APIBase {
         }
     }
 
-    async fetchNeighborhoodListings(neighborhood: string): Promise<string[]> {
+    async fetchNeighborhoodListings(neighborhood: string, city?: string, area?: string): Promise<string[]> {
         try {
             const slug = neighborhood.toLowerCase().replace(/[\s\u2011]+/g, '-')
-            return await this.fetchJSON<string[]>(`/area/${slug}/listings`)
+            const params = new URLSearchParams()
+            if (city) params.append('city', city)
+            if (area) params.append('area', area)
+            const query = params.toString() ? `?${params.toString()}` : ''
+            return await this.fetchJSON<string[]>(`/area/${slug}/listings${query}`)
         } catch (error) {
             console.error(`[APILocations] error fetching listings for ${neighborhood}`, error)
             return []
         }
     }
 
-    async fetchNeighborhoodBuildings(neighborhood: string): Promise<any[]> {
+    async fetchNeighborhoodBuildings(neighborhood: string, city?: string, area?: string): Promise<any[]> {
         try {
             const slug = neighborhood.toLowerCase().replace(/[\s\u2011]+/g, '-')
-            return await this.fetchJSON<any[]>(`/area/${slug}/buildings`)
+            const params = new URLSearchParams()
+            if (city) params.append('city', city)
+            if (area) params.append('area', area)
+            const query = params.toString() ? `?${params.toString()}` : ''
+            return await this.fetchJSON<any[]>(`/area/${slug}/buildings${query}`)
         } catch (error) {
             console.error(`[APILocations] error fetching buildings for ${neighborhood}`, error)
             return []

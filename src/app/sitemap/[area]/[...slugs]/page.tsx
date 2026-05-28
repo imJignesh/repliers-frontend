@@ -35,13 +35,14 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
 const NeighborhoodSitemapPage = async ({ params }: Props) => {
     const { area, slugs } = await params
     const neighborhood = slugs[slugs.length - 1]
+    const parentCity = slugs.length > 1 ? slugs[slugs.length - 2] : undefined
 
     const rawLocationSlugs = [area, ...(slugs ?? [])]
 
     // Fetch data for the neighborhood in parallel including slug validation
     const [listings, buildings, areas, slugValidation] = await Promise.all([
-        APILocations.fetchNeighborhoodListings(neighborhood),
-        APILocations.fetchNeighborhoodBuildings(neighborhood),
+        APILocations.fetchNeighborhoodListings(neighborhood, parentCity, area),
+        APILocations.fetchNeighborhoodBuildings(neighborhood, parentCity, area),
         APILocations.fetchAreas(),
         APILocations.validateSlugs(rawLocationSlugs)
     ])

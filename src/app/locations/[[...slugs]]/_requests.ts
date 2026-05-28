@@ -45,7 +45,7 @@ export const fetchListings = async ({
   // Instead, fetch the exact MLS numbers for this neighborhood from the
   // Locations service and filter by those IDs for a precise result.
   let mlsNumbers: string[] = []
-  const target = hood || city || area
+  const target = hood // Only fetch exact MLS numbers for neighborhood-level queries
   if (target) {
     try {
       const { APILocations } = await import('services/API')
@@ -70,12 +70,16 @@ export const fetchListings = async ({
   const fetchParams: Record<string, any> = {
     area: area || city,
     city: area ? city : '',
-    mlsNumber: mlsNumbers.length > 0 ? mlsNumbers : ['NONE'],
     pageNum: page,
     resultsPerPage: searchConfig.pageSize,
     boardId: searchConfig.defaultBoardId,
     ...getListingFields(),
     ...filters
+  }
+
+  // Only restrict by MLS numbers if we are looking up a neighborhood
+  if (hood) {
+    fetchParams.mlsNumber = mlsNumbers.length > 0 ? mlsNumbers : ['NONE']
   }
 
   console.log('[fetchListings] final fetchParams keys:', Object.keys(fetchParams), 'mlsNumber count:', mlsNumbers.length)

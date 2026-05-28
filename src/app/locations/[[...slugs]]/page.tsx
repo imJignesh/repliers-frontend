@@ -116,7 +116,7 @@ const LocationsCatalogPage = async (props: {
     name: a.name,
     cities: (a.cities ?? []).map((c: any) => ({
       name: c.name,
-      activeCount: 0,
+      activeCount: Number(c.listing_count) || 0,
       location: { lat: 0, lng: 0 },
       state: 'ON',
       neighborhoods: (c.neighborhoods ?? []).map((name: string) => ({
@@ -220,26 +220,30 @@ const LocationsCatalogPage = async (props: {
   const targetForNeighborhoods = city || area
   if (targetForNeighborhoods) {
     const dynamicData = await APILocations.fetchAreaNeighborhoods(
-      targetForNeighborhoods
+      targetForNeighborhoods,
+      true
     )
 
     if (dynamicData.length > 0) {
-      if (typeof dynamicData[0] === 'string') {
-        // City-level: flat neighborhood names
-        hoods = (dynamicData as string[]).map((name) => ({
-          name,
-          activeCount: 0,
+      const first = dynamicData[0]
+      const isNested = typeof first === 'object' && first !== null && 'neighborhoods' in first
+
+      if (!isNested) {
+        // City-level: flat neighborhood objects
+        hoods = (dynamicData as any[]).map((n) => ({
+          name: n.name,
+          activeCount: Number(n.listing_count) || 0,
           location: { lat: 0, lng: 0 }
         }))
       } else {
         // Area-level: nested [{name, neighborhoods}] — use city names as hoods
         hoods = (dynamicData as any[]).map((c) => ({
           name: c.name,
-          activeCount: 0,
+          activeCount: Number(c.listing_count) || 0,
           location: { lat: 0, lng: 0 },
-          neighborhoods: (c.neighborhoods ?? []).map((n: string) => ({
-            name: n,
-            activeCount: 0,
+          neighborhoods: (c.neighborhoods ?? []).map((n: any) => ({
+            name: typeof n === 'string' ? n : n.name,
+            activeCount: typeof n === 'string' ? 0 : (Number(n.listing_count) || 0),
             location: { lat: 0, lng: 0 }
           }))
         }))

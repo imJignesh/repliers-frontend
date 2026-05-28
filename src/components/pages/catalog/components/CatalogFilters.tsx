@@ -39,7 +39,7 @@ import { type Filters } from 'services/Search'
 import { useSearch } from 'providers/SearchProvider'
 import useBreakpoints from 'hooks/useBreakpoints'
 import useClientSide from 'hooks/useClientSide'
-import { getCatalogUrl } from 'utils/urls'
+import { getCatalogUrl, sanitizeUrl } from 'utils/urls'
 import { capitalize } from 'utils/strings'
 import location, { citymap } from 'configs/defaults/location'
 
@@ -190,9 +190,9 @@ const CatalogFilters = ({
 
   useEffect(() => {
     if (selectedRegion) {
-      const slug = selectedRegion.toLowerCase().replace(/\s+/g, '-')
+      const slug = sanitizeUrl(selectedRegion)
       const localityName = hood || city // Provide locality via hood or city
-      const buildingsSlug = localityName ? localityName.toLowerCase().replace(/\s+/g, '-') : slug
+      const buildingsSlug = localityName ? sanitizeUrl(localityName) : slug
 
       // Avoid re-fetching if we already have the correct data
       if (locationTree &&

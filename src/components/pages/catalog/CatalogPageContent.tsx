@@ -172,7 +172,7 @@ const CatalogPageInner = ({
   }
 
   const buildings = locationTree?.buildings || []
-  const buildingsCount = locationTree?.buildings?.length || 0
+  const buildingsCount = locationTree?.building_count ?? locationTree?.buildings?.length ?? 0
 
   return (
     <MapOptionsProvider layout="map" style="map">

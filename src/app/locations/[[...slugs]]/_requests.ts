@@ -49,7 +49,7 @@ export const fetchListings = async ({
     try {
       const { APILocations } = await import('services/API')
       // Backend returns strings like "123 Main St W1234567 1" — extract the MLS number (2nd-last token)
-      const rawEntries = await APILocations.fetchNeighborhoodListings(hood)
+      const rawEntries = await APILocations.fetchNeighborhoodListings(hood, city, area)
       console.log('[fetchListings] hood:', hood, '→ rawEntries:', rawEntries)
       mlsNumbers = rawEntries
         .map((entry: string) => {

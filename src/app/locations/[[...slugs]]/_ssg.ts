@@ -100,8 +100,9 @@ export const generateCatalogMetadata = async ({
   })
 
   const catalogTitle = getCatalogTitle(filters)
-  const shortLocation = getCatalogLocation(city, hood)
-  const fullLocation = getCatalogLocation(city, hood, true)
+  const displayCity = city || area || ''
+  const shortLocation = getCatalogLocation(displayCity, hood)
+  const fullLocation = getCatalogLocation(displayCity, hood, true)
 
   const lowestPrice = listPrice
     ? ` Prices starting at ${formatEnglishPrice(listPrice.min)}.`
@@ -116,7 +117,7 @@ export const generateCatalogMetadata = async ({
     lowestPrice,
     startingPrice: listPrice ? formatEnglishPrice(listPrice.min).replace('$', '') : '',
     neighborhood: hood || '',
-    city: city || '',
+    city: displayCity,
     siteName: content.siteName
   }
 

@@ -17,7 +17,7 @@ import { filter as isFilterSegment, parseUrlFilters, parseUrlParams } from './_p
 import { beautify } from './_parsers'
 import { fetchListings, fetchLocations } from './_requests'
 import { generateCatalogMetadata } from './_ssg'
-import { extractCities, extractLocation } from './_utils'
+import { extractCities, extractLocation, refineLocation } from './_utils'
 
 // catalog pages CANT BE STATICALLY GENERATED (SSG)
 // because we need a token cookie to fetch listings from the client side
@@ -130,59 +130,7 @@ const LocationsCatalogPage = async (props: {
   const finalAreas = formattedAreas.length ? formattedAreas : fetchAreas
 
   // Refine location identification
-  let area = urlArea
-  let city = urlCity
-  let hood = urlHood
-
-  const normalize = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '')
-
-  if (!area) {
-    const asArea = finalAreas.find((a) => normalize(a.name) === normalize(city))
-    if (asArea) {
-      area = asArea.name
-
-      const slug2 = hood
-      const asCity = asArea.cities?.find(
-        (c: any) => normalize(c.name || c) === normalize(slug2)
-      )
-
-      if (asCity) {
-        city = typeof asCity === 'string' ? asCity : asCity.name
-        hood = unknowns.length > 0 ? beautify(unknowns.shift() as string) : ''
-      } else {
-        let foundCity = null
-        let foundHood = null
-        if (asArea.cities) {
-          for (const c of asArea.cities) {
-            const h = c.neighborhoods?.find(
-              (n: any) => normalize(n.name || n) === normalize(slug2)
-            )
-            if (h) {
-              foundCity = c.name
-              foundHood = typeof h === 'string' ? h : h.name
-              break
-            }
-          }
-        }
-
-        if (foundHood) {
-          city = foundCity || ''
-          hood = foundHood
-        } else {
-          city = slug2 || ''
-          hood = unknowns.length > 0 ? beautify(unknowns.shift() as string) : ''
-        }
-      }
-    }
-  }
-
-  // extract the correct neighborhood name from the list of areas
-  if (hood && city) {
-    const location = extractLocation(finalAreas, city, hood)
-    if (location && 'name' in location) {
-      hood = location.name
-    }
-  }
+  const { area, city, hood } = refineLocation(finalAreas, urlArea, urlCity, urlHood, unknowns)
 
   // render property page component if listingId is present and emulate its old url format
   if (listingId) {

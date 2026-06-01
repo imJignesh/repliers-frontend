@@ -554,18 +554,18 @@ const CatalogFilters = ({
             >
               <Typography
                 className="region-label"
-                variant="subtitle2"
-                sx={{ fontWeight: 700 }}
+                variant="h2"
+                sx={{ fontWeight: 700, fontSize: '1.4rem', my: 1 }}
               >
                 Areas in {selectedRegion}:
               </Typography>
             </Box>
-
+ 
             <Box sx={{ display: 'flex', alignItems: 'center', paddingBottom: "30px" }}>
               <IconButton onClick={() => handleScroll('left')} size="small" sx={{ p: 0, mr: 1, border: '1px solid', borderColor: 'divider' }}>
                 <ChevronLeftIcon />
               </IconButton>
-
+ 
               <Box
                 ref={scrollContainerRef}
                 sx={{
@@ -597,120 +597,122 @@ const CatalogFilters = ({
                         return a.localeCompare(b)
                       })
                       .map((locationName) => (
-                        <Button
-                          key={locationName}
-                          component={Link}
-                          href={getSubLocationUrl(locationName)}
-                          onClick={() => setLoading(true)}
-                          variant={normalize(hood) === normalize(locationName) || normalize(city) === normalize(locationName) ? 'contained' : 'outlined'}
-                          sx={{
-                            px: 1.5,
-                            py: 0.5,
-                            minHeight: 32,
-                            textTransform: 'none',
-                            whiteSpace: 'nowrap',
-                            flexShrink: 0,
-                            borderRadius: '4px',
-                            borderColor: 'primary.light',
-                            '&:hover': {
-                              bgcolor: 'primary.main',
-                              color: 'white'
-                            }
-                          }}
-                        >
-                          {capitalize(locationName)}
-                        </Button>
+                        <Box key={locationName} component="h3" sx={{ m: 0, display: 'inline-flex' }}>
+                          <Button
+                            component={Link}
+                            href={getSubLocationUrl(locationName)}
+                            onClick={() => setLoading(true)}
+                            variant={normalize(hood) === normalize(locationName) || normalize(city) === normalize(locationName) ? 'contained' : 'outlined'}
+                            sx={{
+                              px: 1.5,
+                              py: 0.5,
+                              minHeight: 32,
+                              textTransform: 'none',
+                              whiteSpace: 'nowrap',
+                              flexShrink: 0,
+                              borderRadius: '4px',
+                              borderColor: 'primary.light',
+                              '&:hover': {
+                                bgcolor: 'primary.main',
+                                color: 'white'
+                              }
+                            }}
+                          >
+                            {capitalize(locationName)}
+                          </Button>
+                        </Box>
                       ))}
-
+ 
                     {/* New Hierarchical Groups View */}
                     {locationTree && locationTree.children && (
                       <>
                         {locationTree.children.filter((group: any) => group.listing_count > 0 || group.building_count > 0).map((group: any) => {
                           const isActive = activeGroupId === group.id
                           return (
-                            <Stack
-                              key={group.id}
-                              direction="row"
-                              sx={{
-                                flexShrink: 0,
-                                borderRadius: '4px',
-                                border: '1px solid',
-                                borderColor: isActive ? 'primary.main' : 'divider',
-                                bgcolor: isActive ? 'primary.main' : 'background.paper',
-                                color: isActive ? 'white' : 'text.primary',
-                                overflow: 'hidden',
-                                boxShadow: isActive ? 2 : 0,
-                                '&:hover': {
-                                  borderColor: 'primary.main',
-                                }
-                              }}
-                            >
-                              <Button
-                                component={Link}
-                                href={`${routes.listings}/${locationTree.slug}/${group.slug}`}
-                                onClick={() => setLoading(true)}
+                            <Box key={group.id} component="h3" sx={{ m: 0, display: 'inline-flex' }}>
+                              <Stack
+                                direction="row"
                                 sx={{
-                                  textTransform: 'none',
-                                  whiteSpace: 'nowrap',
-                                  px: 1.5,
-                                  py: 0.5,
-                                  minHeight: 32,
-                                  borderRadius: 0,
-                                  color: 'inherit',
-                                  border: 'none',
+                                  flexShrink: 0,
+                                  borderRadius: '4px',
+                                  border: '1px solid',
+                                  borderColor: isActive ? 'primary.main' : 'divider',
+                                  bgcolor: isActive ? 'primary.main' : 'background.paper',
+                                  color: isActive ? 'white' : 'text.primary',
+                                  overflow: 'hidden',
+                                  boxShadow: isActive ? 2 : 0,
                                   '&:hover': {
-                                    bgcolor: isActive ? 'primary.dark' : 'rgba(0, 0, 0, 0.04)',
-                                    border: 'none'
+                                    borderColor: 'primary.main',
                                   }
                                 }}
                               >
-                                {group.name}
-                                <Box
-                                  component="span"
+                                <Button
+                                  component={Link}
+                                  href={`${routes.listings}/${locationTree.slug}/${group.slug}`}
+                                  onClick={() => setLoading(true)}
                                   sx={{
-                                    ml: 1,
-                                    px: 0.75,
-                                    py: 0.25,
-                                    borderRadius: '12px',
-                                    fontSize: '0.75rem',
-                                    lineHeight: 1,
-                                    fontWeight: 600,
-                                    bgcolor: isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.06)',
-                                    color: isActive ? 'inherit' : 'text.secondary'
+                                    textTransform: 'none',
+                                    whiteSpace: 'nowrap',
+                                    px: 1.5,
+                                    py: 0.5,
+                                    minHeight: 32,
+                                    borderRadius: 0,
+                                    color: 'inherit',
+                                    border: 'none',
+                                    '&:hover': {
+                                      bgcolor: isActive ? 'primary.dark' : 'rgba(0, 0, 0, 0.04)',
+                                      border: 'none'
+                                    }
                                   }}
                                 >
-                                  {formatCount(group.listing_count > 0 ? group.listing_count : group.building_count)}
-                                </Box>
-                              </Button>
-                              <Box
-                                sx={{
-                                  width: '1px',
-                                  bgcolor: isActive ? 'rgba(255, 255, 255, 0.3)' : 'divider'
-                                }}
-                              />
-                              <Button
-                                size="small"
-                                onClick={() => setActiveGroupId(isActive ? null : group.id)}
-                                sx={{
-                                  minWidth: 'auto',
-                                  px: 0.5,
-                                  borderRadius: 0,
-                                  color: 'inherit',
-                                  border: 'none',
-                                  '&:hover': {
-                                    bgcolor: isActive ? 'primary.dark' : 'rgba(0, 0, 0, 0.04)',
-                                    border: 'none'
-                                  }
-                                }}
-                              >
-                                <KeyboardArrowDownIcon
+                                  {group.name}
+                                  <Box
+                                    component="span"
+                                    sx={{
+                                      ml: 1,
+                                      px: 0.75,
+                                      py: 0.25,
+                                      borderRadius: '12px',
+                                      fontSize: '0.75rem',
+                                      lineHeight: 1,
+                                      fontWeight: 600,
+                                      bgcolor: isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.06)',
+                                      color: isActive ? 'inherit' : 'text.secondary'
+                                    }}
+                                  >
+                                    {formatCount(group.listing_count > 0 ? group.listing_count : group.building_count)}
+                                  </Box>
+                                </Button>
+                                <Box
                                   sx={{
-                                    transform: isActive ? 'rotate(180deg)' : 'none',
-                                    transition: 'transform 0.2s'
+                                    width: '1px',
+                                    bgcolor: isActive ? 'rgba(255, 255, 255, 0.3)' : 'divider'
                                   }}
                                 />
-                              </Button>
-                            </Stack>
+                                <Button
+                                  size="small"
+                                  onClick={() => setActiveGroupId(isActive ? null : group.id)}
+                                  sx={{
+                                    minWidth: 'auto',
+                                    px: 0.5,
+                                    borderRadius: 0,
+                                    color: 'inherit',
+                                    border: 'none',
+                                    '&:hover': {
+                                      bgcolor: isActive ? 'primary.dark' : 'rgba(0, 0, 0, 0.04)',
+                                      border: 'none'
+                                    }
+                                  }}
+                                >
+                                  <KeyboardArrowDownIcon
+                                    sx={{
+                                      transform: isActive ? 'rotate(180deg)' : 'none',
+                                      transition: 'transform 0.2s'
+                                    }}
+                                  />
+                                </Button>
+                              </Stack>
+                            </Box>
                           )
                         })}
                       </>

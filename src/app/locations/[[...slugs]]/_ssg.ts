@@ -3,7 +3,7 @@ import pThrottle from 'p-throttle'
 import content from '@configs/content'
 import routes from '@configs/routes'
 
-import { type ApiBoardCity } from 'services/API'
+import { type ApiBoardArea, type ApiBoardCity } from 'services/API'
 import { formatEnglishPrice } from 'utils/formatters'
 import { sanitizeUrl } from 'utils/urls'
 
@@ -14,7 +14,8 @@ import {
   extractCities,
   extractHoods,
   getCatalogLocation,
-  getCatalogTitle
+  getCatalogTitle,
+  refineLocation
 } from './_utils'
 import { type Params, type SearchParams } from './page'
 
@@ -59,8 +60,36 @@ export const generateCatalogMetadata = async ({
 
   const {
     filters,
-    location: { area, city, neighborhood: hood }
+    location: { area: urlArea, city: urlCity, neighborhood: urlHood },
+    unknowns
   } = parseUrlParams(slugs)
+
+  // Fetch areas and locations to perform refinement
+  const [fetchAreas, dynamicAreasData] = await Promise.all([
+    fetchLocations(urlCity, ''),
+    APILocations.fetchAreas()
+  ])
+
+  // Build ApiBoardArea[] from the nested cities structure returned by /areas
+  const formattedAreas: ApiBoardArea[] = (dynamicAreasData as any[]).map((a: any) => ({
+    name: a.name,
+    cities: (a.cities ?? []).map((c: any) => ({
+      name: c.name,
+      activeCount: Number(c.listing_count) || 0,
+      location: { lat: 0, lng: 0 },
+      state: 'ON',
+      neighborhoods: (c.neighborhoods ?? []).map((name: string) => ({
+        name,
+        activeCount: 0,
+        location: { lat: 0, lng: 0 }
+      }))
+    }))
+  }))
+
+  const finalAreas = formattedAreas.length ? formattedAreas : fetchAreas
+
+  // Refine location
+  const { area, city, hood } = refineLocation(finalAreas, urlArea, urlCity, urlHood, unknowns)
 
   const { count, listPrice } = await fetchListings({
     area,
@@ -101,13 +130,31 @@ export const generateCatalogMetadata = async ({
   // @ts-ignore
   const templates = content.propertyMetadataTemplates?.location || {}
 
-  const title = templates.title
+  let title = templates.title
     ? interpolate(templates.title)
     : `${count} ${catalogTitle} in ${shortLocation}`
+
+  if (!hood && city) {
+    const titleTrimmed = title.trim()
+    const prefix = 'Condos For Sale,'
+    if (titleTrimmed.startsWith(prefix)) {
+      const rest = titleTrimmed.substring(prefix.length).trim()
+      const parts = rest.split('|')
+      const restCity = parts[0].trim()
+      const restSuffix = parts.slice(1).join('|')
+      title = `${restCity} Condos For Sale` + (restSuffix ? ` | ${restSuffix.trim()}` : '')
+    }
+  }
 
   const description = templates.description
     ? interpolate(templates.description)
     : `Find ${count} ${catalogTitle} in ${fullLocation}. Visit ${content.siteName} to see photos, prices & neighbourhood info.${lowestPrice}`
+
+  const cleanDescription = description
+    .replace(/in\s*,\s*/g, 'in ')
+    .replace(/,\s*,\s*/g, ', ')
+    .replace(/\s\s+/g, ' ')
+    .trim()
 
   const meta: any = {
     title: title
@@ -115,7 +162,7 @@ export const generateCatalogMetadata = async ({
       .replace(/,\s*\|/g, ' |')
       .replace(/^, | ,$/g, '')
       .trim(),
-    description: description.replace(/\s\s+/g, ' ').trim(),
+    description: cleanDescription,
     alternates: {
       canonical: host + routes.listings + (slugs?.length ? '/' + slugs.join('/') : '')
     },

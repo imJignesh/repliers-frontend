@@ -167,3 +167,65 @@ export const getCatalogLocation = (
     ? joinNonEmpty([neighborhood, city, 'Ontario', 'ON'], ', ')
     : [neighborhood, city, 'Ontario'].filter(Boolean)[0]
 }
+
+export const refineLocation = (
+  finalAreas: ApiBoardArea[],
+  urlArea: string,
+  urlCity: string,
+  urlHood: string,
+  unknowns: string[]
+) => {
+  let area = urlArea
+  let city = urlCity
+  let hood = urlHood
+  const remainingUnknowns = [...unknowns]
+
+  if (!area) {
+    const asArea = finalAreas.find((a) => normalize(a.name) === normalize(city))
+    if (asArea) {
+      area = asArea.name
+
+      const slug2 = hood
+      const asCity = asArea.cities?.find(
+        (c: any) => normalize(c.name || c) === normalize(slug2)
+      )
+
+      if (asCity) {
+        city = typeof asCity === 'string' ? asCity : asCity.name
+        hood = remainingUnknowns.length > 0 ? beautify(remainingUnknowns.shift() as string) : ''
+      } else {
+        let foundCity = null
+        let foundHood = null
+        if (asArea.cities) {
+          for (const c of asArea.cities) {
+            const h = c.neighborhoods?.find(
+              (n: any) => normalize(n.name || n) === normalize(slug2)
+            )
+            if (h) {
+              foundCity = c.name
+              foundHood = typeof h === 'string' ? h : h.name
+              break
+            }
+          }
+        }
+
+        if (foundHood) {
+          city = foundCity || ''
+          hood = foundHood
+        } else {
+          city = slug2 || ''
+          hood = remainingUnknowns.length > 0 ? beautify(remainingUnknowns.shift() as string) : ''
+        }
+      }
+    }
+  }
+
+  if (hood && city) {
+    const location = extractLocation(finalAreas, city, hood)
+    if (location && 'name' in location) {
+      hood = location.name
+    }
+  }
+
+  return { area, city, hood, unknowns: remainingUnknowns }
+}

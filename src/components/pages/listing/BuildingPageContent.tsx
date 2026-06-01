@@ -156,14 +156,11 @@ const BuildingPageContent = ({
 
               <BuildingInfo />
 
-
-
-              <HomeDescription />
-
-
               <Box id="features" sx={{ scrollMarginTop: '100px' }}>
                 <FeaturesDetails features={propertyDetails.features} />
               </Box>
+
+              <HomeDescription />
               <AppliancesDetails appliances={propertyDetails.appliances} />
               {/* <ExteriorDetails exterior={propertyDetails.exterior} /> */}
 

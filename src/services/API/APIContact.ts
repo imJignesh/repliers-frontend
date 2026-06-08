@@ -37,6 +37,7 @@ export type LeadRequest = {
   mls_municipality?: string
   contact_source?: string
   neighbourhood?: string
+  postal_code?: string
   recaptcha_token?: string
 }
 
@@ -58,6 +59,7 @@ export type AppointmentRequest = {
   mls_municipality?: string
   contact_source?: string
   neighbourhood?: string
+  postal_code?: string
   recaptcha_token?: string
 }
 

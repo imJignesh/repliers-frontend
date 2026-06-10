@@ -33,9 +33,8 @@ export function mapperCategory(property: Property) {
 }
 
 export function mapperDaysOnMarket(property: Property) {
-  const isNew = property.lastStatus === 'New'
-  if (!sold(property)) {
-    const date = isNew ? property.listDate : property.soldDate
+  if (!sold(property) && property.listDate) {
+    const date = dayjs(property.listDate)
     const days = dayjs().diff(date, 'day') || 0
     return pluralize(days, {
       zero: 'listed today',

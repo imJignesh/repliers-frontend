@@ -5,7 +5,8 @@ import ApartmentIcon from '@mui/icons-material/Apartment'
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted'
 
 import { APILocations } from 'services/API'
-import { Page404Template, StaticPageTemplate } from '@templates'
+import { notFound } from 'next/navigation'
+import { StaticPageTemplate } from '@templates'
 import { GroupTemplate } from '@pages/catalog/components'
 import { getCatalogUrl, sanitizeUrl } from 'utils/urls'
 import { capitalize } from 'utils/strings'
@@ -20,6 +21,11 @@ import { getProtocolHost } from 'utils/urls'
 
 export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
     const { area } = await params
+    const rawLocationSlugs = [area]
+    const slugValidation = await APILocations.validateSlugs(rawLocationSlugs)
+    const hasInvalidSlug = rawLocationSlugs.some((slug) => slug in slugValidation && slugValidation[slug] === null)
+    if (hasInvalidSlug) notFound()
+
     const host = getProtocolHost(await headers())
     const areas = await APILocations.fetchAreas()
     const currentArea = areas.find(a => sanitizeUrl(a.name) === area)
@@ -51,7 +57,7 @@ const AreaSitemapPage = async ({ params }: Props) => {
     ])
 
     const hasInvalidSlug = rawLocationSlugs.some((slug) => slug in slugValidation && slugValidation[slug] === null)
-    if (hasInvalidSlug) return <Page404Template />
+    if (hasInvalidSlug) notFound()
 
     const currentArea = areas.find(a => sanitizeUrl(a.name) === area)
     const areaName = currentArea ? currentArea.name : capitalize(area.replace(/-/g, ' '))

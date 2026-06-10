@@ -17,6 +17,7 @@ import {
   getCatalogTitle,
   refineLocation
 } from './_utils'
+import { notFound } from 'next/navigation'
 import { type Params, type SearchParams } from './page'
 
 import { headers } from 'next/headers'
@@ -51,11 +52,7 @@ export const generateCatalogMetadata = async ({
 
   const hasInvalidSlug = rawLocationSlugs.some((slug) => slug in slugValidation && slugValidation[slug] === null)
   if (hasInvalidSlug) {
-    return {
-      title: 'Page not found',
-      description: 'The requested page was not found.',
-      robots: 'noindex, nofollow'
-    }
+    notFound()
   }
 
   const {

@@ -3,7 +3,8 @@ import { type Metadata } from 'next'
 import { Stack, Container, Typography } from '@mui/material'
 
 import { APILocations } from 'services/API'
-import { Page404Template, StaticPageTemplate } from '@templates'
+import { notFound } from 'next/navigation'
+import { StaticPageTemplate } from '@templates'
 import { GroupTemplate } from '@pages/catalog/components'
 import { sanitizeUrl } from 'utils/urls'
 import { capitalize } from 'utils/strings'
@@ -20,6 +21,11 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
     const { area, slugs } = await params
     const neighborhood = slugs[slugs.length - 1]
     const parentCity = slugs.length > 1 ? slugs[slugs.length - 2] : undefined
+    const rawLocationSlugs = [area, ...(slugs ?? [])]
+    const slugValidation = await APILocations.validateSlugs(rawLocationSlugs)
+    const hasInvalidSlug = rawLocationSlugs.some((slug) => slug in slugValidation && slugValidation[slug] === null)
+    if (hasInvalidSlug) notFound()
+
     const slugPath = slugs.join('/')
     const host = getProtocolHost(await headers())
 
@@ -60,7 +66,7 @@ const NeighborhoodSitemapPage = async ({ params }: Props) => {
     ])
 
     const hasInvalidSlug = rawLocationSlugs.some((slug) => slug in slugValidation && slugValidation[slug] === null)
-    if (hasInvalidSlug) return <Page404Template />
+    if (hasInvalidSlug) notFound()
 
     // Resolve names for titles
     const currentArea = areas.find(a => sanitizeUrl(a.name) === area)

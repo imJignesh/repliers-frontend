@@ -1,7 +1,7 @@
 import { features } from 'features'
-import { permanentRedirect } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 
-import { Page404Template, PageTemplate } from '@templates'
+import { PageTemplate } from '@templates'
 import CatalogPageContent from '@pages/catalog'
 
 import { generateMetadata as generatePropertyMetadata } from 'app/listing/[[...listingName]]/page'
@@ -63,7 +63,7 @@ const LocationsCatalogPage = async (props: {
   const page = Number(searchParams.page) || 1
   const { slugs } = params
 
-  if (!features.listings) return <Page404Template />
+  if (!features.listings) notFound()
 
   const {
     filters,
@@ -109,7 +109,7 @@ const LocationsCatalogPage = async (props: {
 
   // 404 if any location segment is unknown to the database
   const hasInvalidSlug = rawLocationSlugs.some((slug) => slug in slugValidation && slugValidation[slug] === null)
-  if (hasInvalidSlug) return <Page404Template />
+  if (hasInvalidSlug) notFound()
 
   // Build ApiBoardArea[] from the nested cities structure returned by /areas
   const formattedAreas: ApiBoardArea[] = (dynamicAreasData as any[]).map((a: any) => ({
@@ -151,7 +151,7 @@ const LocationsCatalogPage = async (props: {
     page
   })
 
-  if (page > 1 && !listings.length) return <Page404Template />
+  if (page > 1 && !listings.length) notFound()
 
   const byCount = (a: any, b: any) => b.activeCount - a.activeCount
 

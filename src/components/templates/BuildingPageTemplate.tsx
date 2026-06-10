@@ -34,6 +34,7 @@ const BuildingPageTemplate = ({ property, history }: { property: ApiQueryRespons
         streetNumber: property.building.street?.number || cached?.address?.streetNumber,
         streetName: property.building.street?.name || cached?.address?.streetName,
         streetSuffix: property.building.street?.suffix || cached?.address?.streetSuffix,
+        area: property.building.location?.area?.name || cached?.address?.area,
         city: property.building.location?.city?.name || cached?.address?.city,
         neighborhood: property.building.location?.locality?.name || cached?.address?.neighborhood
       } as any,

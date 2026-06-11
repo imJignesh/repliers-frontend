@@ -33,9 +33,10 @@ export function mapperCategory(property: Property) {
 }
 
 export function mapperDaysOnMarket(property: Property) {
-  if (!sold(property) && property.listDate) {
-    const date = dayjs(property.listDate)
-    const days = dayjs().diff(date, 'day') || 0
+  if (!sold(property)) {
+    const days = property.daysOnMarket !== undefined && property.daysOnMarket !== null
+      ? toSafeNumber(property.daysOnMarket)
+      : (property.listDate ? Math.abs(dayjs(property.listDate).diff(dayjs(), 'day')) : 0)
     return pluralize(days, {
       zero: 'listed today',
       one: '$ day ago',
@@ -44,6 +45,7 @@ export function mapperDaysOnMarket(property: Property) {
   }
   return null
 }
+
 
 export function mapperListDate(property: Property) {
   if (sold(property) && property.type !== 'Lease') return null

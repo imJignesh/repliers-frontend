@@ -245,11 +245,12 @@ const getDays = (days: number) => {
 }
 
 export const getDaysSinceListed = (property: Property) => {
-  if (!property.listDate) return { count: NaN, label: '' }
-  const date = dayjs(property.listDate)
-  const daysNumber = dayjs().diff(date, 'day')
-  return getDays(daysNumber)
+  const daysNumber = property.daysOnMarket !== undefined && property.daysOnMarket !== null
+    ? toSafeNumber(property.daysOnMarket)
+    : (property.listDate ? dayjs(property.listDate).diff(dayjs(), 'day') : NaN)
+  return getDays(Math.abs(daysNumber))
 }
+
 
 export const getUpdatedDays = (days: string) => {
   const updatedDays = dayjs().diff(dayjs(days), 'day')

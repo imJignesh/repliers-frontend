@@ -88,7 +88,7 @@ export const generateCatalogMetadata = async ({
   // Refine location
   const { area, city, hood } = refineLocation(finalAreas, urlArea, urlCity, urlHood, unknowns)
 
-  const { count, listPrice } = await fetchListings({
+  const { count, listPrice, listings } = await fetchListings({
     area,
     city,
     hood,
@@ -101,8 +101,18 @@ export const generateCatalogMetadata = async ({
   const shortLocation = getCatalogLocation(displayCity, hood)
   const fullLocation = getCatalogLocation(displayCity, hood, true)
 
-  const lowestPrice = listPrice
-    ? ` Prices starting at ${formatEnglishPrice(listPrice.min)}.`
+  let minPrice = listPrice ? Number(listPrice.min) : 0
+  if ((!minPrice || minPrice < 1000) && listings && listings.length > 0) {
+    const prices = listings
+      .map((l) => Number(l.listPrice))
+      .filter((p) => !isNaN(p) && p >= 1000)
+    if (prices.length > 0) {
+      minPrice = Math.min(...prices)
+    }
+  }
+
+  const lowestPrice = minPrice && minPrice >= 1000
+    ? ` Prices starting at ${formatEnglishPrice(minPrice)}.`
     : ''
 
   const variables: Record<string, string> = {
@@ -112,7 +122,7 @@ export const generateCatalogMetadata = async ({
     shortLocation,
     fullLocation,
     lowestPrice,
-    startingPrice: listPrice ? formatEnglishPrice(listPrice.min).replace('$', '') : '',
+    startingPrice: minPrice && minPrice >= 1000 ? formatEnglishPrice(minPrice).replace('$', '') : '',
     neighborhood: hood || '',
     city: displayCity,
     siteName: content.siteName

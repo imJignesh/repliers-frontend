@@ -15,7 +15,7 @@ const allowedTypes = new Set([
 ])
 
 const allowedStatuses = new Set([
-  'for-rent', 'sold', 'all'
+  'sold', 'all'
 ])
 
 const allowedSorts = new Set([
@@ -216,14 +216,8 @@ export const parseUrlFilters = (filters: string[]) => {
   }
 
   filters.forEach((filter) => {
-    // string matches
-    switch (filter) {
-      // WARN: not sure we should give this option to users
-      case 'for-lease':
-      case 'for-rent':
-        searchFilters.listingStatus = 'rent'
-        break
-    }
+    // No rent filters supported
+
 
     // if (filter === 'open') {
     //   // eslint-disable-next-line prefer-destructuring

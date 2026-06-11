@@ -104,7 +104,8 @@ export const getCatalogTitle = (filters: string[]) => {
   const saleType =
     filters.find((filter) => filter === 'active') ||
     filters.find((filter) => filter === 'sold') ||
-    filters.find((filter) => ['for-sale', 'for-rent'].includes(filter)) ||
+    filters.find((filter) => ['for-sale'].includes(filter)) ||
+
     'for-sale'
 
   // check if we have property/listing type description in the url

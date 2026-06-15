@@ -2,6 +2,8 @@ import dayjs from 'dayjs'
 
 import { type Property } from 'services/API'
 
+import { toSafeNumber } from 'utils/formatters'
+
 /**
  * Creates property utility functions with translation context using ICU Message Format
  * Usage: const { getDaysSinceListed, getUpdatedDays } = createPropertyI18nUtils(t)
@@ -12,9 +14,9 @@ export const createPropertyI18nUtils = (
 ) => {
   return {
     getDaysSinceListed: (property: Property) => {
-      if (!property.listDate) return { count: NaN, label: '' }
-      const date = dayjs(property.listDate)
-      const daysNumber = dayjs().diff(date, 'day')
+      const daysNumber = property.daysOnMarket !== undefined && property.daysOnMarket !== null
+        ? toSafeNumber(property.daysOnMarket)
+        : (property.listDate ? Math.abs(dayjs(property.listDate).diff(dayjs(), 'day')) : NaN)
 
       return {
         count: daysNumber,
@@ -23,6 +25,7 @@ export const createPropertyI18nUtils = (
           : t('property.daysOnMarket', { count: daysNumber })
       }
     },
+
 
     getUpdatedDays: (days: string) => {
       const updatedDays = dayjs().diff(dayjs(days), 'day')

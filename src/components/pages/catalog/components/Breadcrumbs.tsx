@@ -22,7 +22,7 @@ const Breadcrumbs = ({
   const { setLoading } = useSearch()
   const crumbs = [defaultLocation.state, area, city, hood].filter(
     (crumb) => crumb
-  )
+  ) as string[]
 
   if (crumbs.length === 1) return null
 

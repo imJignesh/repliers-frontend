@@ -99,7 +99,7 @@ type ApiGetPostParams = {
   post: { [key: string]: unknown }
 }
 
-const postKeys: (keyof ApiQueryParams)[] = ['imageSearchItems']
+const postKeys: (keyof ApiQueryParams)[] = ['imageSearchItems', 'mlsNumber']
 
 export const createRequestGroups = (
   params: Partial<ApiQueryParams>

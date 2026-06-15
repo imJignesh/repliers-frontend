@@ -20,5 +20,11 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/r/:path*",
+      "destination": "/:path*"
+    }
   ]
 }

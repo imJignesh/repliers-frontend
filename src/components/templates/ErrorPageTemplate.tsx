@@ -1,10 +1,12 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 
 import { Button } from '@mui/material'
 
 import { FullscreenView } from 'components/atoms'
+import FeaturesProvider, { FeaturesContext } from 'providers/FeaturesProvider'
+import { features as staticFeatures } from 'features'
 
 import { PageTemplate } from '.'
 
@@ -13,9 +15,11 @@ export type ErrorPageProps = {
   reset?: () => void
 }
 
-const ErrorPageTemplate = ({ error, reset }: ErrorPageProps) => {
+/**
+ * Inner component that uses the features context (must be inside a FeaturesProvider).
+ */
+const ErrorPageInner = ({ error, reset }: ErrorPageProps) => {
   useEffect(() => {
-    // Log the error to an error reporting service
     console.error('[ErrorPageTemplate]', error)
   }, [error])
 
@@ -29,6 +33,27 @@ const ErrorPageTemplate = ({ error, reset }: ErrorPageProps) => {
         )}
       </FullscreenView>
     </PageTemplate>
+  )
+}
+
+/**
+ * Next.js error boundaries render outside the normal provider tree,
+ * so FeaturesProvider is not available. We re-wrap here with static
+ * defaults so Header (which calls useFeatures) doesn't crash.
+ */
+const ErrorPageTemplate = ({ error, reset }: ErrorPageProps) => {
+  const existingContext = useContext(FeaturesContext)
+
+  if (existingContext) {
+    // Already inside a FeaturesProvider — render directly
+    return <ErrorPageInner error={error} reset={reset} />
+  }
+
+  // Outside the provider tree (error boundary) — wrap with static defaults
+  return (
+    <FeaturesProvider features={staticFeatures}>
+      <ErrorPageInner error={error} reset={reset} />
+    </FeaturesProvider>
   )
 }
 

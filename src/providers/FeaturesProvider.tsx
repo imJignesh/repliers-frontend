@@ -5,6 +5,8 @@ import { type Features, features } from 'features'
 
 const FeaturesContext = createContext<Features | undefined>(undefined)
 
+export { FeaturesContext }
+
 const FeaturesProvider = ({
   children,
   features: propsFeatures

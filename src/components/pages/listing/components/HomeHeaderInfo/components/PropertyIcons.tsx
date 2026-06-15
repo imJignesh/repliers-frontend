@@ -1,5 +1,5 @@
-import { Stack, Typography } from '@mui/material'
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar'
+import { Stack, Typography } from '@mui/material'
 
 import IcoBath from '@icons/IcoBath'
 import IcoBed from '@icons/IcoBed'
@@ -22,7 +22,9 @@ const BasicPropertyIcons = ({ property }: { property: Property }) => {
   const beds = getBedrooms(details)
   const baths = getBathrooms(details)
   const lotSize = getLotSize(property)
-  const parking = toSafeNumber(details?.numParkingSpaces)
+  const parking =
+    toSafeNumber(details?.numGarageSpaces) ||
+    toSafeNumber(details?.numParkingSpaces)
 
   return (
     <Stack

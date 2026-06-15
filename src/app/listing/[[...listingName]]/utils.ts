@@ -37,11 +37,24 @@ export const fetchProperty = cache(
 
 export const fetchNearbies = cache(async (listingName: string) => {
   const parsedAddress = parseSeoUrl(listingName)
-  const { streetName, streetSuffix, city, boardId } = parsedAddress
-  const query = `${streetName} ${streetSuffix}, ${city}`
+  const { city, boardId, mlsNumber } = parsedAddress
+
+  let neighborhood = ''
+  let finalCity = city
+
+  if (mlsNumber) {
+    try {
+      const property = await fetchProperty(mlsNumber, boardId)
+      if (property && property.address) {
+        neighborhood = property.address.neighborhood || ''
+        finalCity = property.address.city || finalCity
+      }
+    } catch (error) {
+      console.error('[fetchNearbies] fetchProperty failed, using URL parsed address', error)
+    }
+  }
+
   const fetchParams: Partial<ApiQueryParams> = {
-    search: query,
-    searchFields: 'address.streetName,address.streetSuffix,address.city',
     boardId,
     status: 'A',
     type: 'sale',
@@ -50,8 +63,23 @@ export const fetchNearbies = cache(async (listingName: string) => {
     ...getListingFields()
   }
 
+  if (neighborhood) {
+    fetchParams.neighborhood = neighborhood
+    fetchParams.city = finalCity
+  } else if (finalCity) {
+    fetchParams.city = finalCity
+  }
+
   try {
-    const response = await SearchService.fetch(fetchParams)
+    let response = await SearchService.fetch(fetchParams)
+
+    // Fallback: if neighborhood search returned no results, try search by city only
+    if (neighborhood && (!response?.listings || response.listings.length === 0)) {
+      const cityParams = { ...fetchParams }
+      delete cityParams.neighborhood
+      response = await SearchService.fetch(cityParams)
+    }
+
     return response?.listings || []
   } catch (error) {
     console.error('[fetchNearbies] error', fetchParams, error)

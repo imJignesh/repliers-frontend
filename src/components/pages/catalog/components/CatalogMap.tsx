@@ -49,6 +49,7 @@ const CatalogMap = ({ listings }: { listings: Property[] }) => {
 
     useEffect(() => {
         if (!mapRef.current) return
+        MapService.setProperties(listings)
         MapService.showMarkers({
             properties: listings,
             onClick: (e, property) => {

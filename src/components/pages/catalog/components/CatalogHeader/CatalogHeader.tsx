@@ -24,6 +24,7 @@ import { CatalogMap, SeoDescription } from './components'
 
 const CatalogHeader = ({
   count,
+  viewMode,
   area,
   city,
   hood,
@@ -33,12 +34,13 @@ const CatalogHeader = ({
   location
 }: {
   count: number
+  viewMode?: 'listings' | 'buildings'
   area?: string
   city?: string
   hood?: string
   areas: ApiBoardArea[]
   cities: ApiBoardCity[]
-  hoods: ApiNeighborhood[]
+  hoods: any[]
   location?: ApiBoardCity | ApiNeighborhood
 }) => {
   const {
@@ -89,7 +91,7 @@ const CatalogHeader = ({
           justifyContent={'space-between'}
           padding={'40px 0'}
         >
-          <Box sx={{ clear: 'both'}}>
+          <Box sx={{ clear: 'both' }}>
             {/* <Button
               href={mapLink}
               target="_blank"
@@ -109,6 +111,8 @@ const CatalogHeader = ({
               {current}{' '}
               <span> Condos for Resale</span>
             </Typography>
+
+
           </Box>
           <Breadcrumbs area={area} city={city} hood={hood} />
           {/* <SeoDescription

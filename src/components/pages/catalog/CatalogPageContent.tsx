@@ -30,6 +30,7 @@ import {
   CatalogFilters,
   CatalogHeader,
   CatalogPagination,
+  CitiesOfRegion,
   FiltersList,
   HoodsOfCity,
   PopularSearches
@@ -58,7 +59,7 @@ const CatalogPageContent = ({
   city?: string
 
   areas: ApiBoardArea[]
-  hoods: ApiNeighborhood[]
+  hoods: any[]  // ApiNeighborhood[] or nested city items with neighborhoods
   cities: ApiBoardCity[]
   location?: ApiBoardCity | ApiNeighborhood
 
@@ -117,7 +118,7 @@ const CatalogPageInner = ({
   city?: string
 
   areas: ApiBoardArea[]
-  hoods: ApiNeighborhood[]
+  hoods: any[]  // ApiNeighborhood[] or nested city items with neighborhoods
   cities: ApiBoardCity[]
   location?: ApiBoardCity | ApiNeighborhood
 
@@ -171,6 +172,7 @@ const CatalogPageInner = ({
   }
 
   const buildings = locationTree?.buildings || []
+  const buildingsCount = locationTree?.buildingsTotal ?? locationTree?.buildings?.length ?? 0
 
   return (
     <MapOptionsProvider layout="map" style="map">
@@ -178,23 +180,24 @@ const CatalogPageInner = ({
 
         {/* Header — always full width constrained */}
         <Container maxWidth="xl" sx={{ pt: { xs: 0, sm: 0 } }}>
-          <CatalogHeader
-            count={count}
-            area={area}
-            city={city}
-            hood={hood}
-            areas={areas}
-            cities={cities}
-            hoods={hoods}
-            location={location}
-          />
+            <CatalogHeader
+              count={viewMode === 'buildings' ? buildingsCount : count}
+              viewMode={viewMode}
+              area={area}
+              city={city}
+              hood={hood}
+              areas={areas}
+              cities={cities}
+              hoods={hoods}
+              location={location}
+            />
         </Container>
 
         {/* Filters bar — always full width constrained */}
         <Box sx={{ boxShadow: count > 0 ? 1 : 0 }}>
           <Container maxWidth="xl" sx={{ pt: { xs: 0, sm: 0 } }}>
             <CatalogFilters
-              count={count}
+              count={viewMode === 'buildings' ? buildingsCount : count}
               area={area}
               city={city}
               hood={hood}
@@ -399,9 +402,7 @@ const CatalogPageInner = ({
           </Container>
         )}
 
-        <Box sx={{ mt: 4 }}>
-          <PopularSearches area={area} city={city} hood={hood} />
-        </Box>
+
 
       </Box>
     </MapOptionsProvider>

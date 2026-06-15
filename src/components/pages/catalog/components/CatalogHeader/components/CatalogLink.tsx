@@ -18,7 +18,8 @@ const CatalogLink = ({
   hood,
   variant = 'primary',
   onFocus,
-  onBlur
+  onBlur,
+  areaName
 }: {
   area?: ApiBoardArea
   city?: ApiBoardCity
@@ -26,6 +27,7 @@ const CatalogLink = ({
   variant?: 'primary' | 'secondary'
   onFocus?: (item: ApiNeighborhood | ApiBoardCity) => void
   onBlur?: () => void
+  areaName?: string
 }) => {
   const linkColorPrimary = darken(color, 0.1)
   const linkColorSecondary = darken(color, 0.3)
@@ -40,10 +42,11 @@ const CatalogLink = ({
 
   return (
     <Link
-      href={getCatalogUrl(
-        area ? area.name + '_area' : city?.name || '',
-        hood?.name || ''
-      )}
+      href={
+        area
+          ? getCatalogUrl(area.name + '_area')
+          : getCatalogUrl(areaName, city?.name || '', hood?.name || '')
+      }
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

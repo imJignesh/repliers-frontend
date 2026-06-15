@@ -56,7 +56,7 @@ const BuildingCard = ({ building }: BuildingCardProps) => {
                     )}
                 </Box>
                 <Box sx={{ p: 2 }}>
-                    <Typography variant="h6" sx={{
+                    <Typography variant="h6" component="div" sx={{
                         fontWeight: 700,
                         fontSize: '1.1rem',
                         mb: 0.5,

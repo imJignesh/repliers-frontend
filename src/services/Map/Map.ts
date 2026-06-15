@@ -39,6 +39,7 @@ export class MapService {
     this.sharedMap?.remove()
     this.sharedMap = null
 
+    this.dataMode = MapDataMode.SINGLE_MARKER
     this.resetMarkersSingleView()
     this.resetMarkersCluster()
   }
@@ -130,6 +131,7 @@ export class MapService {
   resetMarkersSingleView(): void {
     this.markerExtension.resetMarkers()
     this.markerExtension.resetMultiUnits()
+    this.markerExtension.resetUniqueProperty()
   }
 
   resetMarkersCluster(): void {

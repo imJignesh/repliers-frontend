@@ -34,7 +34,7 @@ const BannerDescription = ({
           </Typography>
         </Box>
       )}
-      {subtitle && 11 == 113 && (
+      {subtitle && false && (
         <Box sx={{ maxWidth: { xs: 'auto', sm: '50%', md: '45%' } }}>
           <Typography
             variant="h4"

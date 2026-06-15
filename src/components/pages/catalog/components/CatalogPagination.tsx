@@ -21,9 +21,11 @@ const CatalogPagination = ({
   count: number
 }) => {
   const router = useRouter()
-  const { setLoading } = useSearch()
+  const { loading, setLoading } = useSearch()
   const clientSide = useClientSide()
   const pages = Math.ceil(count / searchConfig.pageSize)
+
+  if (loading) return null
 
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
     setLoading(true)

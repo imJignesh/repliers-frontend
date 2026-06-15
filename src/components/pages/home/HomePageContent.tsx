@@ -27,8 +27,6 @@ const HomePageContent = () => {
       <FeaturedProperties />
 
 
-      <PopularSearches city={'Toronto'} />
-
 
     </Box >
   )

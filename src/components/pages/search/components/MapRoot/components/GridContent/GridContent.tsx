@@ -221,7 +221,7 @@ const GridContent = ({
           )}
         </Stack>
 
-        {count > searchConfig.pageSize && !showMultiUnits && (
+        {count > searchConfig.pageSize && !showMultiUnits && !loading && (
           <Box textAlign="center">
             <Pagination
               size="small"

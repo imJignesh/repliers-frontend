@@ -21,7 +21,7 @@ const NavigationBreadcrumbs = () => {
       <Link key="1" underline="hover" color="inherit" href={routes.map}>
         For sale
       </Link>
-      {notNA(area) && area !== city && (
+      {notNA(area) && (
         <Link
           key="4"
           underline="hover"

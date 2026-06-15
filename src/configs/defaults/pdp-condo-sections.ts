@@ -24,7 +24,8 @@ import {
   mapperSpecialAssessment,
   mapperTaxesYear,
   mapperTotalBeds,
-  mapperTotalParking
+  mapperTotalParking,
+  mapperYearBuilt
 } from 'utils/dataMapper/mappers'
 import { toAffirmative, toSafeNumber } from 'utils/formatters'
 import { scrubbed } from 'utils/properties'
@@ -103,7 +104,7 @@ const condoSections = {
       },
       {
         items: [
-          { label: 'pdp.fields.yearBuilt', path: 'details.yearBuilt' },
+          { label: 'pdp.fields.yearBuilt', fn: mapperYearBuilt },
           {
             label: 'pdp.fields.builderModel',
             fn: mapperBuilderModel

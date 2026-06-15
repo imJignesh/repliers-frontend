@@ -5,7 +5,7 @@ import { createRoot } from 'react-dom/client'
 // NOTE: controversial behavior - we are limiting features available
 // for the PropertyCard popup by SSG generated payload
 // We wouldn't be able to change them without redeploying the app
-import { payload } from 'features'
+import { features } from 'features'
 import { type Map, type Marker, Popup } from 'mapbox-gl'
 import { NextIntlClientProvider } from 'next-intl'
 
@@ -57,7 +57,7 @@ export class PopupExtension {
         timeZone={i18nConfig.timeZone}
       >
         <ThemeProvider theme={theme}>
-          <FeaturesProvider payload={payload}>
+          <FeaturesProvider features={features}>
             <UserProfileProvider>
               <PropertyCard size="map" property={property} />
             </UserProfileProvider>

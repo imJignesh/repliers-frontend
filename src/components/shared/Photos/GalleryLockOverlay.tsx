@@ -1,4 +1,4 @@
-import { SxProps, Theme } from '@mui/material'
+import { type SxProps, type Theme } from '@mui/material'
 import { Box, Button, Typography } from '@mui/material'
 
 import { useScrollToContact } from 'hooks/useScrollToContact'

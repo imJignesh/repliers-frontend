@@ -248,11 +248,6 @@ export const parseUrlFilters = (filters: string[]) => {
     }
   })
 
-  // Exclude placeholder / low-value listings for sales, but keep valid lease prices
-  if (searchFilters.listingStatus !== 'rent' && searchFilters.minPrice === undefined) {
-    searchFilters.minPrice = 1
-  }
-
   return {
     ...searchFilters,
     listingType: parseListingType(filters)

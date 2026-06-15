@@ -77,6 +77,11 @@ export const fetchListings = async ({
     ...filters
   }
 
+  // Exclude placeholder / low-value listings for sales at the API level
+  if (fetchParams.listingStatus !== 'rent' && fetchParams.minPrice === undefined) {
+    fetchParams.minPrice = 1
+  }
+
   // Only restrict by MLS numbers if we are looking up a neighborhood
   if (hood) {
     fetchParams.mlsNumber = mlsNumbers.length > 0 ? mlsNumbers : ['NONE']

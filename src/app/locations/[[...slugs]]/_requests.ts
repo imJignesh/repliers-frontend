@@ -39,16 +39,40 @@ export const fetchListings = async ({
   let count = 0
   let listPrice = null
 
-  const fetchParams = {
+  // When a hood is given, resolve exact MLS numbers from the cached /area/{slug}/listings
+  // endpoint rather than sending neighborhood= directly to searchListings, which requires
+  // a live DB query (resolveLocationIds) that can time out on the remote DB.
+  let mlsNumbers: string[] = []
+  if (hood) {
+    try {
+      const { APILocations } = await import('services/API')
+      const rawEntries = await APILocations.fetchNeighborhoodListings(hood)
+      // Each entry is "{full_address} {mlsNumber} {boardId}"
+      mlsNumbers = rawEntries
+        .map((entry: string) => {
+          const parts = entry.trim().split(/\s+/)
+          return parts.length >= 2 ? parts[parts.length - 2] : ''
+        })
+        .filter(Boolean)
+    } catch (e) {
+      console.error('[fetchListings] could not fetch MLS numbers for', hood, e)
+    }
+  }
+
+  const fetchParams: Record<string, any> = {
     area: area || city,
     city: area ? city : '',
-    neighborhood: hood,
-    // status: 'A',
     pageNum: page,
     resultsPerPage: searchConfig.pageSize,
     boardId: searchConfig.defaultBoardId,
     ...getListingFields(),
     ...filters
+  }
+
+  if (hood) {
+    // Use exact MLS numbers when available; fall back to NONE so the search
+    // returns 0 rather than the full DB scan which can time out.
+    fetchParams.mlsNumber = mlsNumbers.length > 0 ? mlsNumbers : ['NONE']
   }
 
   try {

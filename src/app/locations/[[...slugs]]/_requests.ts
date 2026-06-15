@@ -39,13 +39,12 @@ export const fetchListings = async ({
   let count = 0
   let listPrice = null
 
-  // When a specific neighborhood (hood) is given, the Repliers API's `neighborhood`
-  // param does a fuzzy/substring match — e.g. "Allandale" also matches
-  // "Allandale Centre", returning hundreds of wrong results.
-  // Instead, fetch the exact MLS numbers for this neighborhood from the
-  // Locations service and filter by those IDs for a precise result.
+  // When a specific neighborhood (hood) is given, or a custom city (like "Downtown"), 
+  // the Repliers API param doesn't match perfectly.
+  // Instead, fetch the exact MLS numbers from the Locations service.
   let mlsNumbers: string[] = []
-  const target = hood // Only fetch exact MLS numbers for neighborhood-level queries
+  const isCustomCity = city && area && area.toLowerCase() !== city.toLowerCase()
+  const target = hood || (isCustomCity ? city : undefined)
   if (target) {
     try {
       const { APILocations } = await import('services/API')
@@ -82,8 +81,8 @@ export const fetchListings = async ({
     fetchParams.minPrice = 1
   }
 
-  // Only restrict by MLS numbers if we are looking up a neighborhood
-  if (hood) {
+  // Only restrict by MLS numbers if we are looking up a custom target
+  if (target) {
     fetchParams.mlsNumber = mlsNumbers.length > 0 ? mlsNumbers : ['NONE']
   }
 

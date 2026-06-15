@@ -32,10 +32,7 @@ import type { OptionalTransformers, SimpleTransformers } from './types'
 import { formatPastDate, nonZeroValue } from './utils'
 
 export const simpleTransformers: SimpleTransformers = {
-  minPrice: (v) => {
-    const num = Number(v)
-    return num == 0 ? { minPrice: 1 } : { minPrice: num } // should always be at least 1
-  },
+  minPrice: (v) => nonZeroValue('minPrice', v), // 0 means "no filter", same as every other range filter
   maxPrice: (v) => nonZeroValue('maxPrice', v),
   minBeds: (v) => {
     const effect = nonZeroValue('minBeds', v)

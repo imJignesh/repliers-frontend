@@ -25,7 +25,7 @@ const content = {
   siteDefaultBrokerageName: 'IRISE',
   siteKeywords: ['Precondo', 'Precondos for sale in Canada'],
   siteDescription:
-    "Welcome to Precondo, your exclusive access to all the new and upcoming condos in Canada. Everything you'll need when it comes to properties for Sale, Rent & Preconstruction Properties!",
+    "Welcome to Precondo, your exclusive access to all the new and upcoming condos in Canada. Everything you'll need when it comes to properties for Sale & Preconstruction Properties!",
   siteFooterDescription:
     'Our mission is to make the MLS more valuable while remaining committed to the needs of local markets. We do this by delivering exceptional customer service and striving for continuous innovation.',
   siteFullscreenFooter: '',
@@ -54,7 +54,7 @@ const content = {
     //   telephone: false
     // },
     description:
-      "Welcome to Precondo, your exclusive access to all the new and upcoming condos in Canada. Everything you'll need when it comes to properties for Sale, Rent & Preconstruction Properties!",
+      "Welcome to Precondo, your exclusive access to all the new and upcoming condos in Canada. Everything you'll need when it comes to properties for Sale & Preconstruction Properties!",
     icons: {
       icon: 'https://precondo.ca/r/favicon.ico'
     }

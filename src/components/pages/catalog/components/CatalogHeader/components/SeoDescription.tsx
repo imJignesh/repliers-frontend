@@ -72,6 +72,13 @@ const SeoDescription = ({
 
   if (!clientSide) return null
 
+  const findAreaForCity = (cityName: string) => {
+    const matchedArea = (areas || []).find((a) =>
+      (a.cities || []).some((c) => c.name.toLowerCase() === cityName.toLowerCase())
+    )
+    return matchedArea?.name
+  }
+
   if (!cities.length || !count)
     return (
       <Stack spacing={2} pt={2}>
@@ -103,7 +110,7 @@ const SeoDescription = ({
 
   const MajorCities = majorCities.map((city) => (
     <React.Fragment key={city.name}>
-      <CatalogLink city={city} onFocus={onLinkFocus} onBlur={onLinkBlur} /> (
+      <CatalogLink city={city} areaName={area || findAreaForCity(city.name)} onFocus={onLinkFocus} onBlur={onLinkBlur} /> (
       <Counter count={city.activeCount} /> listings)
     </React.Fragment>
   ))
@@ -126,6 +133,7 @@ const SeoDescription = ({
       >
         <CatalogLink
           city={city}
+          areaName={area || findAreaForCity(city.name)}
           variant="secondary"
           onBlur={onLinkBlur}
           onFocus={onLinkFocus}
@@ -139,6 +147,7 @@ const SeoDescription = ({
           <CatalogLink
             city={location as ApiBoardCity}
             hood={hood}
+            areaName={area || findAreaForCity(city)}
             key={index}
             onBlur={onLinkBlur}
             onFocus={onLinkFocus}
@@ -165,6 +174,7 @@ const SeoDescription = ({
             Among these,{' '}
             <CatalogLink
               city={mainCity}
+              areaName={area || findAreaForCity(mainCity.name)}
               onBlur={onLinkBlur}
               onFocus={onLinkFocus}
             />{' '}
@@ -190,6 +200,7 @@ const SeoDescription = ({
           Cities:{' '}
           <CatalogLink
             city={mainCity}
+            areaName={area || findAreaForCity(mainCity.name)}
             onBlur={onLinkBlur}
             onFocus={onLinkFocus}
           />{' '}

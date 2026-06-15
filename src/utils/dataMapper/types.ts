@@ -4,7 +4,7 @@ import { type Primitive } from 'utils/formatters'
 export type ResolverItem = {
   label: string
   path?: string
-  fn?: (obj: Property, value?: any) => string
+  fn?: (obj: Property, value?: any) => any
 }
 
 export type DetailsItemType = {

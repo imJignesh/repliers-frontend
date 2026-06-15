@@ -39,17 +39,54 @@ export const fetchListings = async ({
   let count = 0
   let listPrice = null
 
-  const fetchParams = {
+  // When a specific neighborhood (hood) is given, or a custom city (like "Downtown"), 
+  // the Repliers API param doesn't match perfectly.
+  // Instead, fetch the exact MLS numbers from the Locations service.
+  let mlsNumbers: string[] = []
+  const isCustomCity = city && area && area.toLowerCase() !== city.toLowerCase()
+  const target = hood || (isCustomCity ? city : undefined)
+  if (target) {
+    try {
+      const { APILocations } = await import('services/API')
+      const targetCity = hood ? city : undefined
+      const targetArea = (hood || city) ? area : undefined
+      // Fetch exact database-backed MLS numbers for this location (area, city, or neighborhood)
+      const rawEntries = await APILocations.fetchNeighborhoodListings(target, targetCity, targetArea)
+      console.log('[fetchListings] target:', target, '→ rawEntries:', rawEntries)
+      mlsNumbers = rawEntries
+        .map((entry: string) => {
+          const parts = entry.trim().split(/\s+/)
+          // Format: "{address tokens...} {mlsNumber} {boardId}"
+          return parts.length >= 2 ? parts[parts.length - 2] : ''
+        })
+        .filter(Boolean)
+      console.log('[fetchListings] resolved mlsNumbers:', mlsNumbers)
+    } catch (e) {
+      console.error('[fetchListings] could not fetch database listings for', target, e)
+    }
+  }
+
+  const fetchParams: Record<string, any> = {
     area: area || city,
     city: area ? city : '',
-    neighborhood: hood,
-    // status: 'A',
     pageNum: page,
     resultsPerPage: searchConfig.pageSize,
     boardId: searchConfig.defaultBoardId,
     ...getListingFields(),
     ...filters
   }
+
+  // Exclude placeholder / low-value listings for sales at the API level
+  if (fetchParams.listingStatus !== 'rent' && fetchParams.minPrice === undefined) {
+    fetchParams.minPrice = 1
+  }
+
+  // Only restrict by MLS numbers if we are looking up a custom target
+  if (target) {
+    fetchParams.mlsNumber = mlsNumbers.length > 0 ? mlsNumbers : ['NONE']
+  }
+
+  console.log('[fetchListings] final fetchParams keys:', Object.keys(fetchParams), 'mlsNumber count:', mlsNumbers.length)
 
   try {
     const response = await SearchService.fetch(fetchParams)
@@ -64,6 +101,8 @@ export const fetchListings = async ({
 
   return { listings, count, listPrice }
 }
+
+
 
 export const fetchLocations = async (
   city = '',

@@ -6,7 +6,8 @@ import { type Property } from 'services/API'
 import {
   formatDate,
   formatEnglishPrice,
-  type Primitive
+  type Primitive,
+  toSafeNumber
 } from 'utils/formatters'
 import { SQFT_PER_ACRE } from 'utils/numbers'
 import { sold } from 'utils/properties'
@@ -32,10 +33,10 @@ export function mapperCategory(property: Property) {
 }
 
 export function mapperDaysOnMarket(property: Property) {
-  const isNew = property.lastStatus === 'New'
   if (!sold(property)) {
-    const date = isNew ? property.listDate : property.soldDate
-    const days = dayjs().diff(date, 'day') || 0
+    const days = property.daysOnMarket !== undefined && property.daysOnMarket !== null
+      ? toSafeNumber(property.daysOnMarket)
+      : (property.listDate ? Math.abs(dayjs(property.listDate).diff(dayjs(), 'day')) : 0)
     return pluralize(days, {
       zero: 'listed today',
       one: '$ day ago',
@@ -44,6 +45,7 @@ export function mapperDaysOnMarket(property: Property) {
   }
   return null
 }
+
 
 export function mapperListDate(property: Property) {
   if (sold(property) && property.type !== 'Lease') return null
@@ -120,7 +122,10 @@ export function mapperBaths(property: Property) {
 
 export function mapperTotalParking(property: Property) {
   const { numParkingSpaces, numGarageSpaces } = property.details
-  return joinNonEmpty([+numGarageSpaces, +numParkingSpaces], ' + ')
+  const garage = toSafeNumber(numGarageSpaces)
+  const parking = toSafeNumber(numParkingSpaces)
+  const val = garage || parking
+  return val ? val.toString() : null
 }
 
 export function mapperAppliancesIncluded(property: Property) {
@@ -159,12 +164,44 @@ export function mapperNeighborhoodInfluences(property: Property) {
   return sanitizeItems(ammenities)
 }
 
+export function isAgeRange(value: string | null | undefined): boolean {
+  if (!value) return false
+  return /^\d+-\d+$/.test(value) || /^\d+\+$/.test(value) || value === 'New'
+}
+
+export function formatYearBuiltValue(value: string | null | undefined): string | null {
+  if (!value || isEmptyValue(value)) return null
+
+  // If it's a 4-digit number (e.g. 2015), return it as is
+  if (/^\d{4}$/.test(value)) {
+    return value
+  }
+
+  // If it matches a range (e.g. 0-5, 16-30) or a plus (e.g. 100+), add "years"
+  if (/^\d+-\d+$/.test(value) || /^\d+\+$/.test(value)) {
+    return `${value} years`
+  }
+
+  return value
+}
+
+export function mapperYearBuilt(property: Property) {
+  const { yearBuilt } = property.details
+  const value = formatYearBuiltValue(yearBuilt)
+  const label = isAgeRange(yearBuilt) ? 'pdp.fields.age' : 'pdp.fields.yearBuilt'
+  return { label, value }
+}
+
 export function mapperConstructionYearBuilt(property: Property) {
   const { yearBuilt } = property.details
   const ageDescription = property.raw?.AgeDescription
-  return yearBuilt && !isEmptyValue(yearBuilt)
-    ? `${yearBuilt} ${ageDescription || ''}`.replace('Unknown', '').trim()
-    : null
+  const formattedYear = formatYearBuiltValue(yearBuilt)
+
+  if (!formattedYear || isEmptyValue(formattedYear)) return null
+
+  const value = `${formattedYear} ${ageDescription || ''}`.replace('Unknown', '').trim()
+  const label = isAgeRange(yearBuilt) ? 'pdp.fields.age' : 'pdp.fields.yearBuilt'
+  return { label, value }
 }
 
 export function mapperAcres(property: Property) {

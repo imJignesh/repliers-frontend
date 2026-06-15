@@ -1,18 +1,23 @@
 import { features } from 'features'
+import { notFound, permanentRedirect } from 'next/navigation'
 
-import { Page404Template, PageTemplate } from '@templates'
+import { PageTemplate } from '@templates'
 import CatalogPageContent from '@pages/catalog'
 
 import { generateMetadata as generatePropertyMetadata } from 'app/listing/[[...listingName]]/page'
 import PropertyPage from 'app/listing/[[...listingName]]/page'
 
-import { APILocations, type ApiBoardArea, type ApiBoardCity } from 'services/API'
+import {
+  type ApiBoardArea,
+  type ApiBoardCity,
+  APILocations
+} from 'services/API'
 
-import { parseUrlFilters, parseUrlParams } from './_parsers'
+import { filter as isFilterSegment, parseUrlFilters, parseUrlParams } from './_parsers'
+import { beautify } from './_parsers'
 import { fetchListings, fetchLocations } from './_requests'
 import { generateCatalogMetadata } from './_ssg'
-import { extractCities, extractLocation } from './_utils'
-import { beautify } from './_parsers'
+import { extractCities, extractLocation, refineLocation } from './_utils'
 
 // catalog pages CANT BE STATICALLY GENERATED (SSG)
 // because we need a token cookie to fetch listings from the client side
@@ -58,7 +63,7 @@ const LocationsCatalogPage = async (props: {
   const page = Number(searchParams.page) || 1
   const { slugs } = params
 
-  if (!features.listings) return <Page404Template />
+  if (!features.listings) notFound()
 
   const {
     filters,
@@ -69,17 +74,49 @@ const LocationsCatalogPage = async (props: {
     unknowns
   } = parseUrlParams(slugs)
 
+  // ─── Slug validation ────────────────────────────────────────────────────────
+  // Extract the raw URL segments that are location slugs (not filters / listing
+  // IDs / zip codes).  Each must exist in the Laravel location tree; if any is
+  // unknown we return a 404 immediately — before fetching any listing data.
+  // Validation runs in parallel with the area/area-data fetches below.
+  const listingIdRegex = /^(.*)-(\d{5,8})(-(\d{1,3}))?$/
+  const usZipRegex = /^\d{5}(-\d{4})?$/
+  const canadianPostalRegex = /^[A-Za-z]\d[A-Za-z][- ]\d[A-Za-z]\d$/
+  const isListingId = (s: string) => listingIdRegex.test(s)
+  const isZipCode = (s: string) => usZipRegex.test(s) || canadianPostalRegex.test(s)
+
+  const rawLocationSlugs = (slugs ?? []).filter(
+    (seg) => !isFilterSegment(seg) && !isListingId(seg) && !isZipCode(seg)
+  )
+
+  const currentPath = '/locations' + (slugs?.length ? '/' + slugs.join('/') : '')
+
   // Fetch data needed for identification
   // Pass empty neighborhood to fetch all neighborhoods in the city for loose matching later
-  const fetchAreas = await fetchLocations(urlCity, '')
-  const dynamicAreasData = await APILocations.fetchAreas()
+  const [fetchAreas, dynamicAreasData, slugValidation, redirectInfo] = await Promise.all([
+    fetchLocations(urlCity, ''),
+    APILocations.fetchAreas(),
+    rawLocationSlugs.length
+      ? APILocations.validateSlugs(rawLocationSlugs)
+      : Promise.resolve({} as Record<string, string | null>),
+    APILocations.lookupRedirect(currentPath)
+  ])
+
+  // If redirect exists in the database, redirect permanently
+  if (redirectInfo?.destination) {
+    permanentRedirect(redirectInfo.destination)
+  }
+
+  // 404 if any location segment is unknown to the database
+  const hasInvalidSlug = rawLocationSlugs.some((slug) => slug in slugValidation && slugValidation[slug] === null)
+  if (hasInvalidSlug) notFound()
 
   // Build ApiBoardArea[] from the nested cities structure returned by /areas
-  const formattedAreas: ApiBoardArea[] = dynamicAreasData.map((a: any) => ({
+  const formattedAreas: ApiBoardArea[] = (dynamicAreasData as any[]).map((a: any) => ({
     name: a.name,
     cities: (a.cities ?? []).map((c: any) => ({
       name: c.name,
-      activeCount: 0,
+      activeCount: Number(c.listing_count) || 0,
       location: { lat: 0, lng: 0 },
       state: 'ON',
       neighborhoods: (c.neighborhoods ?? []).map((name: string) => ({
@@ -93,57 +130,7 @@ const LocationsCatalogPage = async (props: {
   const finalAreas = formattedAreas.length ? formattedAreas : fetchAreas
 
   // Refine location identification
-  let area = urlArea
-  let city = urlCity
-  let hood = urlHood
-
-  const normalize = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
-
-  if (!area) {
-    const asArea = finalAreas.find((a) => normalize(a.name) === normalize(city));
-    if (asArea) {
-      area = asArea.name;
-
-      const slug2 = hood;
-      const asCity = asArea.cities?.find((c: any) => normalize(c.name || c) === normalize(slug2));
-
-      if (asCity) {
-        city = typeof asCity === 'string' ? asCity : asCity.name;
-        hood = unknowns.length > 0 ? beautify(unknowns.shift() as string) : '';
-      } else {
-        let foundCity = null;
-        let foundHood = null;
-        if (asArea.cities) {
-          for (const c of asArea.cities) {
-            const h = c.neighborhoods?.find((n: any) => normalize(n.name || n) === normalize(slug2));
-            if (h) {
-              foundCity = c.name;
-              foundHood = typeof h === 'string' ? h : h.name;
-              break;
-            }
-          }
-        }
-
-        if (foundHood) {
-          city = foundCity;
-          hood = foundHood;
-        } else {
-          city = slug2 || '';
-          hood = unknowns.length > 0 ? beautify(unknowns.shift() as string) : '';
-        }
-      }
-    }
-  }
-
-  // extract the correct neighborhood name from the list of areas
-  if (hood && city) {
-    const location = extractLocation(finalAreas, city, hood)
-    if (location && 'name' in location) {
-      hood = location.name
-    }
-  }
-
-  console.log({ filters, boardId, listingId, localAddress, area, city, hood })
+  const { area, city, hood } = refineLocation(finalAreas, urlArea, urlCity, urlHood, unknowns)
 
   // render property page component if listingId is present and emulate its old url format
   if (listingId) {
@@ -164,7 +151,7 @@ const LocationsCatalogPage = async (props: {
     page
   })
 
-  if (page > 1 && !listings.length) return <Page404Template />
+  if (page > 1 && !listings.length) notFound()
 
   const byCount = (a: any, b: any) => b.activeCount - a.activeCount
 
@@ -172,42 +159,51 @@ const LocationsCatalogPage = async (props: {
   const currentLocation = city
     ? extractLocation(finalAreas, city, hood)
     : undefined
-  const citiesList = extractCities(currentArea ? [currentArea] : finalAreas).sort(
-    byCount
-  )
+  const citiesList = extractCities(
+    currentArea ? [currentArea] : finalAreas
+  ).sort(byCount)
 
   // Fetch area direct children: for an area returns [{name, neighborhoods}], for a city returns string[]
   let hoods: any[] = []
   const targetForNeighborhoods = city || area
   if (targetForNeighborhoods) {
-    const dynamicData = await APILocations.fetchAreaNeighborhoods(targetForNeighborhoods)
+    const dynamicData = await APILocations.fetchAreaNeighborhoods(
+      targetForNeighborhoods,
+      true
+    )
 
     if (dynamicData.length > 0) {
-      if (typeof dynamicData[0] === 'string') {
-        // City-level: flat neighborhood names
-        hoods = (dynamicData as string[]).map((name) => ({
-          name,
-          activeCount: 0,
+      const first = dynamicData[0]
+      const isNested = typeof first === 'object' && first !== null && 'neighborhoods' in first
+
+      if (!isNested) {
+        // City-level: flat neighborhood objects
+        hoods = (dynamicData as any[]).map((n) => ({
+          name: n.name,
+          activeCount: Number(n.listing_count) || 0,
           location: { lat: 0, lng: 0 }
         }))
       } else {
         // Area-level: nested [{name, neighborhoods}] — use city names as hoods
         hoods = (dynamicData as any[]).map((c) => ({
           name: c.name,
-          activeCount: 0,
+          activeCount: Number(c.listing_count) || 0,
           location: { lat: 0, lng: 0 },
-          neighborhoods: (c.neighborhoods ?? []).map((n: string) => ({
-            name: n,
-            activeCount: 0,
+          neighborhoods: (c.neighborhoods ?? []).map((n: any) => ({
+            name: typeof n === 'string' ? n : n.name,
+            activeCount: typeof n === 'string' ? 0 : (Number(n.listing_count) || 0),
             location: { lat: 0, lng: 0 }
           }))
         }))
       }
     } else {
       // Fallback to computed data from areas
-      hoods = city && currentLocation
-        ? (currentLocation as ApiBoardCity).neighborhoods || []
-        : (currentArea ? currentArea.cities : [])
+      hoods =
+        city && currentLocation
+          ? (currentLocation as ApiBoardCity).neighborhoods || []
+          : currentArea
+            ? currentArea.cities
+            : []
     }
   }
 

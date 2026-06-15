@@ -39,7 +39,7 @@ import { type Filters } from 'services/Search'
 import { useSearch } from 'providers/SearchProvider'
 import useBreakpoints from 'hooks/useBreakpoints'
 import useClientSide from 'hooks/useClientSide'
-import { getCatalogUrl } from 'utils/urls'
+import { getCatalogUrl, sanitizeUrl } from 'utils/urls'
 import { capitalize } from 'utils/strings'
 import location, { citymap } from 'configs/defaults/location'
 
@@ -51,21 +51,8 @@ const statusItems: Array<[ListingStatus, string]> = [
 // Helper for fuzzy matching
 const normalize = (str?: string) => str ? str.toLowerCase().replace(/[^a-z0-9]/g, '') : ''
 
-// Helper for bucketed counts
-const formatCount = (n: number) => {
-  if (n >= 3500) return '3k+'
-  if (n >= 3000) return '2.5k+'
-  if (n >= 2500) return '2k+'
-  if (n >= 2000) return '1.5k+'
-  if (n >= 1500) return '1k+'
-  if (n >= 1000) return '500+'
-  if (n >= 500) return '100+'
-  if (n >= 100) return '50+'
-  if (n >= 50) return '25+'
-  if (n >= 25) return '10+'
-  if (n >= 10) return '5+'
-  return '<5'
-}
+// Helper to return accurate counts
+const formatCount = (n: number) => String(n)
 
 const CatalogFilters = ({
   count,
@@ -190,9 +177,9 @@ const CatalogFilters = ({
 
   useEffect(() => {
     if (selectedRegion) {
-      const slug = selectedRegion.toLowerCase().replace(/\s+/g, '-')
+      const slug = sanitizeUrl(selectedRegion)
       const localityName = hood || city // Provide locality via hood or city
-      const buildingsSlug = localityName ? localityName.toLowerCase().replace(/\s+/g, '-') : slug
+      const buildingsSlug = localityName ? sanitizeUrl(localityName) : slug
 
       // Avoid re-fetching if we already have the correct data
       if (locationTree &&
@@ -221,6 +208,7 @@ const CatalogFilters = ({
           if (locationDataFull.success) {
             const locationData = locationDataFull.data
             locationData.buildingsSlug = buildingsSlug
+            locationData.buildingsTotal = buildingsList.total ?? (Array.isArray(buildingsList) ? buildingsList.length : 0)
 
             const buildings = buildingsList.data || (Array.isArray(buildingsList) ? buildingsList : [])
 
@@ -279,12 +267,12 @@ const CatalogFilters = ({
 
     if (sort && sort !== 'createdOnDesc') urlFilters.push('sort-' + sort)
 
-    if (f.minPrice) urlFilters.push(`above - ${f.minPrice} `)
-    if (f.maxPrice) urlFilters.push(`below - ${f.maxPrice} `)
-    if (f.minBeds) urlFilters.push(`${f.minBeds} -bed`)
-    if (f.minBaths) urlFilters.push(`${f.minBaths} -bath`)
-    if (f.minGarageSpaces) urlFilters.push(`${f.minGarageSpaces} -garage`)
-    if (f.minParkingSpaces) urlFilters.push(`${f.minParkingSpaces} -parking`)
+    if (f.minPrice) urlFilters.push(`above-${f.minPrice}`)
+    if (f.maxPrice) urlFilters.push(`below-${f.maxPrice}`)
+    if (f.minBeds) urlFilters.push(`${f.minBeds}-bed`)
+    if (f.minBaths) urlFilters.push(`${f.minBaths}-bath`)
+    if (f.minGarageSpaces) urlFilters.push(`${f.minGarageSpaces}-garage`)
+    if (f.minParkingSpaces) urlFilters.push(`${f.minParkingSpaces}-parking`)
 
     return urlFilters
   }
@@ -314,7 +302,7 @@ const CatalogFilters = ({
     if (filtersChanged) {
       setLoading(true)
       const urlFilters = createFiltersArray(filters)
-      const newUrl = getCatalogUrl(city || area, hood, urlFilters)
+      const newUrl = getCatalogUrl(area, city, hood, urlFilters)
       router.push(newUrl)
     }
   }, [filters, searchFilters, city, hood, area, clientSide, router])
@@ -332,7 +320,9 @@ const CatalogFilters = ({
 
   const getSubLocationUrl = (locationName: string) => {
     const filters = createFiltersArray({})
-    if (city) {
+    if (area && city) {
+      return getCatalogUrl(area, city, locationName, filters)
+    } else if (city) {
       // We are in a city, clicking a neighborhood (Level 2)
       return getCatalogUrl(city, locationName, filters)
     } else if (area) {
@@ -464,12 +454,15 @@ const CatalogFilters = ({
         </Stack>
         <Box
           sx={{
-            minWidth: { md: 218 },
-            alignContent: 'end',
-            textAlign: 'right'
+            flex: 1,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
           }}
         >
-          <ListingsCounter count={count} />
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            {count} {viewMode === 'buildings' ? 'buildings' : 'listings'} found
+          </Typography>
         </Box>
         <Box
           sx={{
@@ -542,37 +535,13 @@ const CatalogFilters = ({
           </Box>
         ) : (
           <Stack spacing={1}>
-            <Box
-              component={Link}
-              href={city && hood ? getCatalogUrl(city, '', createFiltersArray({})) : '#'}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                textDecoration: 'none',
-                color: 'primary.main',
-                whiteSpace: 'nowrap',
-                cursor: (city && hood) ? 'pointer' : 'default',
-                '&:hover': {
-                  '& .region-label': {
-                    textDecoration: (city && hood) ? 'underline' : 'none'
-                  }
-                }
-              }}
-            >
-              <Typography
-                className="region-label"
-                variant="subtitle2"
-                sx={{ fontWeight: 700 }}
-              >
-                Areas in {selectedRegion}:
-              </Typography>
-            </Box>
 
+ 
             <Box sx={{ display: 'flex', alignItems: 'center', paddingBottom: "30px" }}>
               <IconButton onClick={() => handleScroll('left')} size="small" sx={{ p: 0, mr: 1, border: '1px solid', borderColor: 'divider' }}>
                 <ChevronLeftIcon />
               </IconButton>
-
+ 
               <Box
                 ref={scrollContainerRef}
                 sx={{
@@ -604,120 +573,126 @@ const CatalogFilters = ({
                         return a.localeCompare(b)
                       })
                       .map((locationName) => (
-                        <Button
-                          key={locationName}
-                          component={Link}
-                          href={getSubLocationUrl(locationName)}
-                          onClick={() => setLoading(true)}
-                          variant={normalize(hood) === normalize(locationName) || normalize(city) === normalize(locationName) ? 'contained' : 'outlined'}
-                          sx={{
-                            px: 1.5,
-                            py: 0.5,
-                            minHeight: 32,
-                            textTransform: 'none',
-                            whiteSpace: 'nowrap',
-                            flexShrink: 0,
-                            borderRadius: '4px',
-                            borderColor: 'primary.light',
-                            '&:hover': {
-                              bgcolor: 'primary.main',
-                              color: 'white'
-                            }
-                          }}
-                        >
-                          {capitalize(locationName)}
-                        </Button>
+                        <Box key={locationName} sx={{ m: 0, display: 'inline-flex' }}>
+                          <Button
+                            component={Link}
+                            href={getSubLocationUrl(locationName)}
+                            onClick={() => setLoading(true)}
+                            variant={normalize(hood) === normalize(locationName) || normalize(city) === normalize(locationName) ? 'contained' : 'outlined'}
+                            sx={{
+                              px: 1.5,
+                              py: 0.5,
+                              minHeight: 32,
+                              textTransform: 'none',
+                              whiteSpace: 'nowrap',
+                              flexShrink: 0,
+                              borderRadius: '4px',
+                              borderColor: 'primary.light',
+                              '&:hover': {
+                                bgcolor: 'primary.main',
+                                color: 'white'
+                              }
+                            }}
+                          >
+                            <Box component="h2" sx={{ m: 0, fontSize: 'inherit', fontWeight: 'inherit', display: 'inline' }}>
+                              {capitalize(locationName)}
+                            </Box>
+                          </Button>
+                        </Box>
                       ))}
-
+ 
                     {/* New Hierarchical Groups View */}
                     {locationTree && locationTree.children && (
                       <>
                         {locationTree.children.filter((group: any) => group.listing_count > 0 || group.building_count > 0).map((group: any) => {
                           const isActive = activeGroupId === group.id
                           return (
-                            <Stack
-                              key={group.id}
-                              direction="row"
-                              sx={{
-                                flexShrink: 0,
-                                borderRadius: '4px',
-                                border: '1px solid',
-                                borderColor: isActive ? 'primary.main' : 'divider',
-                                bgcolor: isActive ? 'primary.main' : 'background.paper',
-                                color: isActive ? 'white' : 'text.primary',
-                                overflow: 'hidden',
-                                boxShadow: isActive ? 2 : 0,
-                                '&:hover': {
-                                  borderColor: 'primary.main',
-                                }
-                              }}
-                            >
-                              <Button
-                                component={Link}
-                                href={`${routes.listings}/${locationTree.slug}/${group.slug}`}
-                                onClick={() => setLoading(true)}
+                            <Box key={group.id} sx={{ m: 0, display: 'inline-flex' }}>
+                              <Stack
+                                direction="row"
                                 sx={{
-                                  textTransform: 'none',
-                                  whiteSpace: 'nowrap',
-                                  px: 1.5,
-                                  py: 0.5,
-                                  minHeight: 32,
-                                  borderRadius: 0,
-                                  color: 'inherit',
-                                  border: 'none',
+                                  flexShrink: 0,
+                                  borderRadius: '4px',
+                                  border: '1px solid',
+                                  borderColor: isActive ? 'primary.main' : 'divider',
+                                  bgcolor: isActive ? 'primary.main' : 'background.paper',
+                                  color: isActive ? 'white' : 'text.primary',
+                                  overflow: 'hidden',
+                                  boxShadow: isActive ? 2 : 0,
                                   '&:hover': {
-                                    bgcolor: isActive ? 'primary.dark' : 'rgba(0, 0, 0, 0.04)',
-                                    border: 'none'
+                                    borderColor: 'primary.main',
                                   }
                                 }}
                               >
-                                {group.name}
-                                <Box
-                                  component="span"
+                                <Button
+                                  component={Link}
+                                  href={`${routes.listings}/${locationTree.slug}/${group.slug}`}
+                                  onClick={() => setLoading(true)}
                                   sx={{
-                                    ml: 1,
-                                    px: 0.75,
-                                    py: 0.25,
-                                    borderRadius: '12px',
-                                    fontSize: '0.75rem',
-                                    lineHeight: 1,
-                                    fontWeight: 600,
-                                    bgcolor: isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.06)',
-                                    color: isActive ? 'inherit' : 'text.secondary'
+                                    textTransform: 'none',
+                                    whiteSpace: 'nowrap',
+                                    px: 1.5,
+                                    py: 0.5,
+                                    minHeight: 32,
+                                    borderRadius: 0,
+                                    color: 'inherit',
+                                    border: 'none',
+                                    '&:hover': {
+                                      bgcolor: isActive ? 'primary.dark' : 'rgba(0, 0, 0, 0.04)',
+                                      border: 'none'
+                                    }
                                   }}
                                 >
-                                  {formatCount(group.listing_count > 0 ? group.listing_count : group.building_count)}
-                                </Box>
-                              </Button>
-                              <Box
-                                sx={{
-                                  width: '1px',
-                                  bgcolor: isActive ? 'rgba(255, 255, 255, 0.3)' : 'divider'
-                                }}
-                              />
-                              <Button
-                                size="small"
-                                onClick={() => setActiveGroupId(isActive ? null : group.id)}
-                                sx={{
-                                  minWidth: 'auto',
-                                  px: 0.5,
-                                  borderRadius: 0,
-                                  color: 'inherit',
-                                  border: 'none',
-                                  '&:hover': {
-                                    bgcolor: isActive ? 'primary.dark' : 'rgba(0, 0, 0, 0.04)',
-                                    border: 'none'
-                                  }
-                                }}
-                              >
-                                <KeyboardArrowDownIcon
+                                  <Box component="h2" sx={{ m: 0, fontSize: 'inherit', fontWeight: 'inherit', display: 'inline' }}>
+                                    {group.name}
+                                  </Box>
+                                  <Box
+                                    component="span"
+                                    sx={{
+                                      ml: 1,
+                                      px: 0.75,
+                                      py: 0.25,
+                                      borderRadius: '12px',
+                                      fontSize: '0.75rem',
+                                      lineHeight: 1,
+                                      fontWeight: 600,
+                                      bgcolor: isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.06)',
+                                      color: isActive ? 'inherit' : 'text.secondary'
+                                    }}
+                                  >
+                                    {formatCount(group.listing_count > 0 ? group.listing_count : group.building_count)}
+                                  </Box>
+                                </Button>
+                                <Box
                                   sx={{
-                                    transform: isActive ? 'rotate(180deg)' : 'none',
-                                    transition: 'transform 0.2s'
+                                    width: '1px',
+                                    bgcolor: isActive ? 'rgba(255, 255, 255, 0.3)' : 'divider'
                                   }}
                                 />
-                              </Button>
-                            </Stack>
+                                <Button
+                                  size="small"
+                                  onClick={() => setActiveGroupId(isActive ? null : group.id)}
+                                  sx={{
+                                    minWidth: 'auto',
+                                    px: 0.5,
+                                    borderRadius: 0,
+                                    color: 'inherit',
+                                    border: 'none',
+                                    '&:hover': {
+                                      bgcolor: isActive ? 'primary.dark' : 'rgba(0, 0, 0, 0.04)',
+                                      border: 'none'
+                                    }
+                                  }}
+                                >
+                                  <KeyboardArrowDownIcon
+                                    sx={{
+                                      transform: isActive ? 'rotate(180deg)' : 'none',
+                                      transition: 'transform 0.2s'
+                                    }}
+                                  />
+                                </Button>
+                              </Stack>
+                            </Box>
                           )
                         })}
                       </>
@@ -773,7 +748,7 @@ const CatalogFilters = ({
                           clickable
                           onClick={() => {
                             setLoading(true)
-                            const url = `${routes.listings}/${locationTree.slug}/${child.slug}`
+                            const url = `${routes.listings}/${locationTree.slug}/${activeGroup.slug}/${child.slug}`
                             router.push(url)
                           }}
                           sx={{

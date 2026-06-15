@@ -12,24 +12,33 @@ import { getSeoUrl, parseSeoUrl } from './seo'
 describe('utils/properties/seo', () => {
   it('should correctly format addresses to SEO url', () => {
     expect(getSeoUrl(property1)).toBe(
-      '/listing/ph3-135-lower-barrette-way-east-ottawa-k1l-7z9-12345-12'
+      '/listing/ph3-135-lower-barrette-way-east-ottawa-k1l-7z9-12345'
     )
     expect(getSeoUrl(property2)).toBe(
-      '/listing/135-lower-barrette-way-ottawa-k1l-7z9-12346-13'
+      '/listing/135-lower-barrette-way-ottawa-k1l-7z9-12346'
     )
   })
 
   it('should correctly format adresses with additional image param', () => {
     expect(getSeoUrl(property2, { startImage: 12 })).toBe(
-      '/listing/135-lower-barrette-way-ottawa-k1l-7z9-12346-13?startImage=12'
+      '/listing/135-lower-barrette-way-ottawa-k1l-7z9-12346?startImage=12'
+    )
+  })
+
+  it('should exclude query parameters like startImage when excludeQuery option is true', () => {
+    expect(getSeoUrl(property2, { startImage: 12, excludeQuery: true })).toBe(
+      '/listing/135-lower-barrette-way-ottawa-k1l-7z9-12346'
+    )
+    expect(getSeoUrl(property3, { boardId: 14, excludeQuery: true })).toBe(
+      '/listing/13-5-d-artagnan-bay-ottawa-12346'
     )
   })
 
   it('should correctly format adresses with missing boardId or boardId passed in arguments to SEO url', () => {
     expect(getSeoUrl(property3, { boardId: 14 })).toBe(
-      '/listing/13-5-d-artagnan-bay-ottawa-12346-14?startImage=1'
+      '/listing/13-5-d-artagnan-bay-ottawa-12346?startImage=1'
     )
-    expect(getSeoUrl(property4, { boardId: 15 })).toBe('/listing/12347-15')
+    expect(getSeoUrl(property4, { boardId: 15 })).toBe('/listing/12347')
   })
 
   it('should correctly format adresses with scrabbed fields and missing boardId to SEO url', () => {

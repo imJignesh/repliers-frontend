@@ -7,7 +7,8 @@ import { Box, Typography, Button, Grid, Avatar, Card } from '@mui/material'
 import defaultLocation from '@configs/location'
 import { StatsWidgets } from '@shared/Stats'
 import { useFeatures } from 'providers/FeaturesProvider'
-import { FeaturedProperties, HomePageBanner } from './components'
+import FeaturedProperties from './FeaturedProperties'
+import HomePageBanner from './HomePageBanner'
 import { PopularSearches } from '@pages/catalog/components'
 
 const teamMembers = [

@@ -14,7 +14,7 @@ declare global {
       eventName: string,
       eventParams?: EventParams
     ) => void
-    // dataLayer is already declared in google.d.ts(3, 9)
+    dataLayer?: any
   }
 }
 

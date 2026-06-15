@@ -77,8 +77,6 @@ const AdvancedFiltersForm = ({
       filters.area ||
       filters.neighborhood
 
-    if (!hasLocation) return
-
     // remove price filters from the request
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { minPrice, maxPrice, ...requestFilters } = filters
@@ -89,28 +87,41 @@ const AdvancedFiltersForm = ({
         ? getMapRectangle(bounds)
         : {}
 
-    const response = await SearchService.fetch({
-      ...requestFilters,
-      ...dialogState,
-      aggregates: 'listPrice',
-      ...mapParams
-    })
-    if (!response) return
+    try {
+      if (hasLocation) {
+        const response = await SearchService.fetch({
+          ...requestFilters,
+          ...dialogState,
+          aggregates: 'listPrice',
+          ...mapParams
+        }, { cancelGroup: 'filters' })
 
-    const { aggregates: { listPrice } = {} } = response
-    if (!listPrice) return
+        if (response) {
+          const { aggregates: { listPrice } = {} } = response
+          if (listPrice) {
+            const priceBuckets = mergeBuckets(
+              filters.listingStatus === 'rent' ? listPrice.lease : listPrice.sale
+            )
+            setPriceBuckets(priceBuckets)
+          } else {
+            setPriceBuckets({})
+          }
+        }
+      } else {
+        setPriceBuckets({})
+      }
 
-    const priceBuckets = mergeBuckets(
-      filters.listingStatus === 'rent' ? listPrice.lease : listPrice.sale
-    )
-    setPriceBuckets(priceBuckets)
-
-    const response2 = await SearchService.fetch({
-      ...filters,
-      ...dialogState,
-      ...mapParams
-    })
-    if (response2) setCount(response2.count)
+      const response2 = await SearchService.fetch({
+        ...filters,
+        ...dialogState,
+        ...(hasLocation ? mapParams : {})
+      }, { cancelGroup: 'filters' })
+      if (response2) setCount(response2.count)
+    } catch (error) {
+      if (error !== 'disabled' && (error as any)?.name !== 'AbortError') {
+        console.error('[AdvancedFiltersForm] fetchBucketsCounts error:', error)
+      }
+    }
   }
 
   useEffect(() => {

@@ -23,7 +23,8 @@ const extractValuesArray = (obj: any) =>
 const extractValuesObject = (obj: any) =>
   obj && Object.keys(obj).map((key) => obj[key])
 
-type StatsTabPanelProps = StatsParams & {
+type StatsTabPanelProps = Omit<StatsParams, 'propertyClass'> & {
+  propertyClass: PropertyClass | PropertyClass[] | 'all'
   label?: string
 }
 

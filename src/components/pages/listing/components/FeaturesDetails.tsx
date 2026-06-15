@@ -7,6 +7,24 @@ import { type DetailsGroupType } from 'utils/dataMapper'
 import { useProperty } from 'providers/PropertyProvider'
 import { isPureAmenity } from 'utils/properties'
 
+const isEmptyValue = (val: any) => {
+  if (val === null || val === undefined) return true
+  if (typeof val === 'string') {
+    const s = val.trim()
+    return (
+      s === '' ||
+      s === '-' ||
+      s.toLowerCase() === 'n/a' ||
+      s === '0' ||
+      s.toLowerCase() === 'built in -' ||
+      s.toLowerCase() === 'built in' ||
+      s.toLowerCase() === 'built:' ||
+      s.toLowerCase() === 'built: -'
+    )
+  }
+  return false
+}
+
 const FeaturesDetails = ({ features }: { features?: DetailsGroupType[] }) => {
   const t = useTranslations()
   const { property } = useProperty()
@@ -36,7 +54,12 @@ const FeaturesDetails = ({ features }: { features?: DetailsGroupType[] }) => {
     return text
   }
 
-  const hasBuildingDetails = building?.type || building?.management || building?.corp || building?.date_registered
+  const showType = !isEmptyValue(building?.type)
+  const showManagement = !isEmptyValue(building?.management)
+  const showCorp = !isEmptyValue(building?.corp)
+  const showDateRegistered = !isEmptyValue(building?.date_registered)
+
+  const hasBuildingDetails = showType || showManagement || showCorp || showDateRegistered
 
   if (!hasBuildingDetails && amenitiesList.length === 0 && maintenanceList.length === 0) return null
 
@@ -54,38 +77,46 @@ const FeaturesDetails = ({ features }: { features?: DetailsGroupType[] }) => {
           gap: 3,
           mb: (amenitiesList.length > 0 || maintenanceList.length > 0) ? 4 : 0
         }}>
-          <Box>
-            <Typography variant="body2" fontWeight="bold" color="text.primary" sx={{ display: 'block', mb: 0.5 }}>
-              Building Type
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              {building?.type || '-'}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography variant="body2" fontWeight="bold" color="text.primary" sx={{ display: 'block', mb: 0.5 }}>
-              Property Management
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              {parseManagement(building?.management) || '-'}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography variant="body2" fontWeight="bold" color="text.primary" sx={{ display: 'block', mb: 0.5 }}>
-              Condo Corp
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              {building?.corp || '-'}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography variant="body2" fontWeight="bold" color="text.primary" sx={{ display: 'block', mb: 0.5 }}>
-              Date Registered
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              {building?.date_registered || '-'}
-            </Typography>
-          </Box>
+          {showType && (
+            <Box>
+              <Typography variant="body2" fontWeight="bold" color="text.primary" sx={{ display: 'block', mb: 0.5 }}>
+                Building Type
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                {building?.type}
+              </Typography>
+            </Box>
+          )}
+          {showManagement && (
+            <Box>
+              <Typography variant="body2" fontWeight="bold" color="text.primary" sx={{ display: 'block', mb: 0.5 }}>
+                Property Management
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                {parseManagement(building?.management)}
+              </Typography>
+            </Box>
+          )}
+          {showCorp && (
+            <Box>
+              <Typography variant="body2" fontWeight="bold" color="text.primary" sx={{ display: 'block', mb: 0.5 }}>
+                Condo Corp
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                {building?.corp}
+              </Typography>
+            </Box>
+          )}
+          {showDateRegistered && (
+            <Box>
+              <Typography variant="body2" fontWeight="bold" color="text.primary" sx={{ display: 'block', mb: 0.5 }}>
+                Date Registered
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                {building?.date_registered}
+              </Typography>
+            </Box>
+          )}
         </Box>
       )}
 

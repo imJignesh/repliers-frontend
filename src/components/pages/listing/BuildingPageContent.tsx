@@ -116,10 +116,20 @@ const BuildingPageContent = ({
                   }
                 }}
               >
+                {address.area && (
+                  <Link
+                    component={NextLink}
+                    href={getCatalogUrl(address.area)}
+                    color="text.secondary"
+                    underline="hover"
+                  >
+                    {address.area}
+                  </Link>
+                )}
                 {address.city && (
                   <Link
                     component={NextLink}
-                    href={getCatalogUrl(address.city)}
+                    href={address.area ? getCatalogUrl(address.area, address.city) : getCatalogUrl(address.city)}
                     color="text.secondary"
                     underline="hover"
                   >
@@ -129,7 +139,7 @@ const BuildingPageContent = ({
                 {address.neighborhood && (
                   <Link
                     component={NextLink}
-                    href={getCatalogUrl(address.city, address.neighborhood)}
+                    href={address.area ? getCatalogUrl(address.area, address.city, address.neighborhood) : getCatalogUrl(address.city, address.neighborhood)}
                     color="text.primary"
                     underline="hover"
                   >
@@ -146,14 +156,11 @@ const BuildingPageContent = ({
 
               <BuildingInfo />
 
-
-
-              <HomeDescription />
-
-
               <Box id="features" sx={{ scrollMarginTop: '100px' }}>
                 <FeaturesDetails features={propertyDetails.features} />
               </Box>
+
+              <HomeDescription />
               <AppliancesDetails appliances={propertyDetails.appliances} />
               {/* <ExteriorDetails exterior={propertyDetails.exterior} /> */}
 

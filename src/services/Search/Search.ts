@@ -13,6 +13,8 @@ const { defaultAddressZoom, defaultAreaZoom, fallbackAreaZoom } = mapConfig
 class SearchService {
   private abortController: AbortController | undefined
 
+  private abortControllers = new Map<string, AbortController>()
+
   private disabled = false
 
   disableRequests() {
@@ -20,22 +22,42 @@ class SearchService {
     if (this.abortController) {
       this.abortController.abort('disableRequests')
     }
+    this.abortControllers.forEach((controller) => {
+      controller.abort('disableRequests')
+    })
+    this.abortControllers.clear()
   }
 
   enableRequests() {
     this.disabled = false
   }
 
-  async fetch(params: Partial<ApiQueryParams | Filters>) {
+  async fetch(
+    params: Partial<ApiQueryParams | Filters>,
+    options?: { cancelGroup?: string; signal?: AbortSignal }
+  ) {
     if (this.disabled) return Promise.reject('disabled')
 
-    this.abortController = new AbortController()
+    let signal = options?.signal
+
+    if (options?.cancelGroup) {
+      const prevController = this.abortControllers.get(options.cancelGroup)
+      if (prevController) {
+        prevController.abort('cancelled')
+      }
+      const newController = new AbortController()
+      this.abortControllers.set(options.cancelGroup, newController)
+      signal = newController.signal
+    } else if (!signal) {
+      this.abortController = new AbortController()
+      signal = this.abortController.signal
+    }
 
     let response
     try {
       response = await APISearch.fetch(
         { ...processParams(params) },
-        { signal: this.abortController.signal }
+        { signal }
       )
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {

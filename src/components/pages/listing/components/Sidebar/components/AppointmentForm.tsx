@@ -112,7 +112,8 @@ const AppointmentForm = () => {
             price: listPrice,
             listing_neighbourhood: address?.neighborhood,
             listing_city: address?.city,
-            mls_municipality: address?.district || address?.area,
+            mls_municipality: address?.district || address?.city,
+            postal_code: address?.zip,
             contact_source: joinNonEmpty([address?.streetNumber, address?.streetName]),
             beds: property?.details?.numBedrooms,
             baths: property?.details?.numBathrooms,
@@ -135,7 +136,8 @@ const AppointmentForm = () => {
     return (
         <form onSubmit={(e) => { e.preventDefault(); handleSubmit() }} autoComplete="off">
             <input type="hidden" name="price" value={listPrice || ''} />
-            <input type="hidden" name="mls_municipality" value={address?.district || address?.area || ''} />
+            <input type="hidden" name="mls_municipality" value={address?.district || address?.city || ''} />
+            <input type="hidden" name="postal_code" value={address?.zip || ''} />
             <input type="hidden" name="contact_source" value={joinNonEmpty([address?.streetNumber, address?.streetName]) || ''} />
             <input type="hidden" name="beds" value={property?.details?.numBedrooms || ''} />
             <input type="hidden" name="baths" value={property?.details?.numBathrooms || ''} />

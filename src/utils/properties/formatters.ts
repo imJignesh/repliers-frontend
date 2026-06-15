@@ -1,8 +1,10 @@
 import dayjs from 'dayjs'
 
+import contentConfig from '@configs/content'
 import propsConfig from '@configs/properties'
 
 import { type Property, type PropertyAddress } from 'services/API'
+import { formatEnglishPrice } from 'utils/formatters'
 
 import { capitalize, joinNonEmpty } from '../strings'
 import { getCDNPath } from '../urls'
@@ -10,27 +12,15 @@ import { getCDNPath } from '../urls'
 import { sanitizeScrubbed, sanitizeStreetNumber } from './sanitizers'
 import { getSeoStatus, getSeoTitle, getSeoType, getSeoUrl } from './seo'
 import { getBathrooms, getBedrooms, scrubbed, sold } from '.'
-import contentConfig from '@configs/content'
-import { formatEnglishPrice } from 'utils/formatters'
-
-
 
 export const formatBuildingAddress = (
   address: Partial<PropertyAddress>,
   removeScrubbed: boolean = false
 ) => {
-  const {
-
-    streetNumber,
-    streetName,
-    streetSuffix,
-    streetDirection
-  } = address
-
+  const { streetNumber, streetName, streetSuffix, streetDirection } = address
 
   return joinNonEmpty(
     [
-
       sanitizeStreetNumber(streetNumber || ''),
       capitalize(streetName?.toLowerCase()),
       capitalize(streetSuffix?.toLowerCase()),
@@ -39,7 +29,6 @@ export const formatBuildingAddress = (
     ' '
   )
 }
-
 
 export const formatShortAddress = (
   address: Partial<PropertyAddress>,
@@ -93,26 +82,21 @@ export const formatMetadata = (
     buildingName?: string
   }
 ) => {
-  const {
-    details,
-    images,
-    address,
-    listPrice,
-    soldPrice
-  } = property
+  const { details, images, address, listPrice, soldPrice } = property
   const { description, propertyType } = details
   const { neighborhood, city } = address
 
   const openGraph = {
     images: getCDNPath(images[0], 'small'),
-    url: host + getSeoUrl(property)
+    url: host + getSeoUrl(property, { excludeQuery: true })
   }
 
   const beds = getBedrooms(details)
   const baths = getBathrooms(details)
-  
+
   const priceToUse = sold(property) ? soldPrice : listPrice
-  const formattedPrice = (!scrubbed(priceToUse) && priceToUse) ? formatEnglishPrice(priceToUse) : ''
+  const formattedPrice =
+    !scrubbed(priceToUse) && priceToUse ? formatEnglishPrice(priceToUse) : ''
 
   const type = options?.type || 'listing'
 
@@ -121,9 +105,10 @@ export const formatMetadata = (
     propertyType: getSeoType(propertyType || ''),
     neighborhood: capitalize(neighborhood || ''),
     city: capitalize(city || ''),
-    address: type === 'building'
-      ? formatBuildingAddress(address, true)
-      : formatShortAddress(address, true),
+    address:
+      type === 'building'
+        ? formatBuildingAddress(address, true)
+        : formatShortAddress(address, true),
     price: formattedPrice,
     beds: beds.count.toString(),
     baths: baths.count.toString(),
@@ -131,25 +116,39 @@ export const formatMetadata = (
   }
 
   const interpolate = (template: string) => {
-    return template.replace(/{{(.*?)}}/g, (_, key) => variables[key.trim()] || '')
+    return template.replace(
+      /{{(.*?)}}/g,
+      (_, key) => variables[key.trim()] || ''
+    )
   }
   // @ts-ignore
   const templates = contentConfig.propertyMetadataTemplates?.[type] || {}
 
-  let title = templates.title ? interpolate(templates.title) : getSeoTitle(property)
-  
-  // Cleanup artifacts like " -  - " if price or building name is empty
-  title = title.replace(/\s\s+/g, ' ').replace(/ - - /g, ' - ').replace(/^ - | - $/g, '').replace(/,(\s*\|)/g, '$1').replace(/,\s*$/g, '')
+  let title = templates.title
+    ? interpolate(templates.title)
+    : getSeoTitle(property)
 
-  let finalDescription = templates.description ? interpolate(templates.description) : description
-  finalDescription = scrubbed(finalDescription) ? propsConfig.scrubbedDescriptionLabel : finalDescription
+  // Cleanup artifacts like " -  - " if price or building name is empty
+  title = title
+    .replace(/\s\s+/g, ' ')
+    .replace(/ - - /g, ' - ')
+    .replace(/^ - | - $/g, '')
+    .replace(/,(\s*\|)/g, '$1')
+    .replace(/,\s*$/g, '')
+
+  let finalDescription = templates.description
+    ? interpolate(templates.description)
+    : description
+  finalDescription = scrubbed(finalDescription)
+    ? propsConfig.scrubbedDescriptionLabel
+    : finalDescription
 
   return {
     title,
     description: finalDescription,
     openGraph,
     alternates: {
-      canonical: host + getSeoUrl(property)
+      canonical: host + getSeoUrl(property, { excludeQuery: true })
     },
     robots: {
       index: true,
@@ -175,12 +174,12 @@ export const formatRawData = (raw: string | undefined) => {
   return !raw || !raw.trim()
     ? ''
     : String(raw)
-      .trim()
-      .replace(/\r/g, '')
-      .replace(/\n\n/g, '<br />')
-      .replace(/,/g, ', ')
-      .replace(/\//g, ' / ')
-      .replace(/\s+/g, ' ')
+        .trim()
+        .replace(/\r/g, '')
+        .replace(/\n\n/g, '<br />')
+        .replace(/,/g, ', ')
+        .replace(/\//g, ' / ')
+        .replace(/\s+/g, ' ')
 }
 
 export const formatOpenHouseTimeRange = (start: string, end: string) => {
@@ -196,8 +195,9 @@ export const formatOpenHouseTimeRange = (start: string, end: string) => {
   const startTimeSuffix = dayjs(start).format('A')
   const endTimeSuffix = dayjs(end).format('A')
 
-  return `${startDate}${startTime !== endTime
-    ? `${startTime}${startTimeSuffix !== endTimeSuffix ? startTimeSuffix : ''}-`
-    : ''
-    }${endTime}${endTimeSuffix}`
+  return `${startDate}${
+    startTime !== endTime
+      ? `${startTime}${startTimeSuffix !== endTimeSuffix ? startTimeSuffix : ''}-`
+      : ''
+  }${endTime}${endTimeSuffix}`
 }

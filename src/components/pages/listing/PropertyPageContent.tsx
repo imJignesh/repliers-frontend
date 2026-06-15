@@ -159,7 +159,6 @@ const PropertyPageContent = ({
             <DetailsContainer>
               <Stack spacing={{ xs: 4, sm: 6 }}>
                 <BuildingInfo />
-                <HomeDescription />
 
                 {/* {mapType === 'static' ? (
                   <HomeMap type={mapType} />
@@ -169,6 +168,7 @@ const PropertyPageContent = ({
                   </MapOptionsProvider>
                 )} */}
                 <SummaryDetails />
+                <HomeDescription />
               </Stack>
             </DetailsContainer>
             <FeaturesDetails />

@@ -4,8 +4,9 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import { Stack, Typography } from '@mui/material'
 
 import defaultLocation from '@configs/location'
+import routes from '@configs/routes'
 
-import { getCatalogUrl } from 'utils/urls'
+import { sanitizeUrl } from 'utils/urls'
 
 import { useSearch } from 'providers/SearchProvider/SearchProvider'
 
@@ -26,7 +27,10 @@ const Breadcrumbs = ({
   if (crumbs.length === 1) return null
 
   const crumbsLinks = crumbs.map((crumb, index) => {
-    const url = getCatalogUrl(...crumbs.slice(1, index + 1))
+    // crumbs[0] is the state; the rest are positional location path segments
+    // (area / city / hood). Build the cumulative URL up to this crumb.
+    const segments = crumbs.slice(1, index + 1).map((c) => sanitizeUrl(c!))
+    const url = `${routes.listings}${segments.length ? '/' + segments.join('/') : ''}`
     return (
       <Link key={crumb} href={url} onClick={() => setLoading(true)}>
         <Typography fontSize={14} fontWeight={500}>

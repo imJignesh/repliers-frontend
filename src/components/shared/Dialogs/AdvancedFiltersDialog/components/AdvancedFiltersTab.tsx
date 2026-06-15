@@ -5,21 +5,20 @@ import { type Filters } from 'services/Search'
 import { DaysSelect, FilterButtonGroup, PricePicker, PriceSelect, YearBuiltSelect } from '.'
 
 const bedsItems: [string, number][] = [
-  ['0 bed', 0],
-  ['1 bed', 1],
-  ['2 bed', 2],
-  ['3+ Beds', 3]
+  ['1+ beds', 1],
+  ['2+ beds', 2],
+  ['3+ beds', 3],
+  ['4+ beds', 4]
 ]
 
 const bathsItems: [string, number][] = [
-  ['1 bath', 1],
-  ['2 bath', 2],
-  ['3+ bath', 3]
+  ['1+ baths', 1],
+  ['2+ baths', 2],
+  ['3+ baths', 3]
 ]
 
 const parkingItems: [string, number][] = [
-  ['0 parking', 0],
-  ['1 parking', 1],
+  ['1+ parking', 1],
   ['2+ parking', 2]
 ]
 

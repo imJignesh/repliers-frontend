@@ -573,7 +573,7 @@ const CatalogFilters = ({
                         return a.localeCompare(b)
                       })
                       .map((locationName) => (
-                        <Box key={locationName} component="h2" sx={{ m: 0, display: 'inline-flex' }}>
+                        <Box key={locationName} sx={{ m: 0, display: 'inline-flex' }}>
                           <Button
                             component={Link}
                             href={getSubLocationUrl(locationName)}
@@ -594,7 +594,9 @@ const CatalogFilters = ({
                               }
                             }}
                           >
-                            {capitalize(locationName)}
+                            <Box component="h2" sx={{ m: 0, fontSize: 'inherit', fontWeight: 'inherit', display: 'inline' }}>
+                              {capitalize(locationName)}
+                            </Box>
                           </Button>
                         </Box>
                       ))}
@@ -605,7 +607,7 @@ const CatalogFilters = ({
                         {locationTree.children.filter((group: any) => group.listing_count > 0 || group.building_count > 0).map((group: any) => {
                           const isActive = activeGroupId === group.id
                           return (
-                            <Box key={group.id} component="h2" sx={{ m: 0, display: 'inline-flex' }}>
+                            <Box key={group.id} sx={{ m: 0, display: 'inline-flex' }}>
                               <Stack
                                 direction="row"
                                 sx={{
@@ -641,7 +643,25 @@ const CatalogFilters = ({
                                     }
                                   }}
                                 >
-                                  {group.name}
+                                  <Box component="h2" sx={{ m: 0, fontSize: 'inherit', fontWeight: 'inherit', display: 'inline' }}>
+                                    {group.name}
+                                  </Box>
+                                  <Box
+                                    component="span"
+                                    sx={{
+                                      ml: 1,
+                                      px: 0.75,
+                                      py: 0.25,
+                                      borderRadius: '12px',
+                                      fontSize: '0.75rem',
+                                      lineHeight: 1,
+                                      fontWeight: 600,
+                                      bgcolor: isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.06)',
+                                      color: isActive ? 'inherit' : 'text.secondary'
+                                    }}
+                                  >
+                                    {formatCount(group.listing_count > 0 ? group.listing_count : group.building_count)}
+                                  </Box>
                                 </Button>
                                 <Box
                                   sx={{
@@ -708,6 +728,21 @@ const CatalogFilters = ({
                           label={
                             <Stack direction="row" alignItems="center" gap={0.5}>
                               <span>{child.name}</span>
+                              <Box
+                                component="span"
+                                sx={{
+                                  px: 0.6,
+                                  py: 0.2,
+                                  borderRadius: '10px',
+                                  fontSize: '0.7rem',
+                                  lineHeight: 1,
+                                  fontWeight: 600,
+                                  bgcolor: isChildActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.06)',
+                                  color: isChildActive ? 'inherit' : 'text.secondary'
+                                }}
+                              >
+                                {formatCount(child.listing_count > 0 ? child.listing_count : child.building_count)}
+                              </Box>
                             </Stack>
                           }
                           clickable

@@ -102,16 +102,16 @@ export const generateCatalogMetadata = async ({
   const fullLocation = getCatalogLocation(displayCity, hood, true)
 
   let minPrice = listPrice ? Number(listPrice.min) : 0
-  if ((!minPrice || minPrice < 1000) && listings && listings.length > 0) {
+  if ((!minPrice || minPrice < 100000) && listings && listings.length > 0) {
     const prices = listings
       .map((l) => Number(l.listPrice))
-      .filter((p) => !isNaN(p) && p >= 1000)
+      .filter((p) => !isNaN(p) && p >= 100000)
     if (prices.length > 0) {
       minPrice = Math.min(...prices)
     }
   }
 
-  const lowestPrice = minPrice && minPrice >= 1000
+  const lowestPrice = minPrice && minPrice >= 100000
     ? ` Prices starting at ${formatEnglishPrice(minPrice)}.`
     : ''
 
@@ -122,7 +122,7 @@ export const generateCatalogMetadata = async ({
     shortLocation,
     fullLocation,
     lowestPrice,
-    startingPrice: minPrice && minPrice >= 1000 ? formatEnglishPrice(minPrice).replace('$', '') : '',
+    startingPrice: minPrice && minPrice >= 100000 ? formatEnglishPrice(minPrice).replace('$', '') : '',
     neighborhood: hood || '',
     city: displayCity,
     siteName: content.siteName

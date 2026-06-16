@@ -30,6 +30,7 @@ export type Params = {
 
 export type SearchParams = {
   page?: number
+  type?: string
 }
 
 type LocationsPageProps = {
@@ -151,7 +152,10 @@ const LocationsCatalogPage = async (props: {
     page
   })
 
-  if (page > 1 && !listings.length) notFound()
+  // Don't 404 paginated building views — buildings paginate independently of
+  // listings (the ?page param is shared), so a high building page may exceed the
+  // number of listing pages without meaning the location is empty.
+  if (page > 1 && !listings.length && searchParams.type !== 'building') notFound()
 
   const byCount = (a: any, b: any) => b.activeCount - a.activeCount
 

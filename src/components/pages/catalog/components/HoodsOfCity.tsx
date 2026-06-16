@@ -29,7 +29,7 @@ const HoodsOfCity = ({
     return (
       <Container>
         <Stack spacing={4} pb={{ xs: 4, sm: 6 }}>
-          <Typography variant="h2" sx={{ fontSize: '1.8rem', fontWeight: 700 }}>
+          <Typography component="p">
             Cities of {city}
           </Typography>
           {hoods.map((cityHood) => (

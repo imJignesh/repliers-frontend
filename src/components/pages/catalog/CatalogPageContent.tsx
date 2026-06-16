@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useRef } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 import { Box, Container, Stack, useTheme, useMediaQuery } from '@mui/material'
 import APILocations from 'services/API/APILocations'
@@ -127,7 +128,13 @@ const CatalogPageInner = ({
 }) => {
   const { loading, setLoading } = useSearch()
   const [showMap, setShowMap] = useState(false)
-  const [viewMode, setViewMode] = useState<'listings' | 'buildings'>('listings')
+  // View mode is driven by the URL: ?type=building → buildings, otherwise listings.
+  // This makes pagination unambiguous — removing &type=building paginates listings.
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const urlType = searchParams.get('type')
+  const viewMode: 'listings' | 'buildings' =
+    urlType === 'building' || urlType === 'buildings' ? 'buildings' : 'listings'
   const [locationTree, setLocationTree] = useState<any>(null)
   const [isReady, setIsReady] = useState(false)
   const mapRef = useRef<HTMLDivElement>(null)
@@ -146,16 +153,19 @@ const CatalogPageInner = ({
     if (storedMap === 'true') {
       setShowMap(true)
     }
-
-    const storedView = localStorage.getItem('repliers_catalog_view_mode')
-    if (storedView === 'listings' || storedView === 'buildings') {
-      setViewMode(storedView as 'listings' | 'buildings')
-    }
   }, [])
 
   const handleSetViewMode = (mode: 'listings' | 'buildings') => {
-    setViewMode(mode)
-    localStorage.setItem('repliers_catalog_view_mode', mode)
+    // Reflect the view in the URL (single source of truth) and reset to page 1.
+    const params = new URLSearchParams(window.location.search)
+    if (mode === 'buildings') {
+      params.set('type', 'building')
+    } else {
+      params.delete('type')
+    }
+    params.delete('page')
+    const qs = params.toString()
+    router.push(`${window.location.pathname}${qs ? `?${qs}` : ''}`)
   }
 
   const handleToggleMap = () => {
@@ -215,6 +225,7 @@ const CatalogPageInner = ({
               viewMode={viewMode}
               setViewMode={handleSetViewMode}
               onLocationTreeChange={setLocationTree}
+              buildingsPage={page}
             />
           </Container>
         </Box>
@@ -336,11 +347,18 @@ const CatalogPageInner = ({
                 </Stack>
               )}
 
-              {viewMode === 'listings' && (
-                <Stack spacing={2} alignItems="center" py={4}>
+              <Stack spacing={2} alignItems="center" py={4}>
+                {viewMode === 'listings' ? (
                   <CatalogPagination page={page} count={count} />
-                </Stack>
-              )}
+                ) : (
+                  <CatalogPagination
+                    page={page}
+                    count={buildingsCount}
+                    pageSize={locationTree?.buildingsPerPage || 100}
+                    extraParams={{ type: 'building' }}
+                  />
+                )}
+              </Stack>
             </Box>
           </Box>
         ) : (
@@ -414,11 +432,18 @@ const CatalogPageInner = ({
               </Stack>
             )}
 
-            {viewMode === 'listings' && (
-              <Stack spacing={2} alignItems="center" py={4}>
+            <Stack spacing={2} alignItems="center" py={4}>
+              {viewMode === 'listings' ? (
                 <CatalogPagination page={page} count={count} />
-              </Stack>
-            )}
+              ) : (
+                <CatalogPagination
+                  page={page}
+                  count={buildingsCount}
+                  pageSize={locationTree?.buildingsPerPage || 100}
+                  extraParams={{ type: 'building' }}
+                />
+              )}
+            </Stack>
           </Container>
         )}
 

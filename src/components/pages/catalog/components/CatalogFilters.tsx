@@ -66,7 +66,8 @@ const CatalogFilters = ({
   onToggleMap,
   viewMode,
   setViewMode,
-  onLocationTreeChange
+  onLocationTreeChange,
+  buildingsPage = 1
 }: {
   count: number
   city?: string
@@ -81,6 +82,7 @@ const CatalogFilters = ({
   viewMode: 'listings' | 'buildings'
   setViewMode: (mode: 'listings' | 'buildings') => void
   onLocationTreeChange?: (tree: any) => void
+  buildingsPage?: number
 }) => {
   const dynamicCitymap: Record<string, { active: boolean; items: Record<string, { active: boolean }> }> = {}
   areas.forEach((a: ApiBoardArea) => {
@@ -181,10 +183,11 @@ const CatalogFilters = ({
       const localityName = hood || city // Provide locality via hood or city
       const buildingsSlug = localityName ? sanitizeUrl(localityName) : slug
 
-      // Avoid re-fetching if we already have the correct data
+      // Avoid re-fetching if we already have the correct data (same location AND page)
       if (locationTree &&
         (locationTree.slug === slug || locationTree.name.toLowerCase() === selectedRegion.toLowerCase()) &&
-        locationTree.buildingsSlug === buildingsSlug
+        locationTree.buildingsSlug === buildingsSlug &&
+        locationTree.buildingsPage === buildingsPage
       ) {
         if (onLocationTreeChange) onLocationTreeChange(locationTree)
         return
@@ -199,6 +202,8 @@ const CatalogFilters = ({
       if (localityName && normalize(localityName) !== normalize(selectedRegion)) {
         buildingsApiUrl = `${precondoUrl}/api/buildings/area/${slug}/locality/${buildingsSlug}`;
       }
+      // Buildings are paginated server-side (100/page)
+      buildingsApiUrl += `?page=${buildingsPage}`;
 
       Promise.all([
         fetch(`${precondoUrl}/api/locations/area/${slug}`).then((res) => res.json()),
@@ -208,7 +213,9 @@ const CatalogFilters = ({
           if (locationDataFull.success) {
             const locationData = locationDataFull.data
             locationData.buildingsSlug = buildingsSlug
+            locationData.buildingsPage = buildingsPage
             locationData.buildingsTotal = buildingsList.total ?? (Array.isArray(buildingsList) ? buildingsList.length : 0)
+            locationData.buildingsPerPage = buildingsList.per_page ?? 100
 
             const buildings = buildingsList.data || (Array.isArray(buildingsList) ? buildingsList : [])
 
@@ -244,7 +251,7 @@ const CatalogFilters = ({
       setLocationTree(null)
       if (onLocationTreeChange) onLocationTreeChange(null)
     }
-  }, [selectedRegion, locationTree])
+  }, [selectedRegion, locationTree, buildingsPage])
 
   const createFiltersArray = (f: Partial<Filters> = filters) => {
     const urlFilters: string[] = []
@@ -594,7 +601,7 @@ const CatalogFilters = ({
                               }
                             }}
                           >
-                            <Box component="h2" sx={{ m: 0, fontSize: 'inherit', fontWeight: 'inherit', display: 'inline' }}>
+                            <Box component="span" sx={{ m: 0, fontSize: 'inherit', fontWeight: 'inherit', display: 'inline' }}>
                               {capitalize(locationName)}
                             </Box>
                           </Button>
@@ -643,7 +650,7 @@ const CatalogFilters = ({
                                     }
                                   }}
                                 >
-                                  <Box component="h2" sx={{ m: 0, fontSize: 'inherit', fontWeight: 'inherit', display: 'inline' }}>
+                                  <Box component="span" sx={{ m: 0, fontSize: 'inherit', fontWeight: 'inherit', display: 'inline' }}>
                                     {group.name}
                                   </Box>
                                   <Box

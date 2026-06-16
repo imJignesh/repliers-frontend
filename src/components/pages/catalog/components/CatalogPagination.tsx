@@ -15,24 +15,32 @@ import useClientSide from 'hooks/useClientSide'
 
 const CatalogPagination = ({
   page,
-  count
+  count,
+  pageSize = searchConfig.pageSize,
+  extraParams
 }: {
   page: number
   count: number
+  pageSize?: number
+  extraParams?: Record<string, string>
 }) => {
   const router = useRouter()
   const { loading, setLoading } = useSearch()
   const clientSide = useClientSide()
-  const pages = Math.ceil(count / searchConfig.pageSize)
+  const pages = Math.ceil(count / pageSize)
 
   if (loading) return null
 
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
     setLoading(true)
-    router.push(`${window?.location.pathname}?page=${value}`)
+    // Preserve existing query params (e.g. type=building) when changing page
+    const params = new URLSearchParams(window?.location.search)
+    Object.entries(extraParams || {}).forEach(([k, v]) => params.set(k, v))
+    params.set('page', String(value))
+    router.push(`${window?.location.pathname}?${params.toString()}`)
   }
 
-  return count > searchConfig.pageSize ? (
+  return count > pageSize ? (
     clientSide ? (
       <Pagination
         size="small"

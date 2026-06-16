@@ -44,9 +44,7 @@ const GroupTemplate = ({
   return (
     <Container>
       <Stack width="100%" spacing={0} pb={{ xs: 4, sm: 6 }}>
-        <Typography variant="h2" sx={{
-          fontSize: '1.8rem',
-          fontWeight: 700,
+        <Typography component="p" sx={{
           mb: 2
         }}>
           {title}

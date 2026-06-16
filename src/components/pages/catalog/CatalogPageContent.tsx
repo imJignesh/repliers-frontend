@@ -174,6 +174,12 @@ const CatalogPageInner = ({
   const buildings = locationTree?.buildings || []
   const buildingsCount = locationTree?.buildingsTotal ?? locationTree?.buildings?.length ?? 0
 
+  // While a page (or hood) is loading we must show skeletons, never an empty-state
+  // message. `locationTree` is fetched client-side after mount/navigation, so until
+  // it resolves the buildings view is still loading.
+  const listingsLoading = loading || !isReady
+  const buildingsLoading = loading || !isReady || locationTree === null
+
   return (
     <MapOptionsProvider layout="map" style="map">
       <Box minHeight="calc(100vh - 72px)">
@@ -253,7 +259,7 @@ const CatalogPageInner = ({
               }}
             >
               {viewMode === 'listings' ? (
-                listings?.length > 0 || loading || !isReady ? (
+                listings?.length > 0 || listingsLoading ? (
                   <Stack
                     direction="row"
                     flexWrap="wrap"
@@ -269,7 +275,7 @@ const CatalogPageInner = ({
                       },
                     }}
                   >
-                    {loading || !isReady ? (
+                    {listingsLoading ? (
                       Array.from({ length: 12 }).map((_, i) => (
                         <SkeletonCard key={i} />
                       ))
@@ -316,10 +322,17 @@ const CatalogPageInner = ({
                     },
                   }}
                 >
-                  {buildings.map((building: any, index: number) => (
-                    <BuildingCard key={index} building={building} />
-                  ))}
-                  {(buildings.length === 0 && isReady) && <EmptyBuildings />}
+                  {buildingsLoading ? (
+                    Array.from({ length: 12 }).map((_, i) => (
+                      <SkeletonCard key={i} />
+                    ))
+                  ) : buildings.length > 0 ? (
+                    buildings.map((building: any, index: number) => (
+                      <BuildingCard key={index} building={building} />
+                    ))
+                  ) : (
+                    <EmptyBuildings />
+                  )}
                 </Stack>
               )}
 
@@ -340,7 +353,7 @@ const CatalogPageInner = ({
             }}
           >
             {viewMode === 'listings' ? (
-              listings?.length > 0 || loading || !isReady ? (
+              listings?.length > 0 || listingsLoading ? (
                 <Stack
                   direction="row"
                   flexWrap="wrap"
@@ -357,7 +370,7 @@ const CatalogPageInner = ({
                     },
                   }}
                 >
-                  {loading || !isReady ? (
+                  {listingsLoading ? (
                     Array.from({ length: 12 }).map((_, i) => (
                       <SkeletonCard key={i} />
                     ))
@@ -387,10 +400,17 @@ const CatalogPageInner = ({
                   },
                 }}
               >
-                {buildings.map((building: any, index: number) => (
-                  <BuildingCard key={index} building={building} />
-                ))}
-                {(buildings.length === 0 && isReady) && <EmptyBuildings />}
+                {buildingsLoading ? (
+                  Array.from({ length: 12 }).map((_, i) => (
+                    <SkeletonCard key={i} />
+                  ))
+                ) : buildings.length > 0 ? (
+                  buildings.map((building: any, index: number) => (
+                    <BuildingCard key={index} building={building} />
+                  ))
+                ) : (
+                  <EmptyBuildings />
+                )}
               </Stack>
             )}
 

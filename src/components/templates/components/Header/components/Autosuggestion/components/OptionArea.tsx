@@ -16,14 +16,11 @@ const OptionArea = ({
   props: React.HTMLAttributes<HTMLLIElement>
   option: AutosuggestionOption
 }) => {
-  // Link to the published location's catalog page using its real slugs (a city
-  // option's parent is the area, a neighbourhood option's parent is the city).
+  // Link to the published location's catalog page using the full canonical path
+  // (area/city/neighbourhood) supplied by the backend.
   const source = option.source as ApiBoardCity
-  const parent = option.parent as ApiBoardCity | undefined
-  const areaUrl = source?.slug
-    ? `${routes.listings}/${[parent?.slug, source.slug]
-        .filter(Boolean)
-        .join('/')}`
+  const areaUrl = source?.path
+    ? `${routes.listings}/${source.path}`
     : `${routes.area}/?q=${encodeURIComponent(getAreaLabel(option))}`
 
   return (

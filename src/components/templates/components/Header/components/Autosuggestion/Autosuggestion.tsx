@@ -304,19 +304,15 @@ const Autosuggestion = ({
   const handleAreaClick = (option: any) => {
     setOpen(false)
 
-    // Redirect a location result straight to its published catalog page
-    // (area/city or city/neighbourhood). Use the real location slugs returned by
-    // the backend — a city option's parent is the area, a neighbourhood option's
-    // parent is the city — and fall back to slugified names only if a slug is
-    // missing.
-    const source = option.source as { name?: string; slug?: string }
-    const parent = option.parent as { name?: string; slug?: string } | undefined
-    if (!source?.name && !source?.slug) return
+    // Redirect a location result to its published catalog page. The backend
+    // supplies `path` — the full canonical area/city/neighbourhood slug path —
+    // so we use it directly. Fall back to slugified names only if it's missing.
+    const source = option.source as { name?: string; path?: string }
+    const parent = option.parent as { name?: string } | undefined
 
-    if (source.slug) {
-      const segments = [parent?.slug, source.slug].filter(Boolean)
-      router.push(`${routes.listings}/${segments.join('/')}`)
-    } else {
+    if (source?.path) {
+      router.push(`${routes.listings}/${source.path}`)
+    } else if (source?.name) {
       router.push(
         parent?.name
           ? getCatalogUrl(parent.name, source.name)

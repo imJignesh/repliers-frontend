@@ -558,6 +558,7 @@ export interface ApiLocation {
 export interface ApiNeighborhood {
   name: string
   slug?: string
+  path?: string
   activeCount: number
   location: ApiLocation
   coordinates?: Position[][]
@@ -566,6 +567,7 @@ export interface ApiNeighborhood {
 export interface ApiBoardCity {
   name: string
   slug?: string
+  path?: string
   activeCount: number
   location: ApiLocation
   state: string
@@ -576,6 +578,7 @@ export interface ApiBoardCity {
 export interface ApiBoardArea {
   name: string
   slug?: string
+  path?: string
   cities: ApiBoardCity[]
 }
 

@@ -15,11 +15,11 @@ import {
 import { type AutocompleteRenderInputParams } from '@mui/material/Autocomplete'
 
 import mapConfig from '@configs/map'
-import searchConfig from '@configs/search'
 import routes from '@configs/routes'
+import searchConfig from '@configs/search'
 import IcoSearch from '@icons/IcoSearch'
 
-import { APISearch, APILocations } from 'services/API'
+import { APILocations, APISearch } from 'services/API'
 import {
   type AutosuggestionOption,
   type MapboxAddress,
@@ -39,6 +39,7 @@ import {
   toMapboxPoint
 } from 'utils/map'
 import { getSeoUrl } from 'utils/properties'
+import { getCatalogUrl } from 'utils/urls'
 
 import OptionAddress from './components/OptionAddress'
 import OptionArea from './components/OptionArea'
@@ -56,7 +57,7 @@ import {
 } from './utils'
 
 const { minCharsToSuggest } = searchConfig
-const { defaultAddressZoom, defaultAreaZoom } = mapConfig
+const { defaultAddressZoom } = mapConfig
 
 const Autosuggestion = ({
   showButton = false,
@@ -303,31 +304,17 @@ const Autosuggestion = ({
   const handleAreaClick = (option: any) => {
     setOpen(false)
 
-    const query = getAreaLabel(option)
-    // The suggestion already carries the area's center point, so navigate
-    // instantly instead of awaiting a slow cluster-bounds lookup — which was
-    // also returning nothing for some areas (e.g. "North York"), making the
-    // click silently do nothing.
-    const location = (
-      option.source as { location?: { lat: number; lng: number } }
-    )?.location
+    // Redirect a location result straight to its catalog page (area/city or
+    // city/neighbourhood URL) instead of the map. The option carries its own
+    // name and parent: a city option's parent is the area, a neighbourhood
+    // option's parent is the city — so parent + name forms the catalog path.
+    const name = (option.source as { name?: string })?.name
+    if (!name) return
+    const parentName = (option.parent as { name?: string })?.name
 
-    if (!location) return
-
-    const center = toMapboxPoint({
-      latitude: location.lat,
-      longitude: location.lng
-    })
-    const zoom = defaultAreaZoom
-
-    if (map) {
-      setSearchString(query)
-      setPosition({ zoom, center }) // save last focused result
-      map.flyTo({ center, zoom, curve: 1 })
-      router.replace(updateQueryParam(query))
-    } else {
-      router.push(getMapUrl({ zoom, center, query }))
-    }
+    router.push(
+      parentName ? getCatalogUrl(parentName, name) : getCatalogUrl(name)
+    )
   }
 
   const handleListingClick = (option: any) => {
@@ -350,7 +337,7 @@ const Autosuggestion = ({
         handleListingClick(option)
         break
       case 'building':
-        // Buildings are handled by Link in OptionBuilding, 
+        // Buildings are handled by Link in OptionBuilding,
         // but if we want to handle it here too:
         router.push(`${routes.building}/${(option.source as any).slug}`)
         break

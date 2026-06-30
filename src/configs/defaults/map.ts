@@ -27,12 +27,14 @@ const config = {
   fallbackAreaZoom: 11,
   defaultAddressZoom: 15,
   propertyPageAddressZoom: 18,
-  // Default polygon to limit searches and Repliers API requests (!)
+  // Default polygon to limit searches and Repliers API requests (!).
+  // Scoped to (Southern/Central) Ontario — the actual market — so the default
+  // map view lands on the listings instead of the empty centre of North America.
   defaultPolygon: [
-    { lat: 50.0, lng: -130.0 },
-    { lat: 50.0, lng: -65.0 },
-    { lat: 23.5, lng: -65.0 },
-    { lat: 23.5, lng: -130.0 }
+    { lat: 46.8, lng: -83.5 },
+    { lat: 46.8, lng: -74.0 },
+    { lat: 41.6, lng: -74.0 },
+    { lat: 41.6, lng: -83.5 }
   ] as ApiLocation[],
   // proximity search
   proximitySearchCenter: { lat: 43.613131, lng: 8.18188 } as ApiLocation,

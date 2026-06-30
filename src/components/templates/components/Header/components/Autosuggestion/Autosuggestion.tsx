@@ -26,15 +26,12 @@ import {
   type Property
 } from 'services/API'
 import MapService, { MapSearch } from 'services/Map'
-import SearchService from 'services/Search'
 import { useLocations } from 'providers/LocationsProvider'
 import { type MapPosition } from 'providers/MapOptionsProvider'
 import useClientSide from 'hooks/useClientSide'
 import useDebouncedEffect from 'hooks/useDebouncedEffect'
 import {
   calcBoundsAtZoom,
-  calcZoomLevel,
-  getCenter,
   getCoords,
   getMapUrl,
   getZoom,
@@ -303,43 +300,34 @@ const Autosuggestion = ({
     }, 500)
   }
 
-  const handleAreaClick = async (option: any) => {
+  const handleAreaClick = (option: any) => {
     setOpen(false)
-    setAreaLoading(true)
 
     const query = getAreaLabel(option)
-    const bounds = await SearchService.fetchBoundsForArea(query)
-    if (!bounds) {
-      setAreaLoading(false)
-      return
-    }
+    // The suggestion already carries the area's center point, so navigate
+    // instantly instead of awaiting a slow cluster-bounds lookup — which was
+    // also returning nothing for some areas (e.g. "North York"), making the
+    // click silently do nothing.
+    const location = (
+      option.source as { location?: { lat: number; lng: number } }
+    )?.location
 
-    const center = getCenter(bounds)
+    if (!location) return
+
+    const center = toMapboxPoint({
+      latitude: location.lat,
+      longitude: location.lng
+    })
+    const zoom = defaultAreaZoom
 
     if (map) {
-      // calculate zoom level based on bounds and current map size
-      const zoom = calcZoomLevel(map, bounds)
-      const mapboxBounds = toMapboxBounds(bounds)
-
       setSearchString(query)
       setPosition({ zoom, center }) // save last focused result
-      map.fitBounds(mapboxBounds, {
-        // NOTE: How did it happen NOBODY (!) read the Mapbox documentation
-        // and figure out the native way to add bounds paddings ???
-        // padding: { top: 50, bottom: 50, left: 50, right: 50 },
-      })
-      const updatedUrl = updateQueryParam(query)
-      router.replace(updatedUrl)
+      map.flyTo({ center, zoom, curve: 1 })
+      router.replace(updateQueryParam(query))
     } else {
-      // no map available, use default area zoom level
-      const zoom = defaultAreaZoom
-      const coordsUrl = getMapUrl({ zoom, center, query })
-      router.push(coordsUrl)
+      router.push(getMapUrl({ zoom, center, query }))
     }
-
-    setTimeout(() => {
-      setAreaLoading(false)
-    }, 500)
   }
 
   const handleListingClick = (option: any) => {

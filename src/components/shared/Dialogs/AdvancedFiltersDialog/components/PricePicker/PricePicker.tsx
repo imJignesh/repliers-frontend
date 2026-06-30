@@ -38,8 +38,14 @@ const PricePicker = ({
   const step = 1
 
   const formatLabel = (index: number) => {
-    const price = bucketKeys[index]
-    return `${formatPrice(price)}${index === lastIndex ? '+' : ''}`
+    // Bucket keys are "min-max" or "min+". Use only the lower bound, otherwise
+    // the price formatter strips the dash and mashes both numbers together
+    // (e.g. "800000-900000" -> 800000900000 -> "$800B").
+    const key = bucketKeys[index]
+    const min = key.includes('+')
+      ? parseInt(key, 10)
+      : Number(key.split('-')[0])
+    return `${formatPrice(min)}${index === lastIndex ? '+' : ''}`
   }
 
   const handleChange = (

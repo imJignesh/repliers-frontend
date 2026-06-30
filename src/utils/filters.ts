@@ -2,6 +2,15 @@ import { defaultAdvancedFilters, priceBuckets } from '@configs/filters'
 
 import { type Filters } from 'services/Search'
 
+// Upper bound for the price-range slider. The API can return buckets up into the
+// billions (a stray/ultra-high listing or a default top bucket), which made the
+// slider max read "$500B". Anything at or above the cap collapses into a single
+// `${cap}+` bucket so the slider stays data-driven but never exceeds this.
+const priceCaps: Record<'sale' | 'rent', number> = {
+  sale: 30000000, // $30M
+  rent: 100000 // $100k / mo
+}
+
 export function mergeBuckets(
   buckets: Record<string, number>,
   config: 'sale' | 'rent' = 'sale'
@@ -69,7 +78,26 @@ export function mergeBuckets(
     result[rangeKey] = aggregatedValue
   }
 
-  return result
+  // Cap the top of the slider: collapse every bucket at/above the cap into a
+  // single `${cap}+` bucket so a stray ultra-high value can't blow up the max.
+  const cap = priceCaps[config]
+  const capped: Record<string, number> = {}
+  let overflow = 0
+  Object.entries(result).forEach(([key, count]) => {
+    const min = key.includes('+')
+      ? parseInt(key, 10)
+      : Number(key.split('-')[0])
+    if (min >= cap) {
+      overflow += count
+    } else {
+      capped[key] = count
+    }
+  })
+  if (overflow > 0) {
+    capped[`${cap}+`] = (capped[`${cap}+`] ?? 0) + overflow
+  }
+
+  return capped
 }
 
 const inRange = (value: number, range: string) => {

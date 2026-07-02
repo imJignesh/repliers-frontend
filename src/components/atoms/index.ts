@@ -9,6 +9,7 @@ export {
   default as ImagePlaceholder,
   type ImagePlaceholderIconType
 } from './ImagePlaceholder'
+export { default as JsonLd } from './JsonLd'
 export { default as LoadingContent } from './LoadingContent'
 export { default as LoadingView } from './LoadingView'
 export { default as PhoneLink } from './PhoneLink'

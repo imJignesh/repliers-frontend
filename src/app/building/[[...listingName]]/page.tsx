@@ -6,9 +6,16 @@ import content from '@configs/content'
 import routes from '@configs/routes'
 import { Property404Template } from '@templates'
 
+import { JsonLd } from 'components/atoms'
 import BuildingPageTemplate from 'components/templates/BuildingPageTemplate'
 
 import { formatMetadata } from 'utils/properties'
+import { deriveBuildingProperty } from 'utils/properties/building'
+import {
+  getBreadcrumbJsonLd,
+  getBuildingJsonLd,
+  getPropertyBreadcrumbItems
+} from 'utils/structuredData'
 import { getProtocolHost } from 'utils/urls'
 
 import { type Params, type SearchParams } from './types'
@@ -127,13 +134,15 @@ export const generateMetadata = async (props: PropertyPageProps) => {
 const PropertyPage = async (props: PropertyPageProps) => {
   const searchParams = await props.searchParams
   const params = await props.params
+  const host = getProtocolHost(await headers())
   const {
     boardId,
     streetName,
     streetNumber,
     slug,
     streetSuffix,
-    streetDirection
+    streetDirection,
+    buildingName: slugBuildingName
   } = parseSlug(params, searchParams)
   const listingName = params.listingName?.[0] || ''
 
@@ -179,7 +188,25 @@ const PropertyPage = async (props: PropertyPageProps) => {
     permanentRedirect(routes.building + '/' + canonicalSlug)
   }
 
-  return <BuildingPageTemplate property={property} history={history} />
+  const buildName = property.building.name || slugBuildingName || ''
+  const derivedProperty = deriveBuildingProperty(property)
+  const buildingJsonLd = canonicalSlug
+    ? getBuildingJsonLd(property, host, buildName, canonicalSlug)
+    : null
+  const breadcrumbItems = derivedProperty
+    ? getPropertyBreadcrumbItems(derivedProperty.address, host, {
+        name: buildName,
+        url: `${host}${routes.building}/${canonicalSlug}`
+      })
+    : null
+
+  return (
+    <>
+      <JsonLd data={buildingJsonLd} />
+      {breadcrumbItems && <JsonLd data={getBreadcrumbJsonLd(breadcrumbItems)} />}
+      <BuildingPageTemplate property={property} history={history} />
+    </>
+  )
 }
 
 export default PropertyPage

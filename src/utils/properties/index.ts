@@ -83,6 +83,7 @@ export const active = (property: Property) => {
   }
   if (
     status === 'A' ||
+    status === 'Active' ||
     ['New', 'Sc', 'Sce', 'Lc', 'Pc', 'Ext', 'Lce', 'Dft'].includes(lastStatus)
   ) {
     return true

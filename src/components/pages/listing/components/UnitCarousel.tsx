@@ -6,7 +6,7 @@ import { CarouselHeader } from '@shared/Property/Carousel/components'
 
 
 import { type Property } from 'services/API'
-
+import { active } from 'utils/properties'
 const UnitCarousel = ({
   properties
 }: {
@@ -15,10 +15,10 @@ const UnitCarousel = ({
   if (properties.length === 0) return null
 
   const activeUnits = properties.filter((property) => {
-    const status = property?.status === 'A'
+    const isActive = active(property)
     const pType = property?.details?.propertyType?.toLowerCase() || ''
     const isParking = pType.includes('parking') || pType.includes('locker')
-    return status && !isParking
+    return isActive && !isParking
   })
 
   if (activeUnits.length === 0) return null

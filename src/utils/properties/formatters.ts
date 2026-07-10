@@ -142,10 +142,6 @@ export const formatMetadata = (
   finalDescription = scrubbed(finalDescription)
     ? propsConfig.scrubbedDescriptionLabel
     : finalDescription
-        // Cleanup artifacts from empty variables, e.g. "located at 30 Ramblings Way, ."
-        .replace(/\s\s+/g, ' ')
-        .replace(/(?:,\s*)+([,.;])/g, '$1')
-        .replace(/\s+\./g, '.')
 
   return {
     title,

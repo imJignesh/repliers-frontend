@@ -1,23 +1,6 @@
 import { type ApiQueryResponse, type Property } from 'services/API'
 
 /**
- * Curated building content sometimes contains list items whose value never got
- * filled in, e.g. "<strong>Average Price:</strong> $ / sq. ft." or
- * "Price/Sqft Range: Sqft range -". Strip any "Label: value" bullet whose
- * value part has no digits and looks like an empty price/sqft placeholder.
- */
-const cleanBuildingContent = (html: string): string =>
-  html.replace(/<li\b[^>]*>(?:(?!<\/li>)[\s\S])*<\/li>/gi, (li) => {
-    const text = li.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
-    const colonIdx = text.indexOf(':')
-    const value = colonIdx >= 0 ? text.slice(colonIdx + 1).trim() : text
-    const looksLikePricePlaceholder =
-      /sq\.?\s*ft|sqft/i.test(value) || value === '' || /^[$\-/\s.]*$/.test(value)
-    if (looksLikePricePlaceholder && !/\d/.test(value)) return ''
-    return li
-  })
-
-/**
  * A building page has no single "property" of its own — it's derived either
  * from its first unit listing, or (if no listings) a skeleton built from the
  * curated building record. Shared by BuildingPageTemplate and the building
@@ -31,10 +14,9 @@ export const deriveBuildingProperty = (
   // If we have curated content for this building in Laravel, it should ALWAYS take precedence
   // over the description of any individual unit listing from Repliers.
   if (p && property.building?.content) {
-    const content = cleanBuildingContent(property.building.content)
     if (!p.details) p.details = {} as any
-    p.details.description = content
-      ; (p as any).description = content
+    p.details.description = property.building.content
+      ; (p as any).description = property.building.content
   }
 
   if (!p && property.building) {
@@ -54,9 +36,7 @@ export const deriveBuildingProperty = (
       images: (property.building.cover_photo_url ? [property.building.cover_photo_url] : []).concat(cached?.images || []),
       details: {
         ...(cached?.details || {}),
-        description: property.building.content
-          ? cleanBuildingContent(property.building.content)
-          : cached?.details?.description
+        description: property.building.content || cached?.details?.description
       } as any,
       building: property.building
     } as any

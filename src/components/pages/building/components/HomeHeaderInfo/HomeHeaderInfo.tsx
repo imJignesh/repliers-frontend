@@ -53,6 +53,9 @@ const HomeHeaderInfo = () => {
             {soldProperty ? (
               <>
                 <SoldPropertyPrice property={property} />
+                <Box sx={reorderedSx}>
+                  <ListedPropertyPrice property={property} />
+                </Box>
               </>
             ) : listPrice ? (
               <>

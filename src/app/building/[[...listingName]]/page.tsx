@@ -194,15 +194,10 @@ const PropertyPage = async (props: PropertyPageProps) => {
     ? getBuildingJsonLd(property, host, buildName, canonicalSlug)
     : null
   const breadcrumbItems = derivedProperty
-    ? getPropertyBreadcrumbItems(
-        derivedProperty.address,
-        host,
-        {
-          name: buildName,
-          url: `${host}${routes.building}/${canonicalSlug}`
-        },
-        property.building?.location
-      )
+    ? getPropertyBreadcrumbItems(derivedProperty.address, host, {
+        name: buildName,
+        url: `${host}${routes.building}/${canonicalSlug}`
+      })
     : null
 
   return (

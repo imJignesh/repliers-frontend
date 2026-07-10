@@ -28,60 +28,38 @@ export const getBreadcrumbJsonLd = (items: BreadcrumbItem[]) => ({
   }))
 })
 
-// Slugs coming from the curated Laravel location records when available;
-// otherwise derived from the display name the same way Laravel's Str::slug
-// does (apostrophes dropped, everything else non-alphanumeric to hyphens).
-const toLocationSlug = (name?: string) =>
-  name
-    ? name
-        .toLowerCase()
-        .replace(/['’.]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '')
-    : ''
-
-export type BreadcrumbLocationSlugs = {
-  area?: { slug?: string | null } | null
-  city?: { slug?: string | null } | null
-  locality?: { slug?: string | null } | null
-}
-
-// Canonical /locations/{area}/{city}/{neighborhood} trail (same URL scheme the
-// Laravel sitemap publishes) — search URLs are not indexable landing pages.
-export const getLocationBreadcrumbItems = (
-  address: Pick<PropertyAddress, 'area' | 'city' | 'neighborhood'>,
-  host: string,
-  location?: BreadcrumbLocationSlugs | null
-): BreadcrumbItem[] => {
-  const { area, city, neighborhood } = address
-  const items: BreadcrumbItem[] = []
-  const segments: string[] = []
-
-  const push = (name: string, slug: string) => {
-    segments.push(slug)
-    items.push({ name, url: `${host}${routes.listings}/${segments.join('/')}` })
-  }
-
-  if (notNA(area)) push(area, location?.area?.slug || toLocationSlug(area))
-  if (notNA(city)) push(city, location?.city?.slug || toLocationSlug(city))
-  if (notNA(neighborhood))
-    push(neighborhood, location?.locality?.slug || toLocationSlug(neighborhood))
-
-  return items
-}
-
 // Mirrors the visible trail in NavigationBreadcrumbs (listing & building pages)
 // so the structured data matches what users actually see, per Google's guidance.
 export const getPropertyBreadcrumbItems = (
   address: Pick<PropertyAddress, 'area' | 'city' | 'neighborhood'>,
   host: string,
-  current: BreadcrumbItem,
-  location?: BreadcrumbLocationSlugs | null
-): BreadcrumbItem[] => [
-  { name: 'For sale', url: host + routes.map },
-  ...getLocationBreadcrumbItems(address, host, location),
-  current
-]
+  current: BreadcrumbItem
+): BreadcrumbItem[] => {
+  const { area, city, neighborhood } = address
+  const items: BreadcrumbItem[] = [{ name: 'For sale', url: host + routes.map }]
+
+  if (notNA(area)) {
+    items.push({
+      name: area,
+      url: `${host}${routes.area}/?q=${encodeURIComponent(area)}`
+    })
+  }
+  if (notNA(city)) {
+    items.push({
+      name: city,
+      url: `${host}${routes.area}/?q=${encodeURIComponent(city)}`
+    })
+  }
+  if (notNA(neighborhood)) {
+    items.push({
+      name: neighborhood,
+      url: `${host}${routes.area}/?q=${encodeURIComponent(`${neighborhood}, ${city}`)}`
+    })
+  }
+
+  items.push(current)
+  return items
+}
 
 const getAboutPlace = (property: Property, streetAddress: string) => {
   const { address, details, map } = property

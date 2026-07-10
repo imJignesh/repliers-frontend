@@ -72,18 +72,10 @@ export const premium = (property: Property) => {
   )
 }
 
-// Sold / leased / suspended / expired / terminated — off the market regardless
-// of `status`, which can lag behind (e.g. expired listings often keep status A).
-const OFF_MARKET_LAST_STATUSES = ['Sld', 'Lsd', 'Sus', 'Exp', 'Ter']
-
 export const active = (property: Property) => {
   const { status, lastStatus } = property
-  if (OFF_MARKET_LAST_STATUSES.includes(lastStatus)) {
-    return false
-  }
   if (
     status === 'A' ||
-    status === 'Active' ||
     ['New', 'Sc', 'Sce', 'Lc', 'Pc', 'Ext', 'Lce', 'Dft'].includes(lastStatus)
   ) {
     return true

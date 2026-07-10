@@ -45,10 +45,15 @@ const PropertyPage = async (props: PropertyPageProps) => {
   try {
     const property = await fetchProperty(listingId, boardId)
     const url = host + getSeoUrl(property, { excludeQuery: true })
-    const breadcrumbItems = getPropertyBreadcrumbItems(property.address, host, {
-      name: formatShortAddress(property.address, true) || property.mlsNumber,
-      url
-    })
+    const breadcrumbItems = getPropertyBreadcrumbItems(
+      property.address,
+      host,
+      {
+        name: formatShortAddress(property.address, true) || property.mlsNumber,
+        url
+      },
+      (property as any).building?.location
+    )
 
     return (
       <>

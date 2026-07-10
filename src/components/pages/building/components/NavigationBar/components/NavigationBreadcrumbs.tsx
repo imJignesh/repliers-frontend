@@ -4,51 +4,30 @@ import { Breadcrumbs, Link } from '@mui/material'
 import routes from '@configs/routes'
 
 import { useProperty } from 'providers/PropertyProvider'
-import { notNA } from 'utils/strings'
+import { getLocationBreadcrumbItems } from 'utils/structuredData'
 
 const NavigationBreadcrumbs = () => {
-  const {
-    property: {
-      address: { neighborhood, area, city }
-    }
-  } = useProperty()
+  const { property } = useProperty()
+  const locationItems = getLocationBreadcrumbItems(
+    property.address,
+    '',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (property as any).building?.location
+  )
 
   return (
     <Breadcrumbs
       separator={<NavigateNextIcon fontSize="small" />}
       sx={{ fontSize: 14, '& .MuiBreadcrumbs-separator': { mx: 0.5 } }}
     >
-      <Link key="1" underline="hover" color="inherit" href={routes.map}>
+      <Link key="for-sale" underline="hover" color="inherit" href={routes.map}>
         For sale
       </Link>
-      {notNA(area) && (
-        <Link
-          key="4"
-          underline="hover"
-          color="inherit"
-          href={`${routes.area}/?q=${area}`}
-        >
-          {area}
+      {locationItems.map(({ name, url }) => (
+        <Link key={url} underline="hover" color="inherit" href={url}>
+          {name}
         </Link>
-      )}
-      <Link
-        key="3"
-        underline="hover"
-        color="inherit"
-        href={`${routes.area}/?q=${city}`}
-      >
-        {city}
-      </Link>
-      {notNA(neighborhood) && (
-        <Link
-          key="5"
-          underline="hover"
-          color="inherit"
-          href={`${routes.area}/?q=${neighborhood}, ${city}`}
-        >
-          {neighborhood}
-        </Link>
-      )}
+      ))}
     </Breadcrumbs>
   )
 }

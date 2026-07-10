@@ -164,6 +164,16 @@ export const generateCatalogMetadata = async ({
     .replace(/\s\s+/g, ' ')
     .trim()
 
+  // Filtered variants (e.g. /toronto/condos-above-500k) duplicate the base
+  // location page's title/H1 — canonicalize them to the base page and keep
+  // them out of the index, while still letting crawlers follow their links.
+  const hasFilterSegments = (slugs ?? []).some(isFilterSegment)
+  const urlPath = routes.listings + (slugs?.length ? '/' + slugs.join('/') : '')
+  const canonicalPath = hasFilterSegments
+    ? routes.listings +
+      (rawLocationSlugs.length ? '/' + rawLocationSlugs.join('/') : '')
+    : urlPath
+
   const meta: any = {
     title: title
       .replace(/\s\s+/g, ' ')
@@ -172,13 +182,13 @@ export const generateCatalogMetadata = async ({
       .trim(),
     description: cleanDescription,
     alternates: {
-      canonical: host + routes.listings + (slugs?.length ? '/' + slugs.join('/') : '')
+      canonical: host + canonicalPath
     },
     openGraph: {
-      url: host + routes.listings + (slugs?.length ? '/' + slugs.join('/') : '')
+      url: host + urlPath
     },
     robots: {
-      index: true,
+      index: !hasFilterSegments,
       follow: true
     }
   }

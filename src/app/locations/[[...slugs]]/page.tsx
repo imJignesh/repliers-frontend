@@ -13,7 +13,11 @@ import {
   APILocations
 } from 'services/API'
 
-import { filter as isFilterSegment, parseUrlFilters, parseUrlParams } from './_parsers'
+import {
+  filter as isFilterSegment,
+  parseUrlFilters,
+  parseUrlParams
+} from './_parsers'
 import { beautify } from './_parsers'
 import { fetchListings, fetchLocations } from './_requests'
 import { generateCatalogMetadata } from './_ssg'
@@ -21,6 +25,14 @@ import { extractCities, extractLocation, refineLocation } from './_utils'
 
 // catalog pages CANT BE STATICALLY GENERATED (SSG)
 // because we need a token cookie to fetch listings from the client side
+//
+// This route must also NOT stream. It previously had a loading.tsx, which made
+// the segment a Suspense boundary: Next.js flushed the shell — and with it the
+// HTTP 200 status line — before this component ran, so every notFound() below
+// rendered 404 markup inside an HTTP 200 response. That is what made invalid
+// location URLs read as soft 404s to Google. The status code cannot be revised
+// once the first byte is out, and the empty-facet check below depends on the
+// listings fetch, so the 404 decisions have to complete before anything renders.
 export const dynamic = 'force-dynamic'
 export const revalidate = 86400
 
@@ -84,24 +96,27 @@ const LocationsCatalogPage = async (props: {
   const usZipRegex = /^\d{5}(-\d{4})?$/
   const canadianPostalRegex = /^[A-Za-z]\d[A-Za-z][- ]\d[A-Za-z]\d$/
   const isListingId = (s: string) => listingIdRegex.test(s)
-  const isZipCode = (s: string) => usZipRegex.test(s) || canadianPostalRegex.test(s)
+  const isZipCode = (s: string) =>
+    usZipRegex.test(s) || canadianPostalRegex.test(s)
 
   const rawLocationSlugs = (slugs ?? []).filter(
     (seg) => !isFilterSegment(seg) && !isListingId(seg) && !isZipCode(seg)
   )
 
-  const currentPath = '/locations' + (slugs?.length ? '/' + slugs.join('/') : '')
+  const currentPath =
+    '/locations' + (slugs?.length ? '/' + slugs.join('/') : '')
 
   // Fetch data needed for identification
   // Pass empty neighborhood to fetch all neighborhoods in the city for loose matching later
-  const [fetchAreas, dynamicAreasData, slugValidation, redirectInfo] = await Promise.all([
-    fetchLocations(urlCity, ''),
-    APILocations.fetchAreas(),
-    rawLocationSlugs.length
-      ? APILocations.validateSlugs(rawLocationSlugs)
-      : Promise.resolve({} as Record<string, string | null>),
-    APILocations.lookupRedirect(currentPath)
-  ])
+  const [fetchAreas, dynamicAreasData, slugValidation, redirectInfo] =
+    await Promise.all([
+      fetchLocations(urlCity, ''),
+      APILocations.fetchAreas(),
+      rawLocationSlugs.length
+        ? APILocations.validateSlugs(rawLocationSlugs)
+        : Promise.resolve({} as Record<string, string | null>),
+      APILocations.lookupRedirect(currentPath)
+    ])
 
   // If redirect exists in the database, redirect permanently
   if (redirectInfo?.destination) {
@@ -109,29 +124,39 @@ const LocationsCatalogPage = async (props: {
   }
 
   // 404 if any location segment is unknown to the database
-  const hasInvalidSlug = rawLocationSlugs.some((slug) => slug in slugValidation && slugValidation[slug] === null)
+  const hasInvalidSlug = rawLocationSlugs.some(
+    (slug) => slug in slugValidation && slugValidation[slug] === null
+  )
   if (hasInvalidSlug) notFound()
 
   // Build ApiBoardArea[] from the nested cities structure returned by /areas
-  const formattedAreas: ApiBoardArea[] = (dynamicAreasData as any[]).map((a: any) => ({
-    name: a.name,
-    cities: (a.cities ?? []).map((c: any) => ({
-      name: c.name,
-      activeCount: Number(c.listing_count) || 0,
-      location: { lat: 0, lng: 0 },
-      state: 'ON',
-      neighborhoods: (c.neighborhoods ?? []).map((name: string) => ({
-        name,
-        activeCount: 0,
-        location: { lat: 0, lng: 0 }
+  const formattedAreas: ApiBoardArea[] = (dynamicAreasData as any[]).map(
+    (a: any) => ({
+      name: a.name,
+      cities: (a.cities ?? []).map((c: any) => ({
+        name: c.name,
+        activeCount: Number(c.listing_count) || 0,
+        location: { lat: 0, lng: 0 },
+        state: 'ON',
+        neighborhoods: (c.neighborhoods ?? []).map((name: string) => ({
+          name,
+          activeCount: 0,
+          location: { lat: 0, lng: 0 }
+        }))
       }))
-    }))
-  }))
+    })
+  )
 
   const finalAreas = formattedAreas.length ? formattedAreas : fetchAreas
 
   // Refine location identification
-  const { area, city, hood } = refineLocation(finalAreas, urlArea, urlCity, urlHood, unknowns)
+  const { area, city, hood } = refineLocation(
+    finalAreas,
+    urlArea,
+    urlCity,
+    urlHood,
+    unknowns
+  )
 
   // render property page component if listingId is present and emulate its old url format
   if (listingId) {
@@ -155,7 +180,19 @@ const LocationsCatalogPage = async (props: {
   // Don't 404 paginated building views — buildings paginate independently of
   // listings (the ?page param is shared), so a high building page may exceed the
   // number of listing pages without meaning the location is empty.
-  if (page > 1 && !listings.length && searchParams.type !== 'building') notFound()
+  if (page > 1 && !listings.length && searchParams.type !== 'building')
+    notFound()
+
+  // An empty *generated facet* has no indexable result and must 404 rather than
+  // render an empty catalog at 200 (e.g. .../alderwood/condos-above-500k).
+  //
+  // This deliberately only fires when the URL carries filter segments. A bare
+  // location hub with zero active listings stays 200: those are legitimate,
+  // linked pages whose inventory comes and goes, and 404ing them would drop
+  // real locations out of the index every time a neighbourhood emptied out.
+  if (!listings.length && filters.length && searchParams.type !== 'building') {
+    notFound()
+  }
 
   const byCount = (a: any, b: any) => b.activeCount - a.activeCount
 
@@ -178,7 +215,8 @@ const LocationsCatalogPage = async (props: {
 
     if (dynamicData.length > 0) {
       const first = dynamicData[0]
-      const isNested = typeof first === 'object' && first !== null && 'neighborhoods' in first
+      const isNested =
+        typeof first === 'object' && first !== null && 'neighborhoods' in first
 
       if (!isNested) {
         // City-level: flat neighborhood objects
@@ -195,7 +233,8 @@ const LocationsCatalogPage = async (props: {
           location: { lat: 0, lng: 0 },
           neighborhoods: (c.neighborhoods ?? []).map((n: any) => ({
             name: typeof n === 'string' ? n : n.name,
-            activeCount: typeof n === 'string' ? 0 : (Number(n.listing_count) || 0),
+            activeCount:
+              typeof n === 'string' ? 0 : Number(n.listing_count) || 0,
             location: { lat: 0, lng: 0 }
           }))
         }))

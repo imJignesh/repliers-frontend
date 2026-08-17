@@ -5,6 +5,8 @@ import propsConfig from '@configs/properties'
 
 import { type PropertyAddress } from 'services/API'
 
+import { slugifyAddress } from './slug'
+
 export const sanitizeScrubbed = (value: string) =>
   String(value).replaceAll(propsConfig.scrubbedDataString, '')
 
@@ -13,47 +15,23 @@ export const sanitizeStreetNumber = (value: string) => {
   return sanitized === '' || sanitized.match(/^0+$/) ? '' : value
 }
 
-export const sanitizeAddress = (address: PropertyAddress) => {
-  const {
-    unitNumber = '',
-    streetNumber = '',
-    streetName = '',
-    streetSuffix = '',
-    streetDirection = '',
-    city = '',
-    zip = ''
-  } = address
-
-  const parts = [
-    unitNumber,
-    streetNumber,
-    streetName,
-    streetSuffix,
-    streetDirection,
-    city,
-    zip
-  ]
-
-  return parts
-    .map((part) => part?.trim().replaceAll(propsConfig.scrubbedDataString, ''))
-    .filter(Boolean)
-    .join('-')
-    .replace(/#/g, '')
-    .replace(/[/\\'`]/g, '-')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .toLowerCase()
-}
+export const sanitizeAddress = (address: PropertyAddress) =>
+  slugifyAddress(address)
 
 export const sanitizePhoneNumber = (value: string | null | undefined) => {
   if (!value) return ''
   try {
-    const phoneNumber = parsePhoneNumber(value, i18nConfig.phoneNumberLocale) || parsePhoneNumber(value)
-    
+    const phoneNumber =
+      parsePhoneNumber(value, i18nConfig.phoneNumberLocale) ||
+      parsePhoneNumber(value)
+
     if (phoneNumber) {
-      // If it's the default country, we might want to strip the + as per original logic, 
+      // If it's the default country, we might want to strip the + as per original logic,
       // but if it's international, we MUST keep it.
-      if (phoneNumber.country === i18nConfig.phoneNumberLocale && !value.startsWith('+')) {
+      if (
+        phoneNumber.country === i18nConfig.phoneNumberLocale &&
+        !value.startsWith('+')
+      ) {
         return phoneNumber.number.replace('+', '')
       }
       return phoneNumber.number // Keep + for international or if user explicitly typed it
@@ -61,7 +39,7 @@ export const sanitizePhoneNumber = (value: string | null | undefined) => {
   } catch (e) {
     // ignore error
   }
-  
+
   // Fallback: just return the value with only digits and +
   return value.replace(/[^\d+]/g, '')
 }

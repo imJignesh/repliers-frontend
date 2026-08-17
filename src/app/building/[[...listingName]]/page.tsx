@@ -54,7 +54,7 @@ export const generateMetadata = async (props: PropertyPageProps) => {
       streetSuffix,
       streetDirection
     )
-    
+
     if (!property?.building) {
       notFound()
     }
@@ -101,7 +101,10 @@ export const generateMetadata = async (props: PropertyPageProps) => {
     return metadata
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error: any) {
-    if (error?.digest === 'NEXT_NOT_FOUND' || error?.message === 'NEXT_NOT_FOUND') {
+    if (
+      error?.digest === 'NEXT_NOT_FOUND' ||
+      error?.message === 'NEXT_NOT_FOUND'
+    ) {
       throw error
     }
     if (slugBuildingName) {
@@ -168,7 +171,15 @@ const PropertyPage = async (props: PropertyPageProps) => {
       )
     ])
   } catch (error: any) {
-    // Attempt to fetch nearbies for the 404 page
+    // Same rule as /listing: a rendered 404 template is still an HTTP 200, so
+    // an absent building has to go through notFound() to get a real status.
+    // 403 (MLS-compliance gated) and 5xx keep the explanatory page — a
+    // transient upstream failure must not de-index a live building.
+    const status = error?.status ?? error?.response?.status
+    if (status === 404 || status === 410) {
+      notFound()
+    }
+
     const properties = await fetchNearbies(listingName)
     return (
       <Property404Template
@@ -203,7 +214,9 @@ const PropertyPage = async (props: PropertyPageProps) => {
   return (
     <>
       <JsonLd data={buildingJsonLd} />
-      {breadcrumbItems && <JsonLd data={getBreadcrumbJsonLd(breadcrumbItems)} />}
+      {breadcrumbItems && (
+        <JsonLd data={getBreadcrumbJsonLd(breadcrumbItems)} />
+      )}
       <BuildingPageTemplate property={property} history={history} />
     </>
   )

@@ -85,6 +85,20 @@ export const active = (property: Property) => {
 
 export const sold = (property: Property) => !active(property)
 
+/**
+ * True when the feed has withdrawn the record: the listing left the market
+ * without selling and there is nothing left to show.
+ *
+ * Sold listings are deliberately NOT withdrawn — the site publishes sold
+ * history on purpose, and those pages stay indexable. This is narrower than
+ * `sold()`: it requires the availability flag to actually be 'U', so a record
+ * still carrying status 'A' keeps its page even if its lastStatus has already
+ * flipped to Ter (the feed routinely lags on that pair).
+ */
+export const withdrawn = (property: Partial<Property>) =>
+  property.status === 'U' &&
+  ['Exp', 'Ter'].includes(String(property.lastStatus))
+
 const typeStyleMatch = (
   property: Partial<Property>,
   type: string[],
@@ -245,12 +259,14 @@ const getDays = (days: number) => {
 }
 
 export const getDaysSinceListed = (property: Property) => {
-  const daysNumber = property.daysOnMarket !== undefined && property.daysOnMarket !== null
-    ? toSafeNumber(property.daysOnMarket)
-    : (property.listDate ? dayjs(property.listDate).diff(dayjs(), 'day') : NaN)
+  const daysNumber =
+    property.daysOnMarket !== undefined && property.daysOnMarket !== null
+      ? toSafeNumber(property.daysOnMarket)
+      : property.listDate
+        ? dayjs(property.listDate).diff(dayjs(), 'day')
+        : NaN
   return getDays(Math.abs(daysNumber))
 }
-
 
 export const getUpdatedDays = (days: string) => {
   const updatedDays = dayjs().diff(dayjs(days), 'day')

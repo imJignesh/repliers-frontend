@@ -172,7 +172,7 @@ const Footer = () => {
                       </a>
                     </li>
                     <li id="menu-item-820618" className="menu-item">
-                      <a href="https://join.precondo.ca/recruiting/">
+                      <a href="https://join.precondo.ca/">
                         <ChevronRightIcon sx={{ fontSize: { xs: 14, md: 16 }, color: '#3889c7' }} />
                         <span className="suki-menu-item-title">Jobs</span>
                       </a>

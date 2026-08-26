@@ -1,6 +1,7 @@
-import { features } from 'features'
 import { notFound, permanentRedirect } from 'next/navigation'
+import { features } from 'features'
 
+import routes from '@configs/routes'
 import { PageTemplate } from '@templates'
 import CatalogPageContent from '@pages/catalog'
 
@@ -18,7 +19,6 @@ import {
   parseUrlFilters,
   parseUrlParams
 } from './_parsers'
-import { beautify } from './_parsers'
 import { fetchListings, fetchLocations } from './_requests'
 import { generateCatalogMetadata } from './_ssg'
 import { extractCities, extractLocation, refineLocation } from './_utils'
@@ -86,6 +86,23 @@ const LocationsCatalogPage = async (props: {
     location: { area: urlArea, city: urlCity, neighborhood: urlHood },
     unknowns
   } = parseUrlParams(slugs)
+
+  // Price facets were never linked or included in the sitemap and duplicate
+  // their parent location's search intent. Retire every legacy above/below
+  // price URL with a permanent redirect to the clean location hub.
+  if (
+    filters.some(
+      (filter) => filter.startsWith('above-') || filter.startsWith('below-')
+    )
+  ) {
+    const locationSlugs = (slugs ?? []).filter(
+      (segment) => !isFilterSegment(segment)
+    )
+    permanentRedirect(
+      routes.listings +
+        (locationSlugs.length ? `/${locationSlugs.join('/')}` : '')
+    )
+  }
 
   // ─── Slug validation ────────────────────────────────────────────────────────
   // Extract the raw URL segments that are location slugs (not filters / listing

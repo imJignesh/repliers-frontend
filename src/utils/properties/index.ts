@@ -72,8 +72,17 @@ export const premium = (property: Property) => {
   )
 }
 
+export const terminalListingStatuses = ['Exp', 'Ter', 'Sld', 'Lsd'] as const
+
+export const inactive = (property: Partial<Property>) =>
+  terminalListingStatuses.includes(
+    String(property.lastStatus) as (typeof terminalListingStatuses)[number]
+  )
+
 export const active = (property: Property) => {
   const { status, lastStatus } = property
+  if (inactive(property)) return false
+
   if (
     status === 'A' ||
     ['New', 'Sc', 'Sce', 'Lc', 'Pc', 'Ext', 'Lce', 'Dft'].includes(lastStatus)
@@ -86,18 +95,11 @@ export const active = (property: Property) => {
 export const sold = (property: Property) => !active(property)
 
 /**
- * True when the feed has withdrawn the record: the listing left the market
- * without selling and there is nothing left to show.
- *
- * Sold listings are deliberately NOT withdrawn — the site publishes sold
- * history on purpose, and those pages stay indexable. This is narrower than
- * `sold()`: it requires the availability flag to actually be 'U', so a record
- * still carrying status 'A' keeps its page even if its lastStatus has already
- * flipped to Ter (the feed routinely lags on that pair).
+ * Terminal MLS statuses take precedence over a stale active availability flag.
+ * These records must not remain indexable or be represented as available.
  */
 export const withdrawn = (property: Partial<Property>) =>
-  property.status === 'U' &&
-  ['Exp', 'Ter'].includes(String(property.lastStatus))
+  inactive(property)
 
 const typeStyleMatch = (
   property: Partial<Property>,

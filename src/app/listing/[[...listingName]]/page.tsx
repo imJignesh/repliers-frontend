@@ -37,6 +37,7 @@ export const generateMetadata = async (props: PropertyPageProps) => {
   const { listingId, boardId } = parseParams(params, searchParams)
   try {
     const property = await fetchProperty(listingId, boardId)
+    if (withdrawn(property)) return content.missingPropertyMetadata
     return formatMetadata(property, host)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error: any) {
@@ -87,10 +88,10 @@ const PropertyPage = async (props: PropertyPageProps) => {
   }
 
   // ─── Rule A (cont.): withdrawn records are gone, not just unavailable ───────
-  // An expired/terminated listing still comes back from the feed, so it used to
+  // An expired/terminated/sold listing can still come back from the feed, so it used to
   // render a full listing page at HTTP 200 with robots "index, follow" — which
-  // is what Google reports as a Soft 404. Sold listings are excluded on purpose:
-  // sold history is real content here and stays indexable.
+  // is what Google reports as a Soft 404. Terminal MLS status wins over a stale
+  // active flag.
   if (withdrawn(property)) {
     notFound()
   }

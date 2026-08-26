@@ -10,7 +10,8 @@ import {
   getUniqueKey,
   premium,
   restricted,
-  sold
+  sold,
+  withdrawn
 } from '.'
 
 const { premiumCondoPrice, premiumResidentialPrice } = propsConfig
@@ -78,6 +79,18 @@ describe('utils/properties', () => {
     expect(active(residentialProperty)).toBe(true)
     expect(active(sold1Property)).toBe(false)
     expect(active(sold2Property)).toBe(false)
+    expect(active({ ...condoProperty, lastStatus: 'Exp' })).toBe(false)
+    expect(active({ ...condoProperty, lastStatus: 'Ter' })).toBe(false)
+    expect(active({ ...condoProperty, lastStatus: 'Sld' })).toBe(false)
+    expect(active({ ...condoProperty, lastStatus: 'Lsd' })).toBe(false)
+  })
+
+  it('treats terminal MLS statuses as withdrawn despite a stale active flag', () => {
+    expect(withdrawn({ status: 'A', lastStatus: 'Exp' })).toBe(true)
+    expect(withdrawn({ status: 'A', lastStatus: 'Ter' })).toBe(true)
+    expect(withdrawn({ status: 'A', lastStatus: 'Sld' })).toBe(true)
+    expect(withdrawn({ status: 'A', lastStatus: 'Lsd' })).toBe(true)
+    expect(withdrawn({ status: 'A', lastStatus: 'New' })).toBe(false)
   })
 
   it('should correctly identify a Sold property', () => {

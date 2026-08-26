@@ -2,7 +2,7 @@ import routes from '@configs/routes'
 
 import { type ApiQueryResponse, type Property, type PropertyAddress } from 'services/API'
 
-import { getBathrooms, getBedrooms, getSqft, scrubbed, sold } from './properties'
+import { active, getBathrooms, getBedrooms, getSqft, scrubbed, sold } from './properties'
 import { deriveBuildingProperty } from './properties/building'
 import { formatShortAddress } from './properties/formatters'
 import { getSeoUrl } from './properties/seo'
@@ -126,7 +126,7 @@ export const getListingJsonLd = (property: Property, host: string) => {
       ? { image: images.slice(0, 6).map((img) => getCDNPath(img, 'large')) }
       : {}),
     about: getAboutPlace(property, streetAddress),
-    ...(!scrubbed(price) && price
+    ...(active(property) && !scrubbed(price) && price
       ? {
           offers: {
             '@type': 'Offer',

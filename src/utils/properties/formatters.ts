@@ -142,6 +142,10 @@ export const formatMetadata = (
   finalDescription = scrubbed(finalDescription)
     ? propsConfig.scrubbedDescriptionLabel
     : finalDescription
+  finalDescription = finalDescription
+    .replace(/,\s*\./g, '.')
+    .replace(/\s{2,}/g, ' ')
+    .trim()
 
   return {
     title,

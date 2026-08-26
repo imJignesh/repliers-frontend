@@ -3,6 +3,7 @@ import { type PropertyAddress } from 'services/API'
 import { property1, property2, property3 } from './__mocks__'
 import {
   formatFullAddress,
+  formatMetadata,
   formatMultiLineText,
   formatOpenHouseTimeRange,
   formatShortAddress
@@ -28,6 +29,25 @@ describe('utils/properties/formatters', () => {
       "13/5 D'artagnan` Bay, Ottawa"
     )
     expect(formatFullAddress({} as unknown as PropertyAddress)).toBe('')
+  })
+
+  it('omits empty city punctuation from building metadata', () => {
+    const property = {
+      ...property1,
+      address: { ...property1.address, city: '' },
+      details: { description: '', propertyType: 'Condo Apt' },
+      images: []
+    }
+
+    const metadata = formatMetadata(property, 'https://precondo.ca', {
+      type: 'building',
+      buildingName: 'Example Condos'
+    })
+
+    expect(metadata.description).toContain(
+      'located at 135 Lower Barrette Way EAST.'
+    )
+    expect(metadata.description).not.toContain(', .')
   })
 
   it('should correctly format open house time range', () => {

@@ -1,5 +1,26 @@
 import { type ApiQueryResponse, type Property } from 'services/API'
 
+export const sanitizeBuildingContent = (content?: string | null): string => {
+  if (!content) return ''
+
+  return content.replace(
+    /<(li|p)\b[^>]*>[\s\S]*?<\/\1>/gi,
+    (block) => {
+      const text = block
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&nbsp;/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+      const priceLabel = /(?:average|avg)\s+price(?:\s*\/\s*sqft)?\s*:/i
+
+      if (!priceLabel.test(text)) return block
+
+      const value = text.split(priceLabel).pop() || ''
+      return /\d/.test(value) ? block : ''
+    }
+  )
+}
+
 /**
  * A building page has no single "property" of its own — it's derived either
  * from its first unit listing, or (if no listings) a skeleton built from the
@@ -15,8 +36,9 @@ export const deriveBuildingProperty = (
   // over the description of any individual unit listing from Repliers.
   if (p && property.building?.content) {
     if (!p.details) p.details = {} as any
-    p.details.description = property.building.content
-      ; (p as any).description = property.building.content
+    const content = sanitizeBuildingContent(property.building.content)
+    p.details.description = content
+      ; (p as any).description = content
   }
 
   if (!p && property.building) {
@@ -36,7 +58,9 @@ export const deriveBuildingProperty = (
       images: (property.building.cover_photo_url ? [property.building.cover_photo_url] : []).concat(cached?.images || []),
       details: {
         ...(cached?.details || {}),
-        description: property.building.content || cached?.details?.description
+        description: property.building.content
+          ? sanitizeBuildingContent(property.building.content)
+          : cached?.details?.description
       } as any,
       building: property.building
     } as any

@@ -60,11 +60,11 @@ const BuildingInfoItem = ({
 }
 
 const getSqftValue = (val: string | number | null | undefined) => {
-  if (val === null || val === undefined) return 'N/A'
+  if (val === null || val === undefined) return null
   const strVal = String(val).trim()
-  if (strVal === '') return 'N/A'
-  if (!/\d/.test(strVal)) return 'N/A'
-  if (scrubbed(strVal)) return 'N/A'
+  if (strVal === '') return null
+  if (!/\d/.test(strVal)) return null
+  if (scrubbed(strVal)) return null
   return strVal
 }
 
@@ -79,8 +79,8 @@ const BuildingInfo = () => {
   const avgPriceSqftVal = getSqftValue(building.avg_price_sqft)
 
   const hasData =
-    (priceSqftVal !== 'N/A') ||
-    (avgPriceSqftVal !== 'N/A') ||
+    priceSqftVal !== null ||
+    avgPriceSqftVal !== null ||
     (building.built_year_ext && !scrubbed(building.built_year_ext)) ||
     (building.floors_units && !scrubbed(building.floors_units))
 
@@ -95,36 +95,40 @@ const BuildingInfo = () => {
           gap: 2
         }}
       >
-        <Box
-          sx={{
-            flex: {
-              xs: '1 1 100%',
-              sm: '1 1 calc(50% - 16px)',
-              md: '1 1 calc(25% - 24px)'
-            }
-          }}
-        >
-          <BuildingInfoItem
-            icon={SquareFootIcon}
-            label="Price/Sqft Range"
-            value={priceSqftVal}
-          />
-        </Box>
-        <Box
-          sx={{
-            flex: {
-              xs: '1 1 100%',
-              sm: '1 1 calc(50% - 16px)',
-              md: '1 1 calc(25% - 24px)'
-            }
-          }}
-        >
-          <BuildingInfoItem
-            icon={TrendingUpIcon}
-            label="Avg Price/Sqft"
-            value={avgPriceSqftVal}
-          />
-        </Box>
+        {priceSqftVal !== null && (
+          <Box
+            sx={{
+              flex: {
+                xs: '1 1 100%',
+                sm: '1 1 calc(50% - 16px)',
+                md: '1 1 calc(25% - 24px)'
+              }
+            }}
+          >
+            <BuildingInfoItem
+              icon={SquareFootIcon}
+              label="Price/Sqft Range"
+              value={priceSqftVal}
+            />
+          </Box>
+        )}
+        {avgPriceSqftVal !== null && (
+          <Box
+            sx={{
+              flex: {
+                xs: '1 1 100%',
+                sm: '1 1 calc(50% - 16px)',
+                md: '1 1 calc(25% - 24px)'
+              }
+            }}
+          >
+            <BuildingInfoItem
+              icon={TrendingUpIcon}
+              label="Avg Price/Sqft"
+              value={avgPriceSqftVal}
+            />
+          </Box>
+        )}
         <Box
           sx={{
             flex: {

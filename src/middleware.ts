@@ -19,6 +19,7 @@ import { slugifyAddress } from 'utils/properties/slug'
 
 const LISTING_PATH = /^(?:\/r)?\/listing\/([^/]+)\/?$/
 const BOARD_ID_SUFFIX = /^\d{1,3}$/
+const TERMINAL_STATUSES = ['Exp', 'Ter', 'Sld', 'Lsd']
 const LOOKUP_TIMEOUT_MS = 2000
 
 export const config = {
@@ -80,10 +81,7 @@ export async function middleware(request: NextRequest) {
 
   // A withdrawn record is about to 404 in the page. Redirecting first would
   // hand crawlers a pointless 301 -> 404 chain, so let the 404 answer directly.
-  if (
-    property.status === 'U' &&
-    ['Exp', 'Ter'].includes(String(property.lastStatus))
-  ) {
+  if (TERMINAL_STATUSES.includes(String(property.lastStatus))) {
     return pass
   }
 

@@ -15,10 +15,12 @@ function load(file, mocks) {
   './utils':{parseParams:()=>({listingId:'id'}),fetchProperty:async()=>{if(state==='error')throw Error('Unavailable');return {}}}
  });
  for(state of ['active','withdrawn','error']) {
-  const m=await route.generateMetadata({params:{},searchParams:{}});
+ const m=await route.generateMetadata({params:{},searchParams:{}});
   assert.equal(m.robots.index,false,state);assert.equal(m.robots.follow,false,state);
   assert.equal(m.robots.googleBot.index,false,state);assert.equal(m.robots.googleBot.follow,false,state);
  }
+ const pageSource=fs.readFileSync('src/app/listing/[[...listingName]]/page.tsx','utf8');
+ assert.ok(!pageSource.includes('permanentRedirect(canonicalPath)'), 'Listing aliases must not redirect outside the /r mount');
  class Response {constructor(body,opts){this.body=body;Object.assign(this,opts)}}
  const retired=load('src/app/listings.xml/route.ts',{'next/server':{NextResponse:Response}});
  const r=await retired.GET();assert.equal(r.status,410);assert.equal(r.headers['X-Robots-Tag'],'noindex, nofollow');

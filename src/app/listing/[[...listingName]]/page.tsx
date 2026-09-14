@@ -1,5 +1,5 @@
 import { headers } from 'next/headers'
-import { notFound, permanentRedirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import type React from 'react'
 
 import content from '@configs/content'
@@ -20,7 +20,6 @@ import { type Params, type SearchParams } from './types'
 import {
   fetchNearbies,
   fetchProperty,
-  getCanonicalPath,
   parseParams
 } from './utils'
 
@@ -96,12 +95,6 @@ const PropertyPage = async (props: PropertyPageProps) => {
   // active flag.
   if (withdrawn(property)) {
     notFound()
-  }
-
-  // ─── Rule C: one 301 from any alternate route to the clean canonical ────────
-  const canonicalPath = getCanonicalPath(property, listingName)
-  if (canonicalPath && canonicalPath !== `${routes.listing}/${listingName}`) {
-    permanentRedirect(canonicalPath)
   }
 
   const url = host + getSeoUrl(property, { excludeQuery: true })

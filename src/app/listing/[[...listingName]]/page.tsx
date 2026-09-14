@@ -29,7 +29,9 @@ type PropertyPageProps = {
   searchParams: SearchParams
 }
 
-// NextJS SSR metadata generation
+const listingRobots = { index: false, follow: false, googleBot: { index: false, follow: false } }
+
+// Listing detail pages remain available to users but are excluded from search.
 export const generateMetadata = async (props: PropertyPageProps) => {
   const searchParams = await props.searchParams
   const params = await props.params
@@ -37,11 +39,11 @@ export const generateMetadata = async (props: PropertyPageProps) => {
   const { listingId, boardId } = parseParams(params, searchParams)
   try {
     const property = await fetchProperty(listingId, boardId)
-    if (withdrawn(property)) return content.missingPropertyMetadata
-    return formatMetadata(property, host)
+    if (withdrawn(property)) return { ...content.missingPropertyMetadata, robots: listingRobots }
+    return { ...formatMetadata(property, host), robots: listingRobots }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error: any) {
-    return content.missingPropertyMetadata
+    return { ...content.missingPropertyMetadata, robots: listingRobots }
   }
 }
 

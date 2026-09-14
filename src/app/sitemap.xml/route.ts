@@ -19,7 +19,8 @@ export async function GET() {
       return new NextResponse('Sitemap index not found', { status: 404 });
     }
 
-    const xml = await response.text();
+    // Also filter a stale backend index during the deployment transition.
+    const xml = (await response.text()).replace(/<sitemap\b[^>]*>[\s\S]*?<\/sitemap>/gi, (entry) => /<loc>[^<]*listings[^<]*<\/loc>/i.test(entry) ? '' : entry);
 
     return new NextResponse(xml, {
       headers: {

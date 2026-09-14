@@ -12,7 +12,7 @@ export async function GET(
 
   // Ignore listings sitemap as per user request
   if (file === 'listings.xml' || file.includes('listings')) {
-    return new NextResponse('Access Denied', { status: 403 });
+    return new NextResponse('Listing sitemap retired', { status: 410, headers: { 'X-Robots-Tag': 'noindex, nofollow' } });
   }
 
   const backendUrl = process.env.NEXT_PUBLIC_PRECONDO_URL || 'https://app.precondo.ca';
@@ -31,7 +31,7 @@ export async function GET(
       return new NextResponse('Sitemap not found', { status: 404 });
     }
 
-    const xml = await response.text();
+    const xml = (await response.text()).replace(/<sitemap\b[^>]*>[\s\S]*?<\/sitemap>/gi, (entry) => /<loc>[^<]*listings[^<]*<\/loc>/i.test(entry) ? '' : entry);
 
     return new NextResponse(xml, {
       headers: {

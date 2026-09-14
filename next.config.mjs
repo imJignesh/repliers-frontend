@@ -29,6 +29,13 @@ const nextConfig = {
     ignoreBuildErrors: true
   },
 
+  async headers() {
+    return ['/listing/:path*', '/r/listing/:path*'].map((source) => ({
+      source,
+      headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }]
+    }))
+  },
+
   trailingSlash: false,
   reactStrictMode: true,
   images: {

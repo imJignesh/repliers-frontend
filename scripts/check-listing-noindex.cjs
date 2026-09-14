@@ -21,6 +21,8 @@ function load(file, mocks) {
  }
  const pageSource=fs.readFileSync('src/app/listing/[[...listingName]]/page.tsx','utf8');
  assert.ok(!pageSource.includes('permanentRedirect(canonicalPath)'), 'Listing aliases must not redirect outside the /r mount');
+ const middlewareSource=fs.readFileSync('src/middleware.ts','utf8');
+ assert.match(middlewareSource,/process\.env\.NODE_ENV === 'production'[\s\S]{0,80}\? '\/r'/,'Production listing redirects must retain /r');
  class Response {constructor(body,opts){this.body=body;Object.assign(this,opts)}}
  const retired=load('src/app/listings.xml/route.ts',{'next/server':{NextResponse:Response}});
  const r=await retired.GET();assert.equal(r.status,410);assert.equal(r.headers['X-Robots-Tag'],'noindex, nofollow');

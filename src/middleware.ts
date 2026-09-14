@@ -98,7 +98,16 @@ export async function middleware(request: NextRequest) {
   if (reparsed.pop() !== String(property.mlsNumber)) return pass
 
   const target = request.nextUrl.clone()
-  target.pathname = `${request.nextUrl.pathname.startsWith('/r/') ? '/r' : ''}/listing/${canonicalSlug}`
+  // Vercel evaluates the /r rewrite before middleware, so pathname is
+  // /listing/... even when the public request was /r/listing/.... Keep
+  // production redirects inside the public mount explicitly.
+  const publicPrefix =
+    process.env.NODE_ENV === 'production'
+      ? '/r'
+      : request.nextUrl.pathname.startsWith('/r/')
+        ? '/r'
+        : ''
+  target.pathname = `${publicPrefix}/listing/${canonicalSlug}`
 
   return NextResponse.redirect(target, 301)
 }

@@ -21,7 +21,7 @@ describe('SearchService/adapter', () => {
           type: 'lease',
           status: 'A',
           propertyType: TYPE_RENTAL,
-          lastStatus: ['New', 'Sc', 'New', 'Sc']
+          lastStatus: ['New', 'Sc', 'Pc', 'Ext', 'Sce', 'New', 'Sc', 'Pc', 'Ext', 'Sce']
         },
         {
           minBeds: 1

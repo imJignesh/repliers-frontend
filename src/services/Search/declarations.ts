@@ -2,9 +2,8 @@ import {
   CLASS_COMMERCIAL,
   CLASS_CONDO,
   CLASS_RESIDENTIAL,
-  LAST_STATUS_NEW,
-  LAST_STATUS_SC,
   LAST_STATUS_SOLD,
+  LAST_STATUSES_ACTIVE,
   STATUS_AVAILABLE,
   STATUS_UNAVAILABLE
 } from '@configs/filter-constants'
@@ -102,12 +101,12 @@ export const optionalTransformers: OptionalTransformers = {
       type: 'lease',
       status: STATUS_AVAILABLE,
       propertyType: TYPE_RENTAL,
-      lastStatus: [LAST_STATUS_NEW, LAST_STATUS_SC]
+      lastStatus: LAST_STATUSES_ACTIVE
     }),
     active: () => ({
       type: 'sale',
       status: STATUS_AVAILABLE,
-      lastStatus: [LAST_STATUS_NEW, LAST_STATUS_SC]
+      lastStatus: LAST_STATUSES_ACTIVE
     }),
     sold: () => ({
       type: 'sale',
@@ -116,7 +115,7 @@ export const optionalTransformers: OptionalTransformers = {
     }),
     all: () => ({
       status: [STATUS_AVAILABLE, STATUS_UNAVAILABLE],
-      lastStatus: [LAST_STATUS_NEW, LAST_STATUS_SC, LAST_STATUS_SOLD]
+      lastStatus: [...LAST_STATUSES_ACTIVE, LAST_STATUS_SOLD]
     })
   },
 

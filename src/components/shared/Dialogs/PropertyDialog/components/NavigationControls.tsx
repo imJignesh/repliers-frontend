@@ -15,6 +15,7 @@ const NavigationControls = ({
     <Box sx={{ position: 'absolute', top: 10, left: 8 }}>
       <Stack spacing={0} direction="row">
         <IconButton
+          aria-label="Previous property"
           size="large"
           disabled={!prev}
           sx={{ color: 'common.black' }}
@@ -23,6 +24,7 @@ const NavigationControls = ({
           <ArrowBackIosNewIcon sx={{ width: 20, height: 20 }} />
         </IconButton>
         <IconButton
+          aria-label="Next property"
           size="large"
           disabled={!next}
           sx={{ color: 'common.black' }}

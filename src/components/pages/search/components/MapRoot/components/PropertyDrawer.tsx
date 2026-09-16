@@ -84,13 +84,13 @@ const PropertyDrawer = ({
             justifyContent="space-between"
             alignItems="center"
           >
-            <IconButton onClick={handlePrevClick}>
+            <IconButton aria-label="Previous listing in building" onClick={handlePrevClick}>
               <ArrowBackIosNewIcon />
             </IconButton>
             <Typography fontWeight="600">
               {currentMultiUnit + 1} of {multiUnits.length} listings
             </Typography>
-            <IconButton onClick={handleNextClick}>
+            <IconButton aria-label="Next listing in building" onClick={handleNextClick}>
               <ArrowBackIosNewIcon sx={{ transform: 'rotate(180deg)' }} />
             </IconButton>
           </Stack>

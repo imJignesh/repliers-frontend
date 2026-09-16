@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import type { Position } from 'geojson'
+import { Box, Typography } from '@mui/material'
 import { type LngLat, type LngLatBounds } from 'mapbox-gl'
 
 import MapService from 'services/Map'
@@ -23,10 +24,10 @@ import { updateWindowHistory } from 'utils/urls'
 import MapFilters from './components/MapFilters'
 import MapRoot from './components/MapRoot'
 
-const MapPageContent = () => {
+const MapPageContent = ({ heading }: { heading: string }) => {
   const searchParams = useSearchParams()
   const [mapLoaded, setMapLoaded] = useState(false)
-  const { search, save, filters, polygon } = useSearch()
+  const { search, save, clearResults, filters, polygon } = useSearch()
   const { layout, position, setPosition } = useMapOptions()
 
   const query = searchParams.get('q')
@@ -35,7 +36,8 @@ const MapPageContent = () => {
   const fetchData = async (
     position: MapPosition,
     filters: Filters,
-    polygon: Position[] | null
+    polygon: Position[] | null,
+    isCurrent: () => boolean
   ) => {
     const { zoom, bounds } = position
 
@@ -53,7 +55,7 @@ const MapPageContent = () => {
       ...getClusterParams(zoom)
     })
 
-    if (!response) return
+    if (!response || !isCurrent()) return
 
     const { list, clusters, count } = save(response)
 
@@ -82,8 +84,15 @@ const MapPageContent = () => {
   useEffect(() => {
     if (!mapLoaded) return
     if (!center || !zoom) return
-    fetchData(position, filters, polygon)
-  }, [position, filters, polygon])
+    let current = true
+    clearResults()
+    MapService.hidePopup()
+    MapService.update([], [], 0)
+    void fetchData(position, filters, polygon, () => current)
+    return () => {
+      current = false
+    }
+  }, [mapLoaded, position, filters, polygon])
 
   const prevParams = useRef(JSON.stringify({ center, zoom, filters }))
   const curParams = JSON.stringify({ center, zoom, filters })
@@ -109,6 +118,11 @@ const MapPageContent = () => {
 
   return (
     <>
+      <Box sx={{ px: { xs: 2, md: 3 }, py: 1, bgcolor: 'background.paper' }}>
+        <Typography component="h1" sx={{ fontSize: { xs: 18, md: 20 }, fontWeight: 600 }}>
+          {heading}
+        </Typography>
+      </Box>
       <MapFilters />
       <MapRoot
         zoom={zoom}

@@ -18,6 +18,8 @@ export type SavedResponse = {
 
 export type SearchContextType = SavedResponse & {
   loading: boolean
+  error: string | null
+  clearResults: () => void
   setLoading: (loading: boolean) => void
   filters: Partial<Filters>
   setFilter: (key: keyof Filters, value: any) => void

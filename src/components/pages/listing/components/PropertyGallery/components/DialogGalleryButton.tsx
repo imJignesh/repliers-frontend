@@ -63,6 +63,8 @@ const DialogGalleryButton = ({
       onClick={handleGalleryClick}
     >
       <IconButton
+        aria-label="Open photo library"
+        onClick={(event) => { event.stopPropagation(); handleGalleryClick() }}
         disableFocusRipple
         sx={{
           top: '50%',

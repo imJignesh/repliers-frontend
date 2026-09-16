@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 /** @type {import('next').NextConfig} */
 import createMDX from '@next/mdx'
 import createNextIntlPlugin from 'next-intl/plugin'
@@ -15,8 +16,13 @@ const loggingConfig =
     }
     : {}
 
+const rootPage = JSON.parse(readFileSync(new URL('./src/features/_static.json', import.meta.url), 'utf8')).rootPage
+
 const nextConfig = {
   assetPrefix: '/r',
+  // Root-page variants come from the existing static feature configuration.
+  // Exclude the unused estimate UI from the landing page's client entry.
+  env: { NEXT_PUBLIC_ROOT_PAGE: rootPage },
   pageExtensions: ['tsx', 'ts', 'jsx', 'js', 'mdx', 'md'],
 
   // Note: 'eslint' and 'typescript' ignore keys are handled differently in v16.

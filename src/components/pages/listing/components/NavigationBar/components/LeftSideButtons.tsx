@@ -58,6 +58,7 @@ const LeftSideButtons = ({ sticky }: { sticky: boolean }) => {
               <IconButton
                 color="primary"
                 disableFocusRipple
+                aria-label="Start property slideshow"
                 onClick={handleSlideshowClick}
               >
                 <SmartDisplayOutlinedIcon sx={{ fontSize: 24, m: '2px' }} />
@@ -76,6 +77,7 @@ const LeftSideButtons = ({ sticky }: { sticky: boolean }) => {
                 <IconButton
                   color="primary"
                   disableFocusRipple
+                  aria-label="Open photo library"
                   onClick={handleGalleryClick}
                 >
                   <ViewDayOutlinedIcon sx={{ fontSize: 24, m: '2px' }} />
@@ -94,6 +96,7 @@ const LeftSideButtons = ({ sticky }: { sticky: boolean }) => {
           <IconButton
             color="primary"
             disableFocusRipple
+            aria-label="Back to property gallery"
             onClick={handleTopClick}
           >
             <BurstModeOutlinedIcon

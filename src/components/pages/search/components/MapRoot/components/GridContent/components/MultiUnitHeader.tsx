@@ -35,6 +35,7 @@ const MultiUnitHeader = ({ count, unit }: { count: any; unit: Property }) => {
           </Typography>
         </Stack>
         <IconButton
+          aria-label="Close building listings"
           size="large"
           sx={{ color: 'common.black' }}
           onClick={handleClearClick}

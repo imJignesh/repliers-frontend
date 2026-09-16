@@ -51,7 +51,7 @@ const MapTitle = () => {
           <Typography variant="h6" sx={{ p: 1 }}>
             {formattedTitle}
           </Typography>
-          <IconButton sx={{ color: 'common.black' }} onClick={handleClear}>
+          <IconButton aria-label="Clear map selection" sx={{ color: 'common.black' }} onClick={handleClear}>
             <CloseIcon sx={{ width: '24px', height: '24px' }} />
           </IconButton>
         </Stack>

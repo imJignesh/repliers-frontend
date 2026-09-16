@@ -431,6 +431,7 @@ const CatalogFilters = ({
               <AdvancedFiltersButton size={size} sx={{ height: 40 }} />
 
               <ToggleButton
+                aria-label={showMap ? "Show listings" : "Show map"}
                 value="map"
                 selected={showMap}
                 onChange={onToggleMap}
@@ -545,7 +546,7 @@ const CatalogFilters = ({
 
  
             <Box sx={{ display: 'flex', alignItems: 'center', paddingBottom: "30px" }}>
-              <IconButton onClick={() => handleScroll('left')} size="small" sx={{ p: 0, mr: 1, border: '1px solid', borderColor: 'divider' }}>
+              <IconButton aria-label="Scroll neighbourhoods left" onClick={() => handleScroll('left')} size="small" sx={{ p: 0, mr: 1, border: '1px solid', borderColor: 'divider' }}>
                 <ChevronLeftIcon />
               </IconButton>
  
@@ -708,7 +709,7 @@ const CatalogFilters = ({
                 )}
               </Box>
 
-              <IconButton onClick={() => handleScroll('right')} size="small" sx={{ ml: 1, border: '1px solid', borderColor: 'divider' }}>
+              <IconButton aria-label="Scroll neighbourhoods right" onClick={() => handleScroll('right')} size="small" sx={{ ml: 1, border: '1px solid', borderColor: 'divider' }}>
                 <ChevronRightIcon />
               </IconButton>
             </Box>

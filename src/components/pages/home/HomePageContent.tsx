@@ -4,22 +4,11 @@ import { useTranslations } from 'next-intl'
 
 import { Box } from '@mui/material'
 
-import defaultLocation from '@configs/location'
-import { StatsWidgets } from '@shared/Stats'
-
-import { useFeatures } from 'providers/FeaturesProvider'
-
 import { FeaturedProperties, HomePageBanner } from './components'
-import { PopularSearches } from '@pages/catalog/components'
-import TeamSection from './components/TeamSection'
-import { Typography, Button, Grid, Avatar, Card } from '@mui/material'
-
 
 const HomePageContent = () => {
-  const features = useFeatures()
   const t = useTranslations('HomePage')
 
-  const { state, defaultFilters } = defaultLocation
 
   return (
     <Box bgcolor="background.default">

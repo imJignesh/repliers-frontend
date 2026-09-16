@@ -13,7 +13,7 @@ import storageConfig from '@configs/storage'
 
 import { useDialog } from 'providers/DialogProvider'
 
-import { BaseResponsiveDialog } from '.'
+import BaseResponsiveDialog from './BaseResponsiveDialog'
 
 const dialogName = 'cookie'
 

@@ -22,7 +22,7 @@ const getRoute = (path: string) => {
 }
 
 const rawRoutes = {
-  home: '/r',
+  home: '/r/',
   login: '/r/login',
 
   search: '/r/search',
@@ -61,7 +61,7 @@ const rawRoutes = {
   dmca: '/r/dmca-notice',
 
   // will be set to home or dashboard or agent
-  loginRedirect: '/r'
+  loginRedirect: '/r/'
 }
 
 export type Routes = Record<keyof typeof rawRoutes, string>

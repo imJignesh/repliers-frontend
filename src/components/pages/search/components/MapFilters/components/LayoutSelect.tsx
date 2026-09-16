@@ -30,10 +30,10 @@ const LayoutSelect = () => {
         '& .MuiToggleButton-root': { px: 2 }
       }}
     >
-      <ToggleButton value="map">
+      <ToggleButton value="map" aria-label="Map view">
         <IcoMap />
       </ToggleButton>
-      <ToggleButton value="grid">
+      <ToggleButton value="grid" aria-label="Grid view">
         <ViewModuleRoundedIcon fontSize="small" />
       </ToggleButton>
     </ToggleButtonGroup>

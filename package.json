@@ -7,7 +7,7 @@
     "dev": "NODE_ENV=production next dev --turbo",
     "dev:inspect": "cross-env NODE_OPTIONS='--inspect' next dev",
     "clean": "rimraf .next",
-    "build": "npm run clean && next build",
+    "build": "npm run clean && next build --webpack",
     "start": "next start",
     "lint": "next lint",
     "prepare": "husky",

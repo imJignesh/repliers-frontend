@@ -30,11 +30,9 @@ const PageTemplate = ({
       </Suspense>
       <Stack direction="column" minHeight="100svh" bgcolor={bgcolor}>
         {!noHeader && <Header />}
-        {loading ? (
-          <LoadingView noHeader={noHeader} />
-        ) : (
-          <Box flex={1}>{children}</Box>
-        )}
+        <Box component="main" flex={1}>
+          {loading ? <LoadingView noHeader={noHeader} /> : children}
+        </Box>
         {!noFooter && <Footer />}
       </Stack>
     </>

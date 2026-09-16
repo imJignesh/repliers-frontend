@@ -80,6 +80,7 @@ const Header = () => {
                 {/* Mobile Search Toggle Icon */}
                 {features.search && (
                   <IconButton
+                    aria-label={openSearch ? "Close search" : "Open search"}
                     onClick={() => setOpenSearch(!openSearch)}
                     sx={{ display: { xs: 'flex', md: 'none' } }}
                   >

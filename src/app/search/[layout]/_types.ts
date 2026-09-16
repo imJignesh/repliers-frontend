@@ -6,6 +6,7 @@ export type Params = {
 }
 
 export type SearchParams = {
+  q?: string
   searchId: number
   aiImage: string
   aiFeature: string

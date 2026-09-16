@@ -1,3 +1,5 @@
+import { cache } from 'react'
+
 import searchConfig from '@configs/search'
 
 import {
@@ -8,6 +10,8 @@ import {
   type Property
 } from 'services/API'
 import SearchService, { type Filters, getListingFields } from 'services/Search'
+
+import { fetchCatalogAreas } from './_data'
 
 import { activeCountLimit, maxDistance } from './_constants'
 import {
@@ -22,7 +26,7 @@ export type CatalogItem = ApiBoardCity & {
   distance?: number
 }
 
-export const fetchListings = async ({
+const fetchListingsUncached = async ({
   area = '',
   city = '',
   hood = '',
@@ -52,7 +56,6 @@ export const fetchListings = async ({
       const targetArea = (hood || city) ? area : undefined
       // Fetch exact database-backed MLS numbers for this location (area, city, or neighborhood)
       const rawEntries = await APILocations.fetchNeighborhoodListings(target, targetCity, targetArea)
-      console.log('[fetchListings] target:', target, '→ rawEntries:', rawEntries)
       mlsNumbers = rawEntries
         .map((entry: string) => {
           const parts = entry.trim().split(/\s+/)
@@ -60,7 +63,6 @@ export const fetchListings = async ({
           return parts.length >= 2 ? parts[parts.length - 2] : ''
         })
         .filter(Boolean)
-      console.log('[fetchListings] resolved mlsNumbers:', mlsNumbers)
     } catch (e) {
       console.error('[fetchListings] could not fetch database listings for', target, e)
     }
@@ -86,8 +88,6 @@ export const fetchListings = async ({
     fetchParams.mlsNumber = mlsNumbers.length > 0 ? mlsNumbers : ['NONE']
   }
 
-  console.log('[fetchListings] final fetchParams keys:', Object.keys(fetchParams), 'mlsNumber count:', mlsNumbers.length)
-
   try {
     const response = await SearchService.fetch(fetchParams)
     if (response) {
@@ -104,13 +104,28 @@ export const fetchListings = async ({
 
 
 
+// Object arguments from metadata and page rendering have different identities.
+// Normalize them to one primitive cache key while retaining all filter values.
+const fetchListingsCached = cache((key: string) =>
+  fetchListingsUncached(JSON.parse(key))
+)
+export const fetchListings = (options: Parameters<typeof fetchListingsUncached>[0]) =>
+  fetchListingsCached(JSON.stringify({
+    area: options.area ?? '',
+    city: options.city ?? '',
+    hood: options.hood ?? '',
+    page: options.page ?? 1,
+    filters: Object.fromEntries(
+      Object.entries(options.filters ?? {}).sort(([a], [b]) => a.localeCompare(b))
+    )
+  }))
+
 export const fetchLocations = async (
   city = '',
   neighborhood = ''
 ): Promise<ApiBoardArea[]> => {
   try {
-    const { APILocations } = await import('services/API');
-    const dynamicAreasData = await APILocations.fetchAreas();
+    const dynamicAreasData = await fetchCatalogAreas();
 
     // Map the simple filtered Structure back to the complex ApiBoardArea structure 
     // that the rest of the frontend expects.

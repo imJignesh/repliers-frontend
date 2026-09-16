@@ -29,9 +29,7 @@ describe('SearchService/adapter', () => {
         {
           maxPrice: 500000
         },
-        {
-          minPrice: 1
-        }
+        {} // zero means no minimum-price filter
       ])
     })
   })

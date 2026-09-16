@@ -56,11 +56,15 @@ export const getZoom = (searchParams: URLSearchParams) =>
 export const getCoords = (searchParams: URLSearchParams) => {
   const firstParam = searchParams.keys().next().value || ''
   const matches = firstParam.match(/([-0-9.]+),([-0-9.]+)/)
-  const [, lat, lng] = matches || [0, 0, 0]
+  if (!matches) return null
+  // Currency/price parsing strips minus signs. Coordinates must retain them
+  // or reloading a Canadian search moves the map to the eastern hemisphere.
+  const lat = Number(matches[1])
+  const lng = Number(matches[2])
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null
+  if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null
 
-  if (!lat || !lng) return null
-
-  return new mapboxgl.LngLat(toSafeNumber(lng), toSafeNumber(lat))
+  return new mapboxgl.LngLat(lng, lat)
 }
 
 export const roundCoord = (coord: number | string) => Number(coord).toFixed(6)

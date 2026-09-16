@@ -139,6 +139,7 @@ const MapDrawButton = ({
         }}
       >
         <Button
+          aria-label={drawMode ? "Stop drawing search area" : "Draw search area"}
           disabled={!clientSide || !logged}
           onClick={handleDrawClick}
           sx={{

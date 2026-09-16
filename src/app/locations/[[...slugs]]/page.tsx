@@ -20,6 +20,7 @@ import {
   parseUrlParams
 } from './_parsers'
 import { fetchListings, fetchLocations } from './_requests'
+import { fetchCatalogAreas, validateCatalogSlugs } from './_data'
 import { generateCatalogMetadata } from './_ssg'
 import { extractCities, extractLocation, refineLocation } from './_utils'
 
@@ -128,9 +129,9 @@ const LocationsCatalogPage = async (props: {
   const [fetchAreas, dynamicAreasData, slugValidation, redirectInfo] =
     await Promise.all([
       fetchLocations(urlCity, ''),
-      APILocations.fetchAreas(),
+      fetchCatalogAreas(),
       rawLocationSlugs.length
-        ? APILocations.validateSlugs(rawLocationSlugs)
+        ? validateCatalogSlugs(rawLocationSlugs)
         : Promise.resolve({} as Record<string, string | null>),
       APILocations.lookupRedirect(currentPath)
     ])
@@ -186,13 +187,13 @@ const LocationsCatalogPage = async (props: {
   }
 
   const searchFilters = parseUrlFilters(filters)
-  const { listings, count } = await fetchListings({
-    area,
-    city,
-    hood,
-    filters: searchFilters,
-    page
-  })
+  const targetForNeighborhoods = city || area
+  const [{ listings, count }, dynamicData] = await Promise.all([
+    fetchListings({ area, city, hood, filters: searchFilters, page }),
+    targetForNeighborhoods
+      ? APILocations.fetchAreaNeighborhoods(targetForNeighborhoods, true)
+      : Promise.resolve([])
+  ])
 
   // Don't 404 paginated building views — buildings paginate independently of
   // listings (the ?page param is shared), so a high building page may exceed the
@@ -223,13 +224,7 @@ const LocationsCatalogPage = async (props: {
 
   // Fetch area direct children: for an area returns [{name, neighborhoods}], for a city returns string[]
   let hoods: any[] = []
-  const targetForNeighborhoods = city || area
   if (targetForNeighborhoods) {
-    const dynamicData = await APILocations.fetchAreaNeighborhoods(
-      targetForNeighborhoods,
-      true
-    )
-
     if (dynamicData.length > 0) {
       const first = dynamicData[0]
       const isNested =

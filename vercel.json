@@ -26,5 +26,17 @@
       "source": "/r/:path*",
       "destination": "/:path*"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/r",
+      "destination": "https://precondo.ca/r/",
+      "permanent": true
+    },
+    {
+      "source": "/r//",
+      "destination": "https://precondo.ca/r/",
+      "permanent": true
+    }
   ]
 }

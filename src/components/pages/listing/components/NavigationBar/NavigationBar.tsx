@@ -133,7 +133,6 @@ const NavigationBar = ({ embedded = false }: { embedded?: boolean }) => {
         py: 1,
         px: 4,
         my: -1,
-        mx: -4,
         zIndex: 'drawer',
         bgcolor: 'common.white',
         top: embedded ? '-8px' : 0,

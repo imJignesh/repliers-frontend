@@ -1,8 +1,7 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useTranslations } from 'next-intl'
 
 import {
   Autocomplete,
@@ -19,7 +18,7 @@ import routes from '@configs/routes'
 import searchConfig from '@configs/search'
 import IcoSearch from '@icons/IcoSearch'
 
-import { APILocations, APISearch } from 'services/API'
+import { APILocations } from 'services/API'
 import {
   type AutosuggestionOption,
   type MapboxAddress,
@@ -29,7 +28,6 @@ import MapService, { MapSearch } from 'services/Map'
 import { useLocations } from 'providers/LocationsProvider'
 import { type MapPosition } from 'providers/MapOptionsProvider'
 import useClientSide from 'hooks/useClientSide'
-import useDebouncedEffect from 'hooks/useDebouncedEffect'
 import {
   calcBoundsAtZoom,
   getCoords,
@@ -44,7 +42,6 @@ import { getCatalogUrl } from 'utils/urls'
 import OptionAddress from './components/OptionAddress'
 import OptionArea from './components/OptionArea'
 import OptionBuilding from './components/OptionBuilding'
-import OptionGroup from './components/OptionGroup'
 import OptionListing from './components/OptionListing'
 import OptionLoader from './components/OptionLoader'
 import {
@@ -67,7 +64,6 @@ const Autosuggestion = ({
   buttonTitle?: string | React.ReactNode
 }) => {
   const router = useRouter()
-  const t = useTranslations()
   const clientSide = useClientSide()
 
   const searchParams = useSearchParams()
@@ -105,41 +101,40 @@ const Autosuggestion = ({
     }
   }
 
-  useDebouncedEffect(
-    () => {
-      const query = searchString.toLowerCase().trim()
+  useEffect(() => {
+    const query = searchString.toLowerCase().trim()
+    let current = true
+    setListings([])
+    setBuildings([])
+    setLocations([])
+    setAddress([])
+    setLoading(query.length >= minCharsToSuggest)
 
-      const fetchData = async () => {
-        setLoading(true)
-        try {
-          // use the first part of the query and drop the second (if any),
-          // because it is (probably) the parent region of the neighborhood or city.
-          // TRIE doesn't have them in the index
-          const trieQuery = query.split(',').at(0) || ''
-          const [trieLocations, laravelResults] = await Promise.all([
-            searchLocations(trieQuery),
-            APILocations.fetchAutosuggestions(query)
-          ])
+    if (query.length < minCharsToSuggest) return
 
-          setLocations(trieLocations)
-          setBuildings(laravelResults.buildings || [])
-          setListings(laravelResults.listings || [])
-          setAddress([]) // Clear Mapbox addresses
-        } catch (error) {
-          console.error('Failed to fetch autosuggestions:', error)
-          // Handle error state here, e.g., show a message to the user
-        } finally {
-          setLoading(false)
-        }
+    const timer = setTimeout(async () => {
+      try {
+        const trieQuery = query.split(',').at(0) || ''
+        const [trieLocations, results] = await Promise.all([
+          searchLocations(trieQuery),
+          APILocations.fetchAutosuggestions(query)
+        ])
+        if (!current) return
+        setLocations(trieLocations)
+        setBuildings(results.buildings || [])
+        setListings(results.listings || [])
+      } catch (error) {
+        if (current) console.error('Failed to fetch autosuggestions:', error)
+      } finally {
+        if (current) setLoading(false)
       }
+    }, 200)
 
-      if (query.length >= minCharsToSuggest) {
-        fetchData()
-      }
-    },
-    200,
-    [searchString]
-  )
+    return () => {
+      current = false
+      clearTimeout(timer)
+    }
+  }, [searchString])
 
   // Options for <Autocomplete />
   const options = []
@@ -231,7 +226,8 @@ const Autosuggestion = ({
 
         htmlInput: {
           ...params.inputProps,
-          autoComplete: 'off'
+          autoComplete: 'off',
+          'aria-label': 'Search by address, neighbourhood, MLS number, or school'
         }
       }}
     />
@@ -396,6 +392,7 @@ const Autosuggestion = ({
         {showButton && (
           <Button
             variant="contained"
+            aria-label={typeof buttonTitle === "string" && buttonTitle ? buttonTitle : "Search listings"}
             onClick={handleButtonClick}
             sx={{ minWidth: 56 }}
           >

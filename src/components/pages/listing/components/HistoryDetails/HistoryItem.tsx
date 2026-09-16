@@ -121,6 +121,7 @@ const HistoryItem = ({
                   direction={{ xs: 'column', sm: 'row' }}
                   alignItems={{ xs: 'flex-end', sm: 'center' }}
                 >      <IconButton
+                  aria-label="Open listing photos"
                   sx={{
                     width: '60px',
                     height: '60px',

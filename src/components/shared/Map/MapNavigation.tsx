@@ -39,10 +39,10 @@ const MapNavigation = () => {
           }
         }}
       >
-        <Button onClick={zoomIn}>
+        <Button aria-label="Zoom map in" onClick={zoomIn}>
           <AddIcon sx={{ fontSize: 24 }} />
         </Button>
-        <Button onClick={zoomOut}>
+        <Button aria-label="Zoom map out" onClick={zoomOut}>
           <RemoveIcon sx={{ fontSize: 24 }} />
         </Button>
       </ButtonGroup>

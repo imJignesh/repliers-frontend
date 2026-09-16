@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 
-import { Box, Pagination, Stack } from '@mui/material'
+import { Alert, Box, Button, Pagination, Stack } from '@mui/material'
 
 import gridConfig from '@configs/cards-grids'
 import searchConfig from '@configs/search'
@@ -56,8 +56,18 @@ const GridContent = ({
   const [serverProperties, setServerProperties] = useState<Property[]>([])
   const [clientProperties, setClientProperties] = useState<Property[]>([])
 
-  const { search, filters, polygon, list, loading, count, page, multiUnits } =
-    useSearch()
+  const {
+    search,
+    filters,
+    setFilters,
+    polygon,
+    list,
+    loading,
+    error,
+    count,
+    page,
+    multiUnits
+  } = useSearch()
 
   const pagesCount = Math.ceil(count / searchConfig.pageSize)
 
@@ -147,9 +157,22 @@ const GridContent = ({
       setClientProperties(slicePropertiesPerPage(list, clientPage))
       scrollToTop()
     }
-  }, [list])
+  }, [list, serverPage, clientPage])
 
   useEffect(() => {
+    if (page === 0) {
+      setServerProperties([])
+      setClientProperties([])
+    }
+  }, [page])
+
+  useEffect(() => {
+    // Page one is owned by MapPageContent. A second request here would cancel
+    // the filter search when resetting from a later server page.
+    if (serverPage === 1) {
+      currentServerPage.current = 1
+      return
+    }
     if (serverPage !== currentServerPage.current) {
       // WARN: abort fetching if the map is not initialized yet
       if (layout === 'map' && !position.bounds) return
@@ -159,6 +182,23 @@ const GridContent = ({
   }, [serverPage, layout, position.bounds])
 
   useEffect(() => scrollToTop(), [multiUnits.length])
+
+  if (error) {
+    return (
+      <Box p={2}>
+        <Alert
+          severity="error"
+          action={
+            <Button color="inherit" onClick={() => setFilters({ ...filters })}>
+              Retry
+            </Button>
+          }
+        >
+          {error}
+        </Alert>
+      </Box>
+    )
+  }
 
   if (mobile || tablet) {
     return (
@@ -170,7 +210,15 @@ const GridContent = ({
         }}
       >
         <Box sx={{ mt: -3, px: 2 }}>
-          <PropertyCarousel properties={serverProperties} loop={false} />
+          {loading || !page ? (
+            <Box role="status" aria-label="Loading listings">
+              <SkeletonCard />
+            </Box>
+          ) : serverProperties.length ? (
+            <PropertyCarousel properties={serverProperties} loop={false} />
+          ) : (
+            <EmptyListings />
+          )}
         </Box>
       </Box>
     )
@@ -201,7 +249,7 @@ const GridContent = ({
             transition: 'opacity 0.2s ease-out'
           }}
         >
-          {!page || (loading && !clientProperties.length) ? (
+          {!page || loading ? (
             // `page: 0` is a special state after first initial load, before any searches/saves
             Array.from({ length: searchConfig.pageSize }).map((_v, index) => (
               <SkeletonCard key={index} />

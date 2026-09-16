@@ -15,7 +15,10 @@ export async function GET() {
     });
     if (!response.ok) return new NextResponse('Sitemap not found', { status: 404 });
 
-    const xml = await response.text();
+    const xml = (await response.text()).replace(
+      /(<loc>https:\/\/precondo\.ca\/r)\/?(<\/loc>)/g,
+      '$1/$2'
+    );
     return new NextResponse(xml, {
       headers: {
         'Content-Type': 'application/xml',

@@ -34,7 +34,7 @@ const MobileMenu = () => {
 
   return (
     <>
-      <IconButton onClick={() => setOpen(!open)} color="inherit">
+      <IconButton aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(!open)} color="inherit">
         <MenuIcon />
       </IconButton>
       <Drawer

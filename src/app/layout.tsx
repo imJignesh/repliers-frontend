@@ -24,9 +24,7 @@ export const metadata: Metadata = content.siteMetadata
 export const viewport: Viewport = {
   themeColor: 'white',
   width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false
+  initialScale: 1
   // interactiveWidget: 'resizes-visual'
 }
 

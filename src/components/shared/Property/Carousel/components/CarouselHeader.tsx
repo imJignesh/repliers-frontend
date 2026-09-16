@@ -24,7 +24,7 @@ const CarouselHeader = ({
       <Typography variant="h2" sx={{ flex: 1 }}>
         {title}
       </Typography>
-      {navigation && <CarouselNavigation onPrev={onPrev} onNext={onNext} />}
+      {navigation && <CarouselNavigation title={title} onPrev={onPrev} onNext={onNext} />}
     </Stack>
   )
 }

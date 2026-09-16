@@ -7,9 +7,9 @@ import { type ApiBoardArea, type ApiBoardCity } from 'services/API'
 import { formatEnglishPrice } from 'utils/formatters'
 import { sanitizeUrl } from 'utils/urls'
 
-import { APILocations } from 'services/API'
 import { filter as isFilterSegment, parseUrlFilters, parseUrlParams } from './_parsers'
 import { fetchListings, fetchLocations } from './_requests'
+import { fetchCatalogAreas, validateCatalogSlugs } from './_data'
 import {
   extractCities,
   extractHoods,
@@ -46,26 +46,24 @@ export const generateCatalogMetadata = async ({
     (seg) => !isFilterSegment(seg) && !isListingId(seg) && !isZipCode(seg)
   )
 
-  const slugValidation = rawLocationSlugs.length
-    ? await APILocations.validateSlugs(rawLocationSlugs)
-    : {}
-
-  const hasInvalidSlug = rawLocationSlugs.some((slug) => slug in slugValidation && slugValidation[slug] === null)
-  if (hasInvalidSlug) {
-    notFound()
-  }
-
   const {
     filters,
     location: { area: urlArea, city: urlCity, neighborhood: urlHood },
     unknowns
   } = parseUrlParams(slugs)
 
-  // Fetch areas and locations to perform refinement
-  const [fetchAreas, dynamicAreasData] = await Promise.all([
+  const [slugValidation, fetchAreas, dynamicAreasData] = await Promise.all([
+    rawLocationSlugs.length
+      ? validateCatalogSlugs(rawLocationSlugs)
+      : Promise.resolve({} as Record<string, string | null>),
     fetchLocations(urlCity, ''),
-    APILocations.fetchAreas()
+    fetchCatalogAreas()
   ])
+
+  const hasInvalidSlug = rawLocationSlugs.some((slug) => slug in slugValidation && slugValidation[slug] === null)
+  if (hasInvalidSlug) {
+    notFound()
+  }
 
   // Build ApiBoardArea[] from the nested cities structure returned by /areas
   const formattedAreas: ApiBoardArea[] = (dynamicAreasData as any[]).map((a: any) => ({

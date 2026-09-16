@@ -53,6 +53,7 @@ const AdvancedFiltersButton = ({ size, sx }: { size: 'medium' | 'small'; sx?: an
         </Button>
       ) : (
         <Button
+          aria-label="Open advanced filters"
           size="small"
           variant="outlined"
           onClick={showDialog}

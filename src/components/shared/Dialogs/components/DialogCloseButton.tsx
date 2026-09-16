@@ -12,6 +12,7 @@ const DialogCloseButton = ({
 }) => {
   return (
     <IconButton
+      aria-label="Close dialog"
       size="large"
       sx={{
         top: 8,

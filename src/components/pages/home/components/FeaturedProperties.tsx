@@ -10,15 +10,14 @@ import { PropertyCard, PropertyCarousel, BuildingCard } from '@shared/Property'
 import { type ApiQueryParams, type Property } from 'services/API'
 import SearchService from 'services/Search'
 import { CarouselHeader } from '@shared/Property/Carousel/components'
-import TeamSection from './TeamSection'
-import { StatsWidgets } from '@shared/Stats'
+import PopularBuildings from './PopularBuildings'
+import DeferredStats from './DeferredStats'
 import { useFeatures } from 'providers/FeaturesProvider'
 import defaultLocation from '@configs/location'
 
 
 const FeaturedProperties = () => {
   const [featured, setFeatured] = useState<Property[]>([])
-  const [featuredBuildings, setFeaturedBuildings] = useState<any[]>([])
   const [showcasedListings, setShowcasedListings] = useState<Property[]>([])
   const [showcased, setShowcased] = useState<Property[]>([])
   const [popularPreconstructions, setPopularPreconstructions] = useState<any[]>([])
@@ -99,23 +98,10 @@ const FeaturedProperties = () => {
     }
   }
 
-  const fetchFeaturedBuildings = async () => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_PRECONDO_URL}/api/buildings?tag=featured`)
-      const data = await response.json()
-      if (data && data.data) {
-        setFeaturedBuildings(data.data.slice(0, 8))
-      }
-    } catch (error) {
-      console.error('FeaturedBuildings::Error fetching data', error)
-    }
-  }
-
   useEffect(() => {
     fetchFeatured()
     fetchShowcasedListings()
     fetchShowcased()
-    fetchFeaturedBuildings()
     fetchPreconstructions()
   }, [])
   const { state, defaultFilters } = defaultLocation
@@ -126,7 +112,7 @@ const FeaturedProperties = () => {
         <PropertyCarousel title={t('justListed')} properties={featured} />
         <PropertyCarousel title={t('recentlySold')} properties={showcasedListings} />
 
-        {features.dashboard && <StatsWidgets {...defaultFilters} name={`Toronto`} />}
+        {features.dashboard && <DeferredStats {...defaultFilters} name={`Toronto`} />}
 
 
 
@@ -188,34 +174,7 @@ const FeaturedProperties = () => {
           )}
         </Box>
 
-        <Box>
-          <CarouselHeader title={'Popular Buildings'} navigation={false} onPrev={function (): void {
-            throw new Error('Function not implemented.')
-          }} onNext={function (): void {
-            throw new Error('Function not implemented.')
-          }} />
-          <br />
-          {featuredBuildings?.length > 0 ? (
-            <Stack
-              spacing={{ xs: 3, sm: 4, md: 4 }}
-              direction="row"
-              flexWrap="wrap"
-              justifyContent="center"
-              sx={{
-                '& > *': {
-                  width: { xs: '100% !important', sm: 'calc(48% - 8px) !important', md: 'calc(32% - 11px) !important', lg: 'calc(24% - 12px) !important' },
-                  height: '100% !important'
-                }
-              }}
-            >
-              {featuredBuildings.map((building, index) => (
-                <BuildingCard key={index} building={building} />
-              ))}
-            </Stack>
-          ) : (
-            <Typography variant="body1" color="text.secondary"></Typography>
-          )}
-        </Box>
+        <PopularBuildings />
 
         <Box
           sx={{

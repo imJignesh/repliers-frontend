@@ -1,8 +1,11 @@
 import { type Metadata } from 'next'
+import { headers } from 'next/headers'
 import { features } from 'features'
 import { type Position } from 'geojson'
 
 import { Page404Template, PageTemplate } from '@templates'
+import routes from '@configs/routes'
+import { getProtocolHost } from 'utils/urls'
 import MapPageContent from '@pages/search'
 
 import { APISaveSearch } from 'services/API'
@@ -12,15 +15,27 @@ import MapOptionsProvider from 'providers/MapOptionsProvider'
 import SearchProvider from 'providers/SearchProvider'
 
 import { type Params, type SearchParams } from './_types'
+import { getMapSearchHeading } from './_pageTitle'
 import {
   getFiltersFromParams,
   getFiltersFromSavedSearch,
   getPositionFromPolygon
 } from './_utils'
 
-const title = 'Search Results'
-
-export const metadata: Metadata = { title }
+export const generateMetadata = async ({ searchParams }: { searchParams: Promise<SearchParams> }): Promise<Metadata> => {
+  const { q } = await searchParams
+  const heading = getMapSearchHeading(q)
+  const canonical = getProtocolHost(await headers()) + routes.map
+  return {
+    title: `${heading} | Precondo`,
+    description: q?.trim()
+      ? `Explore property listings matching ${q.trim().replace(/\s+/g, ' ').slice(0, 80)} on the Precondo map.`
+      : 'Explore property listings and neighbourhoods on the Precondo map.',
+    alternates: { canonical },
+    robots: { index: false, follow: true },
+    openGraph: { url: canonical }
+  }
+}
 
 const MapPage = async (props: {
   params: Promise<Params>
@@ -29,7 +44,7 @@ const MapPage = async (props: {
   const searchParams = await props.searchParams
   const params = await props.params
   const { style, layout } = params
-  const { searchId, aiImage, aiFeature } = searchParams
+  const { searchId, aiImage, aiFeature, q } = searchParams
 
   let title: string | undefined
   let position: any | undefined
@@ -60,7 +75,7 @@ const MapPage = async (props: {
       >
         <SearchProvider filters={filters} polygon={polygon}>
           <AiSearchProvider image={aiImage} feature={aiFeature}>
-            <MapPageContent />
+            <MapPageContent heading={getMapSearchHeading(q)} />
           </AiSearchProvider>
         </SearchProvider>
       </MapOptionsProvider>

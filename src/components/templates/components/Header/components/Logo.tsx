@@ -22,7 +22,7 @@ const Logo = () => {
       ? routes.adminAgents
       : agentRole
         ? routes.agent
-        : 'https://precondo.ca/'
+        : routes.home
 
   return (
     <Box sx={{ minWidth: { xs: 64, sm: 0 } }}>

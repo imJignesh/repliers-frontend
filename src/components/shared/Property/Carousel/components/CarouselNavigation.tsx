@@ -7,29 +7,33 @@ import IcoPrev from '@icons/IcoPrev'
 
 const CarouselNavButton = ({
   direction,
+  title,
   onClick
 }: {
   direction: 'prev' | 'next'
+  title: string
   onClick: () => void
 }) => {
   return (
-    <Button variant="contained" onClick={onClick}>
+    <Button variant="contained" aria-label={`${direction === 'prev' ? 'Previous' : 'Next'} ${title}`} onClick={onClick}>
       {direction === 'prev' ? <IcoPrev /> : <IcoNext />}
     </Button>
   )
 }
 
 const CarouselNavigation = ({
+  title,
   onPrev,
   onNext
 }: {
+  title: string
   onPrev: () => void
   onNext: () => void
 }) => {
   return (
     <Stack spacing={2} direction="row">
-      <CarouselNavButton direction="prev" onClick={onPrev} />
-      <CarouselNavButton direction="next" onClick={onNext} />
+      <CarouselNavButton direction="prev" title={title} onClick={onPrev} />
+      <CarouselNavButton direction="next" title={title} onClick={onNext} />
     </Stack>
   )
 }

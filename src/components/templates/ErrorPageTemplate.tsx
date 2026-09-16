@@ -8,7 +8,7 @@ import { FullscreenView } from 'components/atoms'
 import FeaturesProvider, { FeaturesContext } from 'providers/FeaturesProvider'
 import { features as staticFeatures } from 'features'
 
-import { PageTemplate } from '.'
+import PageTemplate from './PageTemplate'
 
 export type ErrorPageProps = {
   error: Error

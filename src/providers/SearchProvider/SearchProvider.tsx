@@ -1,9 +1,11 @@
 'use client'
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState
 } from 'react'
 import { type Position } from 'geojson'
@@ -37,10 +39,26 @@ const SearchProvider = ({
   children?: React.ReactNode
 }) => {
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const requestId = useRef(0)
   const [saved, setSaved] = useState<SavedResponse>(emptySavedResponse)
   const [multiUnits, saveMultiUnits] = useState<Property[]>([])
 
-  const [searchFilters, setFilters] = useState(filters || defaultFilters)
+  const [searchFilters, updateFilters] = useState(filters || defaultFilters)
+
+  const clearResults = useCallback(() => {
+    // Invalidate in-flight requests before a new filter can label old results.
+    requestId.current += 1
+    setSaved(emptySavedResponse)
+    saveMultiUnits([])
+    setError(null)
+    setLoading(true)
+  }, [])
+
+  const setFilters = (next: React.SetStateAction<Filters>) => {
+    clearResults()
+    updateFilters(next)
+  }
 
   const [searchPolygon, setPolygon] = useState<Position[] | null>(
     polygon || null
@@ -73,8 +91,6 @@ const SearchProvider = ({
   const clearPolygon = () => setPolygon(null)
 
   const save = (response: ApiQueryResponse) => {
-    setLoading(true)
-
     const { listings, count, page, numPages, aggregates, statistics } = response
 
     const remappedResponse: SavedResponse = {
@@ -83,7 +99,7 @@ const SearchProvider = ({
       count,
       statistics,
       list: listings.map(sortPropertyScoredImages),
-      clusters: aggregates ? aggregates.map.clusters : []
+      clusters: aggregates?.map?.clusters || []
     }
 
     setSaved(remappedResponse)
@@ -91,14 +107,41 @@ const SearchProvider = ({
   }
 
   const search = async (params: any) => {
-    let response
+    const id = ++requestId.current
+    setLoading(true)
+    setError(null)
     try {
-      setLoading(true)
-      response = await SearchService.fetch(params, { cancelGroup: 'search' })
+      const response = await SearchService.fetch(params, {
+        cancelGroup: 'search'
+      })
+      if (
+        !response ||
+        !Array.isArray(response.listings) ||
+        !Number.isFinite(response.count)
+      ) {
+        throw new Error('Invalid search response')
+      }
+      // Do not label active properties as sold if an older API ignores status.
+      // Reject the whole response: filtering one page would invent a total.
+      if (
+        params.listingStatus === 'sold' &&
+        response?.listings.some(
+          (listing) => listing.status !== 'U' || listing.lastStatus !== 'Sld'
+        )
+      ) {
+        throw new Error('Search response does not match the selected status')
+      }
+      // Abort alone is insufficient: a response may already be completing.
+      return id === requestId.current ? response : undefined
+    } catch {
+      if (id === requestId.current) {
+        setSaved({ ...emptySavedResponse, page: 1 })
+        setError('Unable to load listings. Please try again.')
+      }
+      return undefined
     } finally {
-      setLoading(false)
+      if (id === requestId.current) setLoading(false)
     }
-    return response
   }
 
   // special effect to clear up the grid and show loading placeholders
@@ -107,12 +150,18 @@ const SearchProvider = ({
     if (filters?.imageSearchItems) setSaved({ ...saved, page: 0 })
   }, [filters])
 
-  // saving the response object takes time, so we need to show loading and placeholders
-  useEffect(() => setLoading(false), [saved])
+  useEffect(
+    () => () => {
+      requestId.current += 1
+    },
+    []
+  )
 
   const contextValue = useMemo(
     () => ({
       loading,
+      error,
+      clearResults,
       setLoading,
       filters: searchFilters,
       setFilter,
@@ -131,7 +180,7 @@ const SearchProvider = ({
       saveMultiUnits,
       clearMultiUnits: () => saveMultiUnits([])
     }),
-    [searchFilters, searchPolygon, loading, saved, multiUnits]
+    [searchFilters, searchPolygon, loading, error, saved, multiUnits]
   )
 
   return (

@@ -679,6 +679,8 @@ const CatalogFilters = ({
                                 />
                                 <Button
                                   size="small"
+                                  aria-label={`${isActive ? 'Hide' : 'Show'} ${group.name} neighbourhoods`}
+                                  aria-expanded={isActive}
                                   onClick={() => setActiveGroupId(isActive ? null : group.id)}
                                   sx={{
                                     minWidth: 'auto',

@@ -199,6 +199,7 @@ const ThumbnailsRibbon = ({
                   <IconButton
                     sx={imageSx}
                     disableFocusRipple
+                    aria-label={`Show photo ${index + 1} of ${images.length}`}
                     onClick={() => handleClick(index)}
                   >
                     <Image

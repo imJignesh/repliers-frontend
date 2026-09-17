@@ -1,8 +1,7 @@
-import { type ApiClass } from 'services/API'
-import SearchService from 'services/Search'
+import { APIWidgets } from 'services/API'
 
 import { type ChartStatsParams } from './types'
-import { extractArrays, getMaxSoldDate, getMinListDate } from './utils'
+import { extractArrays } from './utils'
 
 export const fetchStatistics = async (
   statistics: string,
@@ -11,18 +10,13 @@ export const fetchStatistics = async (
   const { timeRange, propertyClass, ...location } = params
 
   try {
-    const response = await SearchService.fetch({
+    const response = await APIWidgets.fetchHistory({
       ...location,
-      statistics,
-      listings: false,
-      listingStatus: 'sold',
-      class: propertyClass as ApiClass,
-      maxSoldDate: getMaxSoldDate(),
-      minListDate: getMinListDate(timeRange)
-      // NOTE: not used anymore, but kept for compatibility
-      // listingType: propertyClass === 'all' ? 'allListings' : propertyClass,
+      propertyClass,
+      months: timeRange,
+      statistics
     })
-    return response!.statistics
+    return response?.statistics || {}
   } catch (error) {
     console.error('[Statistics] error fetching data', error)
     return {}

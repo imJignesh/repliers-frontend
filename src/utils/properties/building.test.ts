@@ -1,4 +1,4 @@
-import { sanitizeBuildingContent } from './building'
+import { deriveBuildingProperty, sanitizeBuildingContent } from './building'
 
 describe('sanitizeBuildingContent', () => {
   it('removes average price rows without a calculable value', () => {
@@ -19,5 +19,26 @@ describe('sanitizeBuildingContent', () => {
       '<p><strong>Average Price:</strong> $725 / sq. ft.</p>'
 
     expect(sanitizeBuildingContent(content)).toBe(content)
+  })
+})
+
+describe('deriveBuildingProperty', () => {
+  it('fills missing listing hierarchy labels from the curated building', () => {
+    const result = deriveBuildingProperty({
+      listings: [{ address: { city: 'Oakville', neighborhood: 'Clearview' } }],
+      building: {
+        location: {
+          area: { name: 'Halton' },
+          city: { name: 'Oakville' },
+          locality: { name: 'Clearview' }
+        }
+      }
+    } as any)
+
+    expect(result?.address).toMatchObject({
+      area: 'Halton',
+      city: 'Oakville',
+      neighborhood: 'Clearview'
+    })
   })
 })

@@ -68,6 +68,19 @@ export const deriveBuildingProperty = (
 
   if (!p) return null
 
+  // Unit-listing addresses do not always include the full curated location
+  // hierarchy. Fill only missing labels from the building so breadcrumb URLs
+  // keep their required area/city/locality parents.
+  if (property.building?.location) {
+    p.address = {
+      ...(p.address || {}),
+      area: p.address?.area || property.building.location.area?.name,
+      city: p.address?.city || property.building.location.city?.name,
+      neighborhood:
+        p.address?.neighborhood || property.building.location.locality?.name
+    } as any
+  }
+
   // Attach building metadata to the listing object so it's available via useProperty()
   if (property.building && !(p as any).building) {
     (p as any).building = property.building

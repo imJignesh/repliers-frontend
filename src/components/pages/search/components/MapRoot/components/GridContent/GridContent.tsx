@@ -30,6 +30,8 @@ import {
 import { getUniqueKey } from 'utils/properties'
 import { updateWindowHistory } from 'utils/urls'
 
+import { canFetchNextPage } from '../../../../_utils'
+
 import { GridScrollContainer, MultiUnitHeader } from './components'
 
 const { gridSpacing } = gridConfig
@@ -41,7 +43,7 @@ const GridContent = ({
 }) => {
   const params = useSearchParams()
   const { mobile, tablet } = useBreakpoints()
-  const { position, layout } = useMapOptions()
+  const { position, layout, mapFailure } = useMapOptions()
 
   const paramsPage = Number(params.get('page') || 1)
 
@@ -174,12 +176,20 @@ const GridContent = ({
       return
     }
     if (serverPage !== currentServerPage.current) {
-      // WARN: abort fetching if the map is not initialized yet
-      if (layout === 'map' && !position.bounds) return
+      // WARN: abort fetching if the map is not initialized yet, unless it
+      // never will be (audit RT05)
+      if (
+        !canFetchNextPage({
+          layout,
+          hasBounds: !!position.bounds,
+          mapFailed: !!mapFailure
+        })
+      )
+        return
       currentServerPage.current = serverPage
       fetchListings()
     }
-  }, [serverPage, layout, position.bounds])
+  }, [serverPage, layout, position.bounds, mapFailure])
 
   useEffect(() => scrollToTop(), [multiUnits.length])
 

@@ -7,7 +7,7 @@ import {
   useState
 } from 'react'
 import { type Position } from 'geojson'
-import { type LngLat, type LngLatBounds, Map as MapboxMap } from 'mapbox-gl'
+import { type LngLat, type LngLatBounds } from 'mapbox-gl'
 import { useLocale, useMessages } from 'next-intl'
 
 import { Stack } from '@mui/material'
@@ -29,6 +29,7 @@ import useBreakpoints from 'hooks/useBreakpoints'
 import useIntersectionObserver from 'hooks/useIntersectionObserver'
 import { getDefaultBounds, getMapStyleUrl } from 'utils/map'
 import { addPolygon, removePolygon } from 'utils/map'
+import { createMap } from 'utils/map-init'
 import { getSeoUrl } from 'utils/properties'
 
 import {
@@ -41,6 +42,7 @@ import {
   MapDrawButton,
   MapTitle,
   MapTransitionContainer,
+  MapUnavailable,
   MobileCircularProgress,
   OpenDrawerButton,
   PropertyDrawer,
@@ -77,7 +79,8 @@ const MapRoot = ({ zoom, center, polygon, onMove, onLoad }: MapRootProps) => {
   } = useSearch()
 
   const { mobile, tablet, wideScreen } = useBreakpoints()
-  const { layout, style, setMapRef } = useMapOptions()
+  const { layout, style, setMapRef, setLayout, mapFailure, setMapFailure } =
+    useMapOptions()
   const multiUnitsRef = useRef(multiUnits)
   const { logged } = useUser()
 
@@ -135,14 +138,27 @@ const MapRoot = ({ zoom, center, polygon, onMove, onLoad }: MapRootProps) => {
     const initialPosition =
       center && zoom ? { center, zoom } : { bounds: getDefaultBounds() }
 
-    const map = new MapboxMap({
-      container,
-      ...mapboxDefaults,
-      style: getMapStyleUrl(style),
-      // we should use `defaultBounds` rectangle if there is no `center` point
-      // passed in the URL
-      ...initialPosition
-    })
+    // Mapbox throws from its constructor when WebGL is unavailable. Keep that
+    // inside the map component so the results and filters survive (RT05).
+    const { map, failure } = createMap(
+      {
+        container,
+        ...mapboxDefaults,
+        style: getMapStyleUrl(style),
+        // we should use `defaultBounds` rectangle if there is no `center` point
+        // passed in the URL
+        ...initialPosition
+      },
+      setMapFailure
+    )
+
+    if (!map) {
+      console.error('[MapRoot] map initialization failed', failure.message)
+      setMapFailure(failure)
+      return
+    }
+
+    setMapFailure(null)
 
     map.on('load', () => {
       if (polygon) addPolygon(map, polygon)
@@ -294,6 +310,19 @@ const MapRoot = ({ zoom, center, polygon, onMove, onLoad }: MapRootProps) => {
     return () => MapService.removeMap()
   }, [])
 
+  // Only a lost WebGL context is worth retrying; a browser without WebGL
+  // fails the same way every time, so that case offers the list instead.
+  const handleRetryMap = useCallback(() => {
+    if (!mapContainerRef.current) return
+    MapService.removeMap()
+    initializeMap(mapContainerRef.current)
+  }, [style, center, zoom, polygon])
+
+  const handleShowList = useCallback(() => {
+    setLayout('grid')
+    setShowDrawer(true)
+  }, [setLayout])
+
   return (
     <Stack
       direction="row"
@@ -308,9 +337,19 @@ const MapRoot = ({ zoom, center, polygon, onMove, onLoad }: MapRootProps) => {
     >
       <MapTransitionContainer>
         <MapContainer ref={mapContainerRef} />
-        {features.saveSearch && <MapDrawButton />}
-        <MapNavigation />
-        <MapStyleSwitch />
+        {mapFailure ? (
+          <MapUnavailable
+            failure={mapFailure}
+            onShowList={handleShowList}
+            onRetry={handleRetryMap}
+          />
+        ) : (
+          <>
+            {features.saveSearch && <MapDrawButton />}
+            <MapNavigation />
+            <MapStyleSwitch />
+          </>
+        )}
         <MapTitle />
         <SaveSearchCanvas />
         {(mobile || tablet) && (
@@ -328,11 +367,17 @@ const MapRoot = ({ zoom, center, polygon, onMove, onLoad }: MapRootProps) => {
 
       {mobile || tablet ? (
         <GridMobileDrawer show={showDrawer}>
+          {mapFailure && (
+            <MapUnavailable variant="banner" failure={mapFailure} />
+          )}
           <GridFilters />
           <GridContent onCardClick={handleCardClick} />
         </GridMobileDrawer>
       ) : (
         <GridDesktopContainer>
+          {mapFailure && layout === 'grid' && (
+            <MapUnavailable variant="banner" failure={mapFailure} />
+          )}
           <GridFilters />
           <GridContent onCardClick={handleCardClick} />
         </GridDesktopContainer>

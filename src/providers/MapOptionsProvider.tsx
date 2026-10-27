@@ -17,6 +17,7 @@ import {
 import { type MapStyle } from '@configs/map'
 
 import { getCoords, getZoom } from 'utils/map'
+import { type MapFailure } from 'utils/map-init'
 
 export type MapPosition = {
   center: LngLat | null
@@ -42,6 +43,9 @@ type MapOptionsContextProps = {
   clearEditMode: () => void
   mapRef: React.MutableRefObject<MapboxMap | null>
   setMapRef: (ref: MapboxMap) => void
+  // set when Mapbox could not start or lost its WebGL context (audit RT05)
+  mapFailure: MapFailure | null
+  setMapFailure: (failure: MapFailure | null) => void
 }
 
 const MapOptionsContext = createContext<MapOptionsContextProps | undefined>(
@@ -68,6 +72,7 @@ const MapOptionsProvider = ({
   const [mapLayout, setLayout] = useState(layout)
   const [mapTitle, setTitle] = useState(title || null)
   const [editMode, setEditMode] = useState<MapEditMode>(null)
+  const [mapFailure, setMapFailure] = useState<MapFailure | null>(null)
   const clearEditMode = () => setEditMode(null)
 
   const searchParams = useSearchParams()
@@ -98,9 +103,11 @@ const MapOptionsProvider = ({
       setEditMode,
       clearEditMode,
       mapRef,
-      setMapRef: (ref: MapboxMap) => (mapRef.current = ref)
+      setMapRef: (ref: MapboxMap) => (mapRef.current = ref),
+      mapFailure,
+      setMapFailure
     }),
-    [mapLayout, mapPosition, mapStyle, mapTitle, editMode]
+    [mapLayout, mapPosition, mapStyle, mapTitle, editMode, mapFailure]
   )
 
   return (
@@ -130,7 +137,9 @@ export const useMapOptions = () => {
       setTitle: () => undefined,
       editMode: false,
       setEditMode: () => undefined,
-      clearEditMode: () => undefined
+      clearEditMode: () => undefined,
+      mapFailure: null,
+      setMapFailure: () => undefined
     }
   }
   return context

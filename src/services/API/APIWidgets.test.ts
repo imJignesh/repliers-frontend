@@ -23,23 +23,30 @@ beforeEach(() => {
   raw.mockResolvedValue(payload({ widgets: {} }))
 })
 
-// RT04: the homepage widget is titled "Toronto Insights", so its default
-// filters must scope every statistics request to the Toronto area.
-it('scopes the homepage Insights widget to Toronto', async () => {
+// RT04: the homepage widget's label and request must describe the same
+// geography. The feed covers all of Ontario, so the default request is
+// unscoped and the label says Ontario; a scoped label needs a scoped request.
+it('labels the homepage Insights with the scope that the default request covers', async () => {
+  expect(defaultLocation.insightsScope).toBe('Ontario')
+  expect(defaultLocation.defaultFilters).toEqual({})
   await widgets.fetchStats({
     ...defaultLocation.defaultFilters,
     propertyClass: ['condo']
   })
   const url = requestedUrl()
   expect(url.pathname).toBe('/stats/widgets')
-  expect(url.searchParams.get('area')).toBe('Toronto')
-  expect(url.searchParams.get('class')).toBe('condo')
+  expect(url.searchParams.has('area')).toBe(false)
   expect(url.searchParams.has('city')).toBe(false)
+  expect(url.searchParams.get('class')).toBe('condo')
 })
 
-it('passes the area filter to the chart history endpoint', async () => {
+it('passes an area filter through to both statistics endpoints', async () => {
+  await widgets.fetchStats({ area: 'Toronto', propertyClass: ['condo'] })
+  expect(requestedUrl().searchParams.get('area')).toBe('Toronto')
+  raw.mockClear()
+  raw.mockResolvedValue(payload({ statistics: {} }))
   await widgets.fetchHistory({
-    ...defaultLocation.defaultFilters,
+    area: 'Toronto',
     propertyClass: ['condo'],
     months: 12,
     statistics: 'sum-soldPrice,grp-mth'

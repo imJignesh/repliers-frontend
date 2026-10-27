@@ -2,9 +2,13 @@ const location = {
   stateCode: 'ON',
   state: 'Ontario',
   city: 'Toronto',
-  // HOME PAGE STATS. The homepage widget is titled "Toronto Insights", so
-  // the statistics request must be scoped to the Toronto area (RT04).
-  defaultFilters: { area: 'Toronto' },
+  // HOME PAGE STATS (audit RT04). The statistics feed and the published
+  // buildings cover all of Ontario (Toronto, Peel, York, Halton, Hamilton,
+  // Ottawa, Waterloo, ...), so the homepage widget is deliberately unscoped
+  // and labelled with `insightsScope`. Pass `area`/`city` here to narrow it,
+  // and change the label to match.
+  defaultFilters: {},
+  insightsScope: 'Ontario',
   // DASHBOARD LIST
   defaultCities: [
     'Algoma',

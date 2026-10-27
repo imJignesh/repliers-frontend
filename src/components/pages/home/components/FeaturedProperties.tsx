@@ -104,7 +104,7 @@ const FeaturedProperties = () => {
     fetchShowcased()
     fetchPreconstructions()
   }, [])
-  const { state, defaultFilters } = defaultLocation
+  const { state, defaultFilters, insightsScope } = defaultLocation
 
   return (
     <Container maxWidth="lg">
@@ -112,7 +112,7 @@ const FeaturedProperties = () => {
         <PropertyCarousel title={t('justListed')} properties={featured} />
         <PropertyCarousel title={t('recentlySold')} properties={showcasedListings} />
 
-        {features.dashboard && <DeferredStats {...defaultFilters} name={`Toronto`} />}
+        {features.dashboard && <DeferredStats {...defaultFilters} name={insightsScope} />}
 
 
 

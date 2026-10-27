@@ -2,8 +2,9 @@ const location = {
   stateCode: 'ON',
   state: 'Ontario',
   city: 'Toronto',
-  // HOME PAGE STATS
-  defaultFilters: {},
+  // HOME PAGE STATS. The homepage widget is titled "Toronto Insights", so
+  // the statistics request must be scoped to the Toronto area (RT04).
+  defaultFilters: { area: 'Toronto' },
   // DASHBOARD LIST
   defaultCities: [
     'Algoma',

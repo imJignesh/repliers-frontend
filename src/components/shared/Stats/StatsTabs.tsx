@@ -25,6 +25,7 @@ type StatsTabsProps = Omit<StatsParams, 'propertyClass'> & {
 }
 
 export const StatsTabs = ({
+  area,
   city,
   neighborhood,
   onTabChange
@@ -92,6 +93,7 @@ export const StatsTabs = ({
             }}
           >
             <StatsTabPanel
+              area={area}
               city={city}
               label={label}
               neighborhood={neighborhood}

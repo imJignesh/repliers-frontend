@@ -1,7 +1,7 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { alpha, type Theme } from '@mui/material'
 
-import { primary } from '@configs/colors'
+import { placeholder, primary } from '@configs/colors'
 
 import { toRem } from 'utils/theme'
 
@@ -448,6 +448,14 @@ const components = {
             height: 'auto',
             fontSize: toRem(16),
             lineHeight: toRem(24)
+          },
+          // MUI renders placeholders at 0.42 opacity, which composites the
+          // search placeholder to about 2.3:1. Use a solid colour that passes
+          // 4.5:1 on white and on the grey filled background (audit RT06).
+          '& input::placeholder, & textarea::placeholder': {
+            color: placeholder,
+            opacity: 1,
+            WebkitTextFillColor: placeholder
           },
           '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
             borderColor: '#E9E9E9 !important'

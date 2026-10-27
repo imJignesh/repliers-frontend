@@ -17,7 +17,10 @@ export const marker = secondary
 export const soldMarker = darken(marker, 0.2)
 export const rentMarker = marker
 
-export const hint = light
+// Hint and placeholder text must stay readable: #6B6B6B is 5.4:1 on white
+// and 4.9:1 on the page background (WCAG 1.4.3 needs 4.5:1, audit RT06).
+export const hint = '#6B6B6B'
+export const placeholder = hint
 export const disabled = light
 export const divider = '#E9E9E9'
 

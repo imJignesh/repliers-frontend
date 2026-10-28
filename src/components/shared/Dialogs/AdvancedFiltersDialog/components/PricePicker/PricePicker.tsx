@@ -48,6 +48,15 @@ const PricePicker = ({
     return `${formatPrice(min)}${index === lastIndex ? '+' : ''}`
   }
 
+  // The two thumbs are range inputs whose native value is a bucket index
+  // (0..16). Expose a name and the formatted price instead (audit RT06).
+  const getThumbLabel = (index: number) =>
+    index === 0 ? 'Minimum price' : 'Maximum price'
+  const getThumbValueText = (_value: number, index: number) =>
+    `${getThumbLabel(index)} ${formatLabel(
+      index === 0 ? pickerMin : pickerMax
+    )}`
+
   const handleChange = (
     _event: Event,
     position: number | number[],
@@ -130,6 +139,8 @@ const PricePicker = ({
               onChange={handleChange}
               onChangeCommitted={handleChangeCommitted}
               value={[pickerMin, pickerMax]}
+              getAriaLabel={getThumbLabel}
+              getAriaValueText={getThumbValueText}
               valueLabelFormat={formatLabel}
               valueLabelDisplay={showLabels ? 'on' : 'off'}
               sx={{

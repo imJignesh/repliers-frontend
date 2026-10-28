@@ -48,7 +48,7 @@ export const StatsWidgets = (
             <Typography
               align="center"
               variant="caption"
-              color="secondary.main"
+              color="text.secondary"
               sx={{ whiteSpace: 'pre-line' }}
             >
               {t('Statistics.statsDisclaimer')}

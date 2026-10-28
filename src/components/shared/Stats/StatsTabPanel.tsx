@@ -29,6 +29,7 @@ type StatsTabPanelProps = Omit<StatsParams, 'propertyClass'> & {
 }
 
 export const StatsTabPanel = ({
+  area,
   city,
   neighborhood,
   propertyClass,
@@ -59,6 +60,7 @@ export const StatsTabPanel = ({
       ) as PropertyClass[]
 
       const response = await APIWidgets.fetchStats({
+        area,
         city,
         neighborhood,
         propertyClass: propertyClassArray

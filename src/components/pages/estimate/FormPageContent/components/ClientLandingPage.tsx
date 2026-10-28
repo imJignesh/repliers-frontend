@@ -33,6 +33,7 @@ const ClientLandingPage = () => {
           <LocationStatistics
             name={city}
             {...defaultFilters}
+            area={city}
             propertyClass="residential"
           />
           <EstimateFlowBanner />

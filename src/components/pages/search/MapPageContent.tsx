@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import type { Position } from 'geojson'
-import { Box, Typography } from '@mui/material'
 import { type LngLat, type LngLatBounds } from 'mapbox-gl'
+
+import { Box, Typography } from '@mui/material'
 
 import MapService from 'services/Map'
 import {
@@ -23,12 +24,14 @@ import { updateWindowHistory } from 'utils/urls'
 
 import MapFilters from './components/MapFilters'
 import MapRoot from './components/MapRoot'
+import { shouldFetchResults } from './_utils'
 
 const MapPageContent = ({ heading }: { heading: string }) => {
   const searchParams = useSearchParams()
   const [mapLoaded, setMapLoaded] = useState(false)
   const { search, save, clearResults, filters, polygon } = useSearch()
-  const { layout, position, setPosition } = useMapOptions()
+  const { layout, position, setPosition, mapFailure } = useMapOptions()
+  const mapFailed = !!mapFailure
 
   const query = searchParams.get('q')
   const page = searchParams.get('page')
@@ -82,8 +85,9 @@ const MapPageContent = ({ heading }: { heading: string }) => {
   const { center, zoom } = position
 
   useEffect(() => {
-    if (!mapLoaded) return
-    if (!center || !zoom) return
+    // Without a map there is no viewport: `fetchData` falls back to the
+    // polygon or the default rectangle so the list still loads (audit RT05).
+    if (!shouldFetchResults({ mapLoaded, mapFailed, position })) return
     let current = true
     clearResults()
     MapService.hidePopup()
@@ -92,7 +96,7 @@ const MapPageContent = ({ heading }: { heading: string }) => {
     return () => {
       current = false
     }
-  }, [mapLoaded, position, filters, polygon])
+  }, [mapLoaded, mapFailed, position, filters, polygon])
 
   const prevParams = useRef(JSON.stringify({ center, zoom, filters }))
   const curParams = JSON.stringify({ center, zoom, filters })
@@ -119,7 +123,10 @@ const MapPageContent = ({ heading }: { heading: string }) => {
   return (
     <>
       <Box sx={{ px: { xs: 2, md: 3 }, py: 1, bgcolor: 'background.paper' }}>
-        <Typography component="h1" sx={{ fontSize: { xs: 18, md: 20 }, fontWeight: 600 }}>
+        <Typography
+          component="h1"
+          sx={{ fontSize: { xs: 18, md: 20 }, fontWeight: 600 }}
+        >
           {heading}
         </Typography>
       </Box>

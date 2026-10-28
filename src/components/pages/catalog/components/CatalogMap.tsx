@@ -1,12 +1,13 @@
 'use client'
 
 import React, { useEffect, useRef } from 'react'
-import { Map as MapboxMap, LngLatBounds } from 'mapbox-gl'
+import { type Map as MapboxMap, LngLatBounds } from 'mapbox-gl'
 import { Box } from '@mui/material'
 import { useLocale, useMessages } from 'next-intl'
 
 import mapConfig from '@configs/map'
 import { getMapStyleUrl } from 'utils/map'
+import { createMap } from 'utils/map-init'
 import MapService from 'services/Map'
 import { type Property } from 'services/API'
 import { useMapOptions } from 'providers/MapOptionsProvider'
@@ -23,13 +24,18 @@ const CatalogMap = ({ listings }: { listings: Property[] }) => {
     useEffect(() => {
         if (!mapContainerRef.current) return
 
-        const map = new MapboxMap({
+        // WebGL failures must not unmount the location page (audit RT05)
+        const { map, failure } = createMap({
             container: mapContainerRef.current,
             ...mapboxDefaults,
             style: getMapStyleUrl(style),
             center: [-79.3832, 43.6532], // Toronto
             zoom: 10
         })
+        if (!map) {
+            console.error('[CatalogMap] map initialization failed', failure.message)
+            return
+        }
 
         mapRef.current = map
         MapService.setMap(map)

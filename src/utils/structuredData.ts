@@ -81,7 +81,37 @@ export const getPropertyBreadcrumbItems = (
   return items
 }
 
-const getAboutPlace = (property: Property, streetAddress: string) => {
+const getPostalAddress = (
+  address: Pick<PropertyAddress, 'city' | 'state' | 'zip' | 'country'>,
+  streetAddress: string
+) => ({
+  '@type': 'PostalAddress',
+  ...(streetAddress ? { streetAddress } : {}),
+  ...(address.city ? { addressLocality: address.city } : {}),
+  ...(address.state ? { addressRegion: address.state } : {}),
+  ...(!scrubbed(address.zip) && address.zip ? { postalCode: address.zip } : {}),
+  addressCountry: address.country || 'CA'
+})
+
+const getGeo = (map?: Property['map']) =>
+  map?.latitude && map?.longitude
+    ? {
+        geo: {
+          '@type': 'GeoCoordinates',
+          latitude: map.latitude,
+          longitude: map.longitude
+        }
+      }
+    : {}
+
+// Unit-level facts (beds, baths, size) belong to the Apartment entity only.
+// `numberOfBedrooms` is the defined schema.org property; the previously used
+// `numberOfBedroomsTotal` does not exist in the vocabulary (audit RT07).
+const getUnitPlace = (
+  property: Property,
+  streetAddress: string,
+  extra: Record<string, unknown> = {}
+) => {
   const { address, details, map } = property
   const sqft = getSqft(property)
   const beds = getBedrooms(details).count
@@ -89,27 +119,11 @@ const getAboutPlace = (property: Property, streetAddress: string) => {
 
   return {
     '@type': 'Apartment',
+    ...extra,
     ...(streetAddress ? { name: streetAddress } : {}),
-    address: {
-      '@type': 'PostalAddress',
-      ...(streetAddress ? { streetAddress } : {}),
-      ...(address.city ? { addressLocality: address.city } : {}),
-      ...(address.state ? { addressRegion: address.state } : {}),
-      ...(!scrubbed(address.zip) && address.zip
-        ? { postalCode: address.zip }
-        : {}),
-      addressCountry: address.country || 'CA'
-    },
-    ...(map?.latitude && map?.longitude
-      ? {
-          geo: {
-            '@type': 'GeoCoordinates',
-            latitude: map.latitude,
-            longitude: map.longitude
-          }
-        }
-      : {}),
-    ...(beds ? { numberOfBedroomsTotal: beds } : {}),
+    address: getPostalAddress(address, streetAddress),
+    ...getGeo(map),
+    ...(beds ? { numberOfBedrooms: beds } : {}),
     ...(baths ? { numberOfBathroomsTotal: baths } : {}),
     ...(sqft.number
       ? {
@@ -121,6 +135,31 @@ const getAboutPlace = (property: Property, streetAddress: string) => {
         }
       : {})
   }
+}
+
+type BuildingRecord = {
+  total_units?: number | string | null
+  floors_units?: string | null
+}
+
+/**
+ * The verified total number of units in a building, from the curated
+ * building record: the integer `total_units` column when present, otherwise
+ * the "Floors: 24 | Total Units: 314" summary shown on the page as Building
+ * Scale. Never the count of listings currently for sale (audit RT07).
+ */
+export const getBuildingUnitTotal = (
+  building?: BuildingRecord | null
+): number | null => {
+  if (!building) return null
+  const explicit = Number(building.total_units)
+  if (Number.isInteger(explicit) && explicit > 0) return explicit
+  const match = /total\s*units\s*:\s*([\d,]+)/i.exec(
+    building.floors_units || ''
+  )
+  if (!match) return null
+  const parsed = Number(match[1].replace(/,/g, ''))
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null
 }
 
 export const getListingJsonLd = (property: Property, host: string) => {
@@ -156,7 +195,7 @@ export const getListingJsonLd = (property: Property, host: string) => {
     ...(images?.length
       ? { image: images.slice(0, 6).map((img) => getCDNPath(img, 'large')) }
       : {}),
-    about: getAboutPlace(property, streetAddress),
+    about: getUnitPlace(property, streetAddress),
     ...(active(property) && !scrubbed(price) && price
       ? {
           offers: {
@@ -182,14 +221,44 @@ export const getBuildingJsonLd = (
   const p = deriveBuildingProperty(property)
   if (!p || !canonicalSlug) return null
 
-  const streetAddress = formatShortAddress(p.address, true)
   const url = `${host}${routes.building}/${canonicalSlug}`
+  const buildingId = `${url}#building`
+  // The complex is addressed by street number and name only; the unit number
+  // of whichever listing happened to come first is not the building's address.
+  const buildingAddress = formatShortAddress(
+    { ...p.address, unitNumber: undefined },
+    true
+  )
   const description = !scrubbed(p.details?.description)
     ? toPlainText(p.details?.description)
     : undefined
   const { min, max } =
     property.statistics?.listPrice || ({} as { min?: string; max?: string })
-  const unitCount = property.count
+  const totalUnits = getBuildingUnitTotal(property.building)
+  // `count` is the number of units currently listed, i.e. availability.
+  const availableUnits = property.count || property.listings?.length || 0
+
+  const unitOffers = (property.listings || [])
+    .filter(
+      (unit) => active(unit) && !scrubbed(unit.listPrice) && unit.listPrice
+    )
+    .slice(0, 10)
+    .map((unit) => {
+      const unitUrl = host + getSeoUrl(unit, { excludeQuery: true })
+      const unitAddress = formatShortAddress(unit.address, true)
+      return {
+        '@type': 'Offer',
+        '@id': `${unitUrl}#offer`,
+        url: unitUrl,
+        price: Number(unit.listPrice),
+        priceCurrency: 'CAD',
+        availability: 'https://schema.org/InStock',
+        itemOffered: getUnitPlace(unit, unitAddress, {
+          '@id': `${unitUrl}#unit`,
+          containedInPlace: { '@id': buildingId }
+        })
+      }
+    })
 
   return {
     '@context': 'https://schema.org',
@@ -202,10 +271,28 @@ export const getBuildingJsonLd = (
       ? { image: p.images.slice(0, 6).map((img) => getCDNPath(img, 'large')) }
       : {}),
     about: {
-      ...getAboutPlace(p, streetAddress),
       '@type': 'ApartmentComplex',
+      '@id': buildingId,
       name: buildingName,
-      ...(unitCount ? { numberOfAccommodationUnits: unitCount } : {})
+      url,
+      address: getPostalAddress(p.address, buildingAddress),
+      ...getGeo(p.map),
+      ...(totalUnits
+        ? {
+            numberOfAccommodationUnits: {
+              '@type': 'QuantitativeValue',
+              value: totalUnits
+            }
+          }
+        : {}),
+      ...(availableUnits
+        ? {
+            numberOfAvailableAccommodationUnits: {
+              '@type': 'QuantitativeValue',
+              value: availableUnits
+            }
+          }
+        : {})
     },
     ...(min && max
       ? {
@@ -215,7 +302,8 @@ export const getBuildingJsonLd = (
             lowPrice: Number(min),
             highPrice: Number(max),
             priceCurrency: 'CAD',
-            ...(unitCount ? { offerCount: unitCount } : {})
+            ...(availableUnits ? { offerCount: availableUnits } : {}),
+            ...(unitOffers.length ? { offers: unitOffers } : {})
           }
         }
       : {})

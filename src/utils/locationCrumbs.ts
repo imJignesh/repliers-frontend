@@ -84,6 +84,21 @@ export const getPropertyLocationCrumbs = (
 }
 
 /**
+ * The chain for a building page: the building's own place wins, and the
+ * sample listing's chain is used only when the building has none.
+ */
+export const getBuildingPageLocationCrumbs = (
+  property: unknown
+): LocationCrumb[] => {
+  const p = (property || {}) as {
+    location?: ApiPropertyLocation
+    building?: { location?: ApiPropertyLocation } | null
+  }
+  const own = getLocationCrumbs(p.building?.location)
+  return own.length ? own : getLocationCrumbs(p.location)
+}
+
+/**
  * A building page link only exists for a published building; the API marks
  * the rest with `published: false`. Older payloads without the flag keep
  * their link.

@@ -2,6 +2,7 @@ import routes from '@configs/routes'
 
 import {
   getBuildingHref,
+  getBuildingPageLocationCrumbs,
   getLocationCrumbs,
   getPropertyLocationCrumbs
 } from './locationCrumbs'
@@ -88,6 +89,34 @@ describe('location breadcrumbs (audit RT03)', () => {
       'East End',
       'The Beaches'
     ])
+  })
+
+  it("prefers the building's own chain on building pages", () => {
+    const property = {
+      // The sample listing sits in a different locality (a data error).
+      location: {
+        items: [
+          { name: 'Toronto', path: '/locations/toronto' },
+          { name: 'West End', path: '/locations/toronto/west-end' },
+          {
+            name: 'Roncesvalles',
+            path: '/locations/toronto/west-end/roncesvalles'
+          }
+        ]
+      },
+      building: { location: beaches }
+    }
+    expect(getBuildingPageLocationCrumbs(property).map((c) => c.name)).toEqual([
+      'Toronto',
+      'East End',
+      'The Beaches'
+    ])
+    expect(
+      getBuildingPageLocationCrumbs({
+        location: beaches,
+        building: { location: { items: [] } }
+      })
+    ).toHaveLength(3)
   })
 
   it('links a building only when the API says it is published', () => {

@@ -26,7 +26,7 @@ import MapOptionsProvider from 'providers/MapOptionsProvider'
 import { useProperty } from 'providers/PropertyProvider'
 import { useUser } from 'providers/UserProvider'
 import useAnalytics from 'hooks/useAnalytics'
-import { getPropertyLocationCrumbs } from 'utils/locationCrumbs'
+import { getBuildingPageLocationCrumbs } from 'utils/locationCrumbs'
 import { scrubbed } from 'utils/properties'
 
 import { formatShortAddress } from '../../../utils/properties/formatters'
@@ -65,7 +65,7 @@ const PropertyPageContent = ({
       building?: { name: string; slug: string; published?: boolean }
     }
   ).building
-  const locationCrumbs = getPropertyLocationCrumbs(property)
+  const locationCrumbs = getBuildingPageLocationCrumbs(property)
 
   useEffect(() => {
     trackEvent('view_property_page', {

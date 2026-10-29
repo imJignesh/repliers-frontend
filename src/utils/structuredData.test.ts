@@ -1,21 +1,25 @@
 import routes from '@configs/routes'
 
-import { type PropertyAddress } from 'services/API'
-
+import { getLocationCrumbs } from './locationCrumbs'
 import {
   getBreadcrumbJsonLd,
   getPropertyBreadcrumbItems
 } from './structuredData'
 
 describe('property breadcrumb structured data', () => {
-  it('uses cumulative canonical location URLs instead of search URLs', () => {
-    const address = {
-      area: 'Toronto',
-      city: 'Downtown',
-      neighborhood: 'Church-Yonge Corridor'
-    } as PropertyAddress
+  it('uses the curated location chain from the API, not search URLs', () => {
+    const crumbs = getLocationCrumbs({
+      items: [
+        { name: 'Toronto', path: '/locations/toronto' },
+        { name: 'Downtown', path: '/locations/toronto/downtown' },
+        {
+          name: 'Church-Yonge Corridor',
+          path: '/locations/toronto/downtown/church-yonge-corridor'
+        }
+      ]
+    })
 
-    const items = getPropertyBreadcrumbItems(address, 'https://precondo.ca', {
+    const items = getPropertyBreadcrumbItems(crumbs, 'https://precondo.ca', {
       name: '199 Church Condos',
       url: 'https://precondo.ca/r/building/199-church-82-dalhousie'
     })
@@ -32,6 +36,14 @@ describe('property breadcrumb structured data', () => {
     expect(JSON.stringify(getBreadcrumbJsonLd(items))).not.toContain(
       '/r/search/'
     )
+  })
+
+  it('skips location levels the API could not resolve', () => {
+    const items = getPropertyBreadcrumbItems([], 'https://precondo.ca', {
+      name: 'Expressions',
+      url: 'https://precondo.ca/r/building/55-tom-brown-1021-rest-acres-brant'
+    })
+    expect(items.map(({ name }) => name)).toEqual(['For sale', 'Expressions'])
   })
 })
 

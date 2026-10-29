@@ -9,6 +9,7 @@ import { Property404Template } from '@templates'
 import { JsonLd } from 'components/atoms'
 import BuildingPageTemplate from 'components/templates/BuildingPageTemplate'
 
+import { getPropertyLocationCrumbs } from 'utils/locationCrumbs'
 import { formatMetadata } from 'utils/properties'
 import { deriveBuildingProperty } from 'utils/properties/building'
 import {
@@ -205,10 +206,14 @@ const PropertyPage = async (props: PropertyPageProps) => {
     ? getBuildingJsonLd(property, host, buildName, canonicalSlug)
     : null
   const breadcrumbItems = derivedProperty
-    ? getPropertyBreadcrumbItems(derivedProperty.address, host, {
-        name: buildName,
-        url: `${host}${routes.building}/${canonicalSlug}`
-      })
+    ? getPropertyBreadcrumbItems(
+        getPropertyLocationCrumbs(derivedProperty),
+        host,
+        {
+          name: buildName,
+          url: `${host}${routes.building}/${canonicalSlug}`
+        }
+      )
     : null
 
   return (

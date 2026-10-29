@@ -26,10 +26,13 @@ import { useFeatures } from 'providers/FeaturesProvider'
 import { useProperty } from 'providers/PropertyProvider'
 import { useUser } from 'providers/UserProvider'
 import useAnalytics from 'hooks/useAnalytics'
+import {
+  getBuildingHref,
+  getPropertyLocationCrumbs
+} from 'utils/locationCrumbs'
 import { scrubbed } from 'utils/properties'
 
 import { formatShortAddress } from '../../../utils/properties/formatters'
-import { getCatalogUrl } from '../../../utils/urls'
 
 import {
   AppliancesDetails,
@@ -62,8 +65,12 @@ const PropertyPageContent = ({
   const features = useFeatures()
   const { similarProperties, property } = useProperty()
   const { address } = property
-  const building = (property as { building?: { name: string; slug: string } })
-    .building
+  const building = (
+    property as {
+      building?: { name: string; slug: string; published?: boolean }
+    }
+  ).building
+  const locationCrumbs = getPropertyLocationCrumbs(property)
 
   useEffect(() => {
     trackEvent('view_property_page', {
@@ -113,46 +120,38 @@ const PropertyPageContent = ({
                 }
               }}
             >
-              {address.area && (
+              {/* RT03: only levels the API resolved through the location tree */}
+              {locationCrumbs.map((crumb) => (
                 <Link
+                  key={crumb.url}
                   component={NextLink}
-                  href={getCatalogUrl(address.area)}
+                  href={crumb.url}
                   color="text.secondary"
                   underline="hover"
                 >
-                  {address.area}
+                  {crumb.name}
                 </Link>
-              )}
-              {address.city && (
-                <Link
-                  component={NextLink}
-                  href={address.area ? getCatalogUrl(address.area, address.city) : getCatalogUrl(address.city)}
-                  color="text.secondary"
-                  underline="hover"
-                >
-                  {address.city}
-                </Link>
-              )}
-              {address.neighborhood && (
-                <Link
-                  component={NextLink}
-                  href={address.area ? getCatalogUrl(address.area, address.city, address.neighborhood) : getCatalogUrl(address.city, address.neighborhood)}
-                  color="text.secondary"
-                  underline="hover"
-                >
-                  {address.neighborhood}
-                </Link>
-              )}
-              {building?.name && !scrubbed(building.name) && (
-                <Link
-                  component={NextLink}
-                  href={`/r/building/${building.slug}`}
-                  color="text.primary"
-                  underline="hover"
-                >
-                  {building.name}
-                </Link>
-              )}
+              ))}
+              {building?.name &&
+                !scrubbed(building.name) &&
+                // RT03: an unpublished building has no page to link to.
+                (getBuildingHref(building) ? (
+                  <Link
+                    component={NextLink}
+                    href={getBuildingHref(building) as string}
+                    color="text.primary"
+                    underline="hover"
+                  >
+                    {building.name}
+                  </Link>
+                ) : (
+                  <Typography
+                    color="text.primary"
+                    sx={{ fontWeight: 500, fontSize: '0.95rem' }}
+                  >
+                    {building.name}
+                  </Typography>
+                ))}
             </Breadcrumbs>
 
             <HomeHeaderInfo />

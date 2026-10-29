@@ -1,0 +1,82 @@
+import routes from '@configs/routes'
+
+import {
+  getBuildingHref,
+  getLocationCrumbs,
+  getPropertyLocationCrumbs
+} from './locationCrumbs'
+
+const beaches = {
+  items: [
+    { name: 'Toronto', path: '/locations/toronto' },
+    { name: 'East End', path: '/locations/toronto/east-end' },
+    { name: 'The Beaches', path: '/locations/toronto/east-end/the-beaches' }
+  ]
+}
+
+describe('location breadcrumbs (audit RT03)', () => {
+  it('maps API location items to /r/locations URLs', () => {
+    expect(getLocationCrumbs(beaches)).toEqual([
+      { name: 'Toronto', url: `${routes.listings}/toronto` },
+      { name: 'East End', url: `${routes.listings}/toronto/east-end` },
+      {
+        name: 'The Beaches',
+        url: `${routes.listings}/toronto/east-end/the-beaches`
+      }
+    ])
+  })
+
+  it('never builds a URL from address text', () => {
+    // The old builder turned these names into /toronto/toronto/the-beaches-east-end-toronto.
+    const property = {
+      address: {
+        area: 'Toronto',
+        city: 'Toronto',
+        neighborhood: 'The Beaches, East End, Toronto'
+      },
+      location: {
+        area: null,
+        city: null,
+        locality: null,
+        items: [],
+        path: null
+      }
+    }
+    expect(getPropertyLocationCrumbs(property)).toEqual([])
+    expect(getLocationCrumbs(undefined)).toEqual([])
+    expect(
+      getLocationCrumbs({
+        items: [
+          { name: 'Toronto', path: null },
+          { name: 'X', path: '/search/x' }
+        ]
+      })
+    ).toEqual([])
+  })
+
+  it("uses the building's chain when it reaches further than the listing's", () => {
+    const property = {
+      location: { items: [{ name: 'Toronto', path: '/locations/toronto' }] },
+      building: { location: beaches }
+    }
+    expect(getPropertyLocationCrumbs(property).map((c) => c.name)).toEqual([
+      'Toronto',
+      'East End',
+      'The Beaches'
+    ])
+  })
+
+  it('links a building only when the API says it is published', () => {
+    expect(getBuildingHref({ slug: 'the-rideau', published: true })).toBe(
+      `${routes.building}/the-rideau`
+    )
+    expect(
+      getBuildingHref({ slug: '1035-bank-ottawa', published: false })
+    ).toBeNull()
+    expect(getBuildingHref({ slug: 'older-payload' })).toBe(
+      `${routes.building}/older-payload`
+    )
+    expect(getBuildingHref({ slug: '' })).toBeNull()
+    expect(getBuildingHref(null)).toBeNull()
+  })
+})

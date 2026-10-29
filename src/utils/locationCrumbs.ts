@@ -13,17 +13,49 @@ import routes from '@configs/routes'
 export type LocationCrumb = { name: string; url: string }
 
 type ApiLocationItem = { name?: string; path?: string | null }
+type ApiLocationLevel = { name?: string; slug?: string } | null | undefined
 type ApiPropertyLocation =
-  | { items?: ApiLocationItem[] | null }
+  | {
+      items?: ApiLocationItem[] | null
+      area?: ApiLocationLevel
+      city?: ApiLocationLevel
+      locality?: ApiLocationLevel
+      path?: string | null
+    }
   | null
   | undefined
 
 const LOCATIONS_PREFIX = '/locations/'
 
+/**
+ * Payloads from before the backend returned `items` still carry curated
+ * area/city/locality slugs and the matching `path`. Use them only when the
+ * slugs join to exactly that path, so nothing is inferred from text.
+ */
+const itemsFromLevels = (location: ApiPropertyLocation): ApiLocationItem[] => {
+  if (!location?.path?.startsWith(LOCATIONS_PREFIX)) return []
+  const levels = [location.area, location.city, location.locality].filter(
+    (level): level is { name: string; slug: string } =>
+      !!level?.name && !!level?.slug
+  )
+  const items = levels.map((level, i) => ({
+    name: level.name,
+    path:
+      LOCATIONS_PREFIX +
+      levels
+        .slice(0, i + 1)
+        .map((l) => l.slug)
+        .join('/')
+  }))
+  return items.length && items[items.length - 1].path === location.path
+    ? items
+    : []
+}
+
 export const getLocationCrumbs = (
   location: ApiPropertyLocation
 ): LocationCrumb[] =>
-  (location?.items || [])
+  (location?.items?.length ? location.items : itemsFromLevels(location))
     .filter(
       (item): item is { name: string; path: string } =>
         !!item?.name &&

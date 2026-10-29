@@ -54,6 +54,30 @@ describe('location breadcrumbs (audit RT03)', () => {
     ).toEqual([])
   })
 
+  it('reads curated slugs from payloads that predate location.items', () => {
+    const glebe = {
+      area: { name: 'Ottawa', slug: 'ottawa' },
+      city: { name: 'Ottawa City', slug: 'ottawa-city' },
+      locality: { name: 'Glebe', slug: 'glebe' },
+      path: '/locations/ottawa/ottawa-city/glebe'
+    }
+    expect(getLocationCrumbs(glebe).map((c) => c.url)).toEqual([
+      `${routes.listings}/ottawa`,
+      `${routes.listings}/ottawa/ottawa-city`,
+      `${routes.listings}/ottawa/ottawa-city/glebe`
+    ])
+    // Names without slugs, or slugs that do not join to the path, are ignored.
+    expect(
+      getLocationCrumbs({
+        area: { name: 'Toronto' },
+        path: '/locations/toronto'
+      })
+    ).toEqual([])
+    expect(
+      getLocationCrumbs({ ...glebe, path: '/locations/ottawa/glebe' })
+    ).toEqual([])
+  })
+
   it("uses the building's chain when it reaches further than the listing's", () => {
     const property = {
       location: { items: [{ name: 'Toronto', path: '/locations/toronto' }] },

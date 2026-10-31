@@ -8,6 +8,7 @@ import breakpoints from '@configs/theme/breakpoints'
 import { Property404Template, PropertyPageTemplate } from '@templates'
 
 import { JsonLd } from 'components/atoms'
+import { getPropertyLocationCrumbs } from 'utils/locationCrumbs'
 import { formatMetadata, formatShortAddress, withdrawn } from 'utils/properties'
 import { getSeoUrl } from 'utils/properties/seo'
 import {
@@ -99,10 +100,14 @@ const PropertyPage = async (props: PropertyPageProps) => {
   }
 
   const url = host + getSeoUrl(property, { excludeQuery: true })
-  const breadcrumbItems = getPropertyBreadcrumbItems(property.address, host, {
-    name: formatShortAddress(property.address, true) || property.mlsNumber,
-    url
-  })
+  const breadcrumbItems = getPropertyBreadcrumbItems(
+    getPropertyLocationCrumbs(property),
+    host,
+    {
+      name: formatShortAddress(property.address, true) || property.mlsNumber,
+      url
+    }
+  )
 
   // The gallery is client-rendered, so on phones the first photo (the page's
   // Largest Contentful Paint element, audit RT08) was only requested after

@@ -303,6 +303,7 @@ const CatalogPageInner = ({
                           key={index}
                           property={property}
                           imageLoading={index < 2 ? 'eager' : 'lazy'}
+                          imagePriority={index === 0}
                           showViewOnMap={true}
                           onViewOnMap={() => {
                             if (
@@ -420,6 +421,7 @@ const CatalogPageInner = ({
                         key={index}
                         property={property}
                         imageLoading={index < 2 ? 'eager' : 'lazy'}
+                          imagePriority={index === 0}
                       />
                     ))
                   )}

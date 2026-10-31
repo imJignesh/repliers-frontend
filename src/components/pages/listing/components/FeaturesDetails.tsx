@@ -6,6 +6,7 @@ import { DetailsContainer } from '@shared/Containers'
 import { type DetailsGroupType } from 'utils/dataMapper'
 import { useProperty } from 'providers/PropertyProvider'
 import { isPureAmenity } from 'utils/properties'
+import { cleanManagement } from 'utils/properties/buildingFacts'
 
 const isEmptyValue = (val: any) => {
   if (val === null || val === undefined) return true
@@ -55,7 +56,9 @@ const FeaturesDetails = ({ features }: { features?: DetailsGroupType[] }) => {
   }
 
   const showType = !isEmptyValue(building?.type)
-  const showManagement = !isEmptyValue(building?.management)
+  // RT02: scraped build years and floor counts are not management.
+  const management = cleanManagement(building?.management)
+  const showManagement = management !== null
   const showCorp = !isEmptyValue(building?.corp)
   const showDateRegistered = !isEmptyValue(building?.date_registered)
 
@@ -93,7 +96,7 @@ const FeaturesDetails = ({ features }: { features?: DetailsGroupType[] }) => {
                 Property Management
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                {parseManagement(building?.management)}
+                {parseManagement(management as string)}
               </Typography>
             </Box>
           )}

@@ -9,6 +9,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import { Box, Stack, Typography } from '@mui/material'
 
 import { useProperty } from 'providers/PropertyProvider'
+import { getBuildingSizeRange } from 'utils/properties/buildingFacts'
 import { scrubbed } from 'utils/properties'
 
 const BuildingInfoItem = ({
@@ -75,11 +76,12 @@ const BuildingInfo = () => {
 
   if (!building) return null
 
-  const priceSqftVal = getSqftValue(building.price_sqft)
+  // RT02: the stored "price_sqft" is a unit size range, not a price.
+  const sizeRangeVal = getBuildingSizeRange(building)
   const avgPriceSqftVal = getSqftValue(building.avg_price_sqft)
 
   const hasData =
-    priceSqftVal !== null ||
+    sizeRangeVal !== null ||
     avgPriceSqftVal !== null ||
     (building.built_year_ext && !scrubbed(building.built_year_ext)) ||
     (building.floors_units && !scrubbed(building.floors_units))
@@ -95,7 +97,7 @@ const BuildingInfo = () => {
           gap: 2
         }}
       >
-        {priceSqftVal !== null && (
+        {sizeRangeVal !== null && (
           <Box
             sx={{
               flex: {
@@ -107,8 +109,8 @@ const BuildingInfo = () => {
           >
             <BuildingInfoItem
               icon={SquareFootIcon}
-              label="Price/Sqft Range"
-              value={priceSqftVal}
+              label="Unit Size Range"
+              value={sizeRangeVal}
             />
           </Box>
         )}

@@ -13,6 +13,7 @@ import {
   type ApiBoardCity,
   APILocations
 } from 'services/API'
+import { getCDNPath } from 'utils/urls'
 
 import {
   filter as isFilterSegment,
@@ -262,8 +263,27 @@ const LocationsCatalogPage = async (props: {
     }
   }
 
+  // Listing cards render as skeletons until hydration, so the first card photo
+  // (the page's Largest Contentful Paint element, audit RT08) was only requested
+  // after the JS bundle ran. Preload it from the server HTML at the exact URL the
+  // first card paints with: before the auth cookie is read on the client, every
+  // card renders blurred, which uses images[0] at the 'small' CDN class.
+  // React hoists <link> into <head>. Buildings view does not show listing cards.
+  const firstCardPhoto =
+    searchParams.type !== 'building' && listings[0]?.images?.[0]
+      ? getCDNPath(listings[0].images[0], 'small')
+      : ''
+
   return (
     <PageTemplate>
+      {firstCardPhoto && (
+        <link
+          rel="preload"
+          as="image"
+          href={firstCardPhoto}
+          fetchPriority="high"
+        />
+      )}
       <CatalogPageContent
         listings={listings}
         count={count}

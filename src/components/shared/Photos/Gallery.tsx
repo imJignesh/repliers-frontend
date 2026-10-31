@@ -30,6 +30,7 @@ type GalleryProps = {
   start?: number
   icon?: ImagePlaceholderIconType
   loading?: 'lazy' | 'eager'
+  priority?: boolean
 }
 
 const Gallery = React.memo(
@@ -43,7 +44,8 @@ const Gallery = React.memo(
     onMouseLeave,
     start = 0,
     icon = 'house',
-    loading = 'lazy'
+    loading = 'lazy',
+    priority = false
   }: GalleryProps) => {
     const sizeMap = size === 'map'
     const sizeDrawer = size === 'drawer'
@@ -156,6 +158,7 @@ const Gallery = React.memo(
                       // only the slide on screen may be eager; the rest of the
                       // ribbon stays lazy so an eager card does not fetch every photo
                       loading={index === start ? loading : 'lazy'}
+                      priority={index === start && priority}
                       size={cdnImageSize}
                       score={scores?.[index]}
                       blurred={image.startsWith('lock:') || (index === 0 ? false : blurred)}
@@ -175,6 +178,7 @@ const Gallery = React.memo(
               icon={icon}
               src={images[0]}
               loading={loading}
+              priority={priority}
               blurred={false}
               blurVariant={blurVariant}
               size={cdnImageSize}

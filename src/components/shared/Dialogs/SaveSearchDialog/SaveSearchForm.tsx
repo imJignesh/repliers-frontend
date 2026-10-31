@@ -35,7 +35,6 @@ import {
   useSaveSearch
 } from 'providers/SaveSearchProvider'
 import { useSearch } from 'providers/SearchProvider'
-import { getPositionBounds } from 'utils/map'
 import { formatUnionKey } from 'utils/strings'
 
 import schema from './schema'
@@ -129,13 +128,19 @@ const SaveSearchForm = ({
   useEffect(() => {
     if (!editId) {
       if (polygon) {
-        const polygonBounds = getPositionBounds(polygon)
-        const polygonPosition: MapPosition = {
-          center: polygonBounds.getCenter(),
-          bounds: polygonBounds,
-          zoom: position.zoom
-        }
-        fetchAreaName(polygonPosition)
+        // `utils/map` needs the Mapbox GL runtime. This dialog is exported from
+        // the shared Dialogs barrel that listing and catalog pages import, so
+        // load the helper on demand: a polygon only exists on map pages, where
+        // Mapbox is already loaded (audit RT08).
+        import('utils/map').then(({ getPositionBounds }) => {
+          const polygonBounds = getPositionBounds(polygon)
+          const polygonPosition: MapPosition = {
+            center: polygonBounds.getCenter(),
+            bounds: polygonBounds,
+            zoom: position.zoom
+          }
+          fetchAreaName(polygonPosition)
+        })
       } else {
         fetchAreaName(position)
       }

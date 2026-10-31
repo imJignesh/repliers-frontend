@@ -1,9 +1,10 @@
 import mapConfig from '@configs/map'
 
 import { type ApiBounds, type ApiQueryParams, APISearch } from 'services/API'
-import MapService, { MapSearch } from 'services/Map'
+import MapSearch from 'services/Map/MapSearch'
+import { getSharedMap } from 'services/Map/sharedMap'
 import { processParams } from 'services/Search/adapter'
-import { calcBoundsAtZoom, calcZoomLevel } from 'utils/map'
+import { calcBoundsAtZoom, calcZoomLevel } from 'utils/map-geometry'
 
 import { getDefaultRectangle, getListingFields } from './params'
 import { type Filters } from './types'
@@ -84,7 +85,7 @@ class SearchService {
     // get bounds and center point of the area from API
     const { bounds, location } = aggregates?.map?.clusters?.[0] || {}
 
-    const { map } = MapService
+    const map = getSharedMap()
     if (map && bounds && location) {
       const areaZoom = calcZoomLevel(map, bounds)
 
@@ -100,7 +101,7 @@ class SearchService {
   }
 
   async fetchBoundsForAddress(query: string): Promise<ApiBounds | undefined> {
-    const { map } = MapService
+    const map = getSharedMap()
     if (!map) return undefined
 
     const address = await MapSearch.fetchMapboxSuggestion(query)

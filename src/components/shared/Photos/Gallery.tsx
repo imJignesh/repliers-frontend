@@ -153,7 +153,9 @@ const Gallery = React.memo(
                       src={image}
                       icon={icon}
                       index={index}
-                      loading={loading}
+                      // only the slide on screen may be eager; the rest of the
+                      // ribbon stays lazy so an eager card does not fetch every photo
+                      loading={index === start ? loading : 'lazy'}
                       size={cdnImageSize}
                       score={scores?.[index]}
                       blurred={image.startsWith('lock:') || (index === 0 ? false : blurred)}
@@ -172,6 +174,7 @@ const Gallery = React.memo(
             <ImageContainer
               icon={icon}
               src={images[0]}
+              loading={loading}
               blurred={false}
               blurVariant={blurVariant}
               size={cdnImageSize}

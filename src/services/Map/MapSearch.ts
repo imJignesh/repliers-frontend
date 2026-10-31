@@ -9,7 +9,7 @@ import {
   type MapboxAddress,
   type MapboxSuggestResponse
 } from 'services/API'
-import { toApiPoint } from 'utils/map'
+import { toApiPoint } from 'utils/map-geometry'
 import { getSessionToken } from 'utils/tokens'
 
 import APIBase from '../API/APIBase'

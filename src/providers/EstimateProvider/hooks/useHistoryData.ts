@@ -15,7 +15,9 @@ import {
 } from '@configs/filter-types'
 
 import { type ApiAddress, APIEstimate } from 'services/API'
-import { MapSearch } from 'services/Map'
+// Direct import: the services/Map barrel drags the Mapbox GL runtime (marker
+// and popup extensions) into every page that reaches this hook (audit RT08).
+import MapSearch from 'services/Map/MapSearch'
 import { useFeatures } from 'providers/FeaturesProvider'
 
 import { cleanApiData, setApiValues } from '../utils'

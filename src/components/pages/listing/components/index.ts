@@ -5,7 +5,6 @@ export { default as FeaturesDetails } from './FeaturesDetails'
 export { default as HistoryDetails } from './HistoryDetails'
 export { default as HomeDescription } from './HomeDescription'
 export { default as HomeHeaderInfo } from './HomeHeaderInfo'
-export { default as HomeMap } from './HomeMap'
 export { default as NavigationBar, NavigationBarBuildings } from './NavigationBar'
 export { default as NeighborhoodDetails } from './NeighborhoodDetails'
 export { default as PropertyGallery, BuildingGallery } from './PropertyGallery'
@@ -18,5 +17,6 @@ export { default as TableDataView } from './TableDataView'
 export { BuildingHistoryDetails } from './HistoryDetails'
 export { default as BuildingInfo } from './BuildingInfo'
 export { default as UnitCarousel } from './UnitCarousel'
-export { default as BuildingMap } from './BuildingMap'
-export { default as InsightsDetails } from './InsightsDetails'
+// HomeMap, BuildingMap and InsightsDetails are imported directly by the pages
+// that render them (building page). Keeping them out of this barrel keeps
+// Mapbox GL and recharts out of the listing page bundle (audit RT08).

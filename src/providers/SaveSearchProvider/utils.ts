@@ -14,7 +14,7 @@ import {
   transformFilters
 } from 'services/Search'
 import { type MapPosition } from 'providers/MapOptionsProvider'
-import { toRectangle } from 'utils/map'
+import { toRectangle } from 'utils/map-geometry'
 import { pluralize } from 'utils/strings'
 
 import {

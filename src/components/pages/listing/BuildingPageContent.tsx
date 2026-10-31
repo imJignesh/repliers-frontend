@@ -1,5 +1,6 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import React, { useEffect, useMemo } from 'react'
 
 import { Box, Container, Stack, Typography, Breadcrumbs, Link, Paper } from '@mui/material'
@@ -31,7 +32,6 @@ import {
   BuildingHistoryDetails,
   HomeDescription,
   HomeHeaderInfo,
-  HomeMap,
   NavigationBar,
   NavigationBarBuildings,
   NeighborhoodDetails,
@@ -42,10 +42,17 @@ import {
   SimilarPropertyCarousel,
   SummaryDetails,
   BuildingInfo,
-  UnitCarousel,
-  BuildingMap,
-  InsightsDetails
+  UnitCarousel
 } from './components'
+import InsightsDetails from './components/InsightsDetails'
+
+// The building maps need Mapbox GL (~520 KB gzip). This content is reachable
+// from the shared templates barrel, so load the maps on demand to keep the
+// chunk out of listing and location page bundles (audit RT08).
+const HomeMap = dynamic(() => import('./components/HomeMap'), { ssr: false })
+const BuildingMap = dynamic(() => import('./components/BuildingMap'), {
+  ssr: false
+})
 
 import { formatBuildingAddress } from '../../../utils/properties/formatters'
 

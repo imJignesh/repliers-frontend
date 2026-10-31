@@ -40,6 +40,9 @@ type PropertyCardProps = {
   onClick?: (e: React.MouseEvent) => void
   showViewOnMap?: boolean
   onViewOnMap?: () => void
+  // 'eager' for the first cards of a results grid: on catalog pages the first
+  // card photo is the Largest Contentful Paint element (audit RT08).
+  imageLoading?: 'lazy' | 'eager'
 }
 
 const TouchRipple = TouchRippleOriginal as unknown as React.FC<
@@ -58,7 +61,8 @@ const PropertyCard = React.memo(
     onGalleryLeave,
     onClick,
     showViewOnMap,
-    onViewOnMap
+    onViewOnMap,
+    imageLoading = 'lazy'
   }: PropertyCardProps) => {
     const authenticated = useAuthenticated()
     const features = useFeatures()
@@ -122,6 +126,7 @@ const PropertyCard = React.memo(
             start={blurredGallery ? 0 : startImage}
             scores={imagesScore}
             blurred={blurredGallery}
+            loading={imageLoading}
             onMouseEnter={() => onGalleryEnter?.()}
             onMouseLeave={() => onGalleryLeave?.()}
           />

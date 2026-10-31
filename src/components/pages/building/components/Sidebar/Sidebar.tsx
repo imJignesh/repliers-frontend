@@ -4,7 +4,8 @@ import { Box, Paper, Skeleton, Tab, Tabs } from '@mui/material'
 
 import useClientSide from 'hooks/useClientSide'
 
-import { RequestInfoForm, TourHomeForm } from './components'
+// Direct import: the components barrel also exports TourHomeForm (date pickers).
+import RequestInfoForm from './components/RequestInfoForm'
 
 const Sidebar = () => {
   const clientSide = useClientSide()

@@ -26,7 +26,18 @@ afterEach(() => {
 })
 it('renders the landing page and canonical when estimate mode is not configured', async () => {
   process.env.NEXT_PUBLIC_ROOT_PAGE = 'landing'
-  expect((await HomePage({})).type).toBe('landing-template')
+  // The page wraps the template in a fragment with a preload for the banner
+  // photo, the mobile Largest Contentful Paint element (audit RT08).
+  const children = [(await HomePage({})).props.children].flat()
+  const template = children.find((child) => child?.type === 'landing-template')
+  const preload = children.find((child) => child?.type === 'link')
+  expect(template).toBeTruthy()
+  expect(preload?.props).toMatchObject({
+    rel: 'preload',
+    as: 'image',
+    fetchPriority: 'high',
+    href: expect.stringContaining('precondo_main_image')
+  })
   expect((await generateMetadata({})).alternates?.canonical).toBe(
     'https://precondo.ca/r/'
   )

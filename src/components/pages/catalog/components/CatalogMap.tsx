@@ -8,6 +8,10 @@ import { useLocale, useMessages } from 'next-intl'
 import mapConfig from '@configs/map'
 import { getMapStyleUrl } from 'utils/map'
 import { createMap } from 'utils/map-init'
+// Mapbox GL stylesheet travels with the code that creates a map, instead of
+// the root layout, so pages without a map do not block rendering on it
+// (audit RT08, October 2026).
+import 'mapbox-gl/dist/mapbox-gl.css'
 import MapService from 'services/Map'
 import { type Property } from 'services/API'
 import { useMapOptions } from 'providers/MapOptionsProvider'

@@ -5,7 +5,16 @@ import { Box, Paper, Skeleton, Tab, Tabs, Typography } from '@mui/material'
 import { useUser } from 'providers/UserProvider'
 import useClientSide from 'hooks/useClientSide'
 
-import { RequestInfoForm, AppointmentForm } from './components'
+import dynamic from 'next/dynamic'
+
+// Direct import: the components barrel also exports the date-picker forms.
+import RequestInfoForm from './components/RequestInfoForm'
+
+// Shown to signed-in users only; carries the MUI date pickers (~79 KB gzip),
+// so it is loaded on demand instead of with every listing page (audit RT08).
+const AppointmentForm = dynamic(() => import('./components/AppointmentForm'), {
+  loading: () => <Skeleton variant="rounded" height={320} />
+})
 
 const Sidebar = () => {
   const clientSide = useClientSide()

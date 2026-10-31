@@ -14,12 +14,12 @@ import {
 } from '@mui/material'
 
 import { DetailsContainer } from '@shared/Containers'
-import {
-  FullscreenGalleryDialog,
-  FullscreenRibbonDialog,
-  GalleryDialog,
-  SlideshowDialog
-} from '@shared/Dialogs'
+// Direct imports instead of the `@shared/Dialogs` barrel, which also re-exports
+// PropertyDialog, SaveSearchDialog and the AI dialogs (audit RT08).
+import FullscreenGalleryDialog from '@shared/Dialogs/FullscreenGalleryDialog'
+import FullscreenRibbonDialog from '@shared/Dialogs/FullscreenRibbonDialog'
+import GalleryDialog from '@shared/Dialogs/GalleryDialog'
+import SlideshowDialog from '@shared/Dialogs/SlideshowDialog'
 
 import { useFeatures } from 'providers/FeaturesProvider'
 // import MapOptionsProvider from 'providers/MapOptionsProvider'

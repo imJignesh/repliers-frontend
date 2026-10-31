@@ -8,19 +8,19 @@ import React, {
   useState
 } from 'react'
 import { useSearchParams } from 'next/navigation'
-import {
-  type LngLat,
-  type LngLatBounds,
-  type Map as MapboxMap
-} from 'mapbox-gl'
+import { type LngLatBounds, type Map as MapboxMap } from 'mapbox-gl'
 
 import { type MapStyle } from '@configs/map'
 
-import { getCoords, getZoom } from 'utils/map'
+import { getCoordsPoint, getZoom, type LngLatPoint } from 'utils/map-geometry'
 import { type MapFailure } from 'utils/map-init'
 
 export type MapPosition = {
-  center: LngLat | null
+  // Plain `{ lng, lat }` (a `mapboxgl.LngLat` instance also satisfies it).
+  // Everything that consumes it (flyTo, fitBounds, URL formatting) accepts
+  // `LngLatLike`, and keeping the provider free of the Mapbox runtime lets
+  // catalog pages render without the map chunk (audit RT08).
+  center: LngLatPoint | null
   bounds: LngLatBounds | undefined
   zoom: number
 }
@@ -79,7 +79,7 @@ const MapOptionsProvider = ({
   const initialPosition = useMemo(
     () => ({
       zoom: getZoom(searchParams),
-      center: getCoords(searchParams),
+      center: getCoordsPoint(searchParams),
       bounds: undefined
     }),
     []

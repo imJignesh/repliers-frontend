@@ -9,11 +9,10 @@ import MarkerExtensionService, {
 import PopupExtensionService, {
   type PopupExtension
 } from 'services/Map/PopupExtension'
+import { getSharedMap, setSharedMap } from 'services/Map/sharedMap'
 import { MapDataMode } from 'services/Map/types'
 
 export class MapService {
-  sharedMap: Map | null = null
-
   popupExtension: PopupExtension
   markerExtension: MarkerExtension
 
@@ -32,12 +31,12 @@ export class MapService {
   }
 
   setMap(map: Map): void {
-    this.sharedMap = map
+    setSharedMap(map)
   }
 
   removeMap(): void {
-    this.sharedMap?.remove()
-    this.sharedMap = null
+    getSharedMap()?.remove()
+    setSharedMap(null)
 
     this.dataMode = MapDataMode.SINGLE_MARKER
     this.resetMarkersSingleView()
@@ -45,7 +44,7 @@ export class MapService {
   }
 
   get map(): Map | null {
-    return this.sharedMap
+    return getSharedMap()
   }
 
   getMarker(mlsNumber: string): Marker | undefined {

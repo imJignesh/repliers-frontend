@@ -4,7 +4,9 @@ import React from 'react'
 
 import { Box, Container } from '@mui/material'
 
-import { ProfileDialog } from '@shared/Dialogs'
+// Direct import instead of the Dialogs barrel (audit RT08): the barrel reaches
+// the estimate providers and, through them, the Mapbox GL runtime.
+import ProfileDialog from '@shared/Dialogs/ProfileDialog'
 
 import { DashboardMenu, DashboardProfile } from './components'
 

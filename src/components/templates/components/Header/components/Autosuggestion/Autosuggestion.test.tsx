@@ -41,18 +41,24 @@ jest.unstable_mockModule('next/navigation', () => ({
 jest.unstable_mockModule('services/API', () => ({
   APILocations: { fetchAutosuggestions: fetchSuggestions }
 }))
-jest.unstable_mockModule('services/Map', () => ({ default: {}, MapSearch: {} }))
+// Autosuggestion reads the shared map registry and MapSearch directly so that
+// pages without a map do not load the Mapbox runtime (audit RT08).
+jest.unstable_mockModule('services/Map/MapSearch', () => ({ default: {} }))
+jest.unstable_mockModule('services/Map/sharedMap', () => ({
+  getSharedMap: () => null,
+  setSharedMap: jest.fn()
+}))
 jest.unstable_mockModule('providers/LocationsProvider', () => ({
   useLocations: () => ({ searchLocations: async () => [] })
 }))
 jest.unstable_mockModule('hooks/useClientSide', () => ({ default: () => true }))
-jest.unstable_mockModule('utils/map', () => ({
+jest.unstable_mockModule('utils/map-geometry', () => ({
   getZoom: () => 8,
-  getCoords: () => null,
+  getCoordsPoint: () => null,
   calcBoundsAtZoom: jest.fn(),
   getMapUrl: jest.fn(),
-  toMapboxBounds: jest.fn(),
-  toMapboxPoint: jest.fn()
+  toBoundsPair: jest.fn(),
+  toLngLatPoint: jest.fn()
 }))
 jest.unstable_mockModule('utils/properties', () => ({ getSeoUrl: jest.fn() }))
 for (const name of [

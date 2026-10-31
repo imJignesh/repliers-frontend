@@ -1,6 +1,13 @@
 import React from 'react'
-import { Box } from '@mui/material'
-import { StatsWidgets } from '@shared/Stats'
+import dynamic from 'next/dynamic'
+import { Box, Skeleton } from '@mui/material'
+
+// recharts (~109 KB gzip) is loaded with the widgets instead of the page bundle
+// (audit RT08).
+const StatsWidgets = dynamic(
+  () => import('@shared/Stats/StatsWidgets').then((m) => m.StatsWidgets),
+  { loading: () => <Skeleton variant="rounded" height={320} /> }
+)
 
 const InsightsDetails = ({ insights }: { insights?: { city?: string; neighborhood?: string } }) => {
     if (!insights || (!insights.city && !insights.neighborhood)) return null

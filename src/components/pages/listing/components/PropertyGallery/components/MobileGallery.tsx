@@ -46,7 +46,9 @@ const MobileGallery = ({
         <Gallery
           icon={icon}
           size="normal"
-          loading="lazy"
+          // The visible photo is the Largest Contentful Paint element of the
+          // listing page on phones (audit RT08); Gallery keeps other slides lazy.
+          loading="eager"
           images={images}
           start={active}
           blurred={blurred}

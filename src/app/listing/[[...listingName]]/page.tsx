@@ -4,6 +4,7 @@ import type React from 'react'
 
 import content from '@configs/content'
 import routes from '@configs/routes'
+import breakpoints from '@configs/theme/breakpoints'
 import { Property404Template, PropertyPageTemplate } from '@templates'
 
 import { JsonLd } from 'components/atoms'
@@ -14,7 +15,7 @@ import {
   getListingJsonLd,
   getPropertyBreadcrumbItems
 } from 'utils/structuredData'
-import { getProtocolHost } from 'utils/urls'
+import { getCDNPath, getProtocolHost } from 'utils/urls'
 
 import { type Params, type SearchParams } from './types'
 import {
@@ -103,8 +104,26 @@ const PropertyPage = async (props: PropertyPageProps) => {
     url
   })
 
+  // The gallery is client-rendered, so on phones the first photo (the page's
+  // Largest Contentful Paint element, audit RT08) was only requested after
+  // hydration. Preload it from the server HTML at the exact URL and size the
+  // mobile gallery uses; the media query keeps desktop (which shows a
+  // different size) from downloading it. React hoists <link> into <head>.
+  const firstPhoto = property.images?.[0]
+    ? getCDNPath(property.images[0], 'medium')
+    : ''
+
   return (
     <>
+      {firstPhoto && (
+        <link
+          rel="preload"
+          as="image"
+          href={firstPhoto}
+          fetchPriority="high"
+          media={`(max-width: ${breakpoints.values.sm - 0.05}px)`}
+        />
+      )}
       <JsonLd data={getListingJsonLd(property, host)} />
       <JsonLd data={getBreadcrumbJsonLd(breadcrumbItems)} />
       <PropertyPageTemplate property={property} />

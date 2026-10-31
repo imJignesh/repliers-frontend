@@ -9,7 +9,7 @@ import {
 import searchConfig from '@configs/search'
 
 import { nonDefaultFilter } from 'utils/filters'
-import { getDefaultBounds, toRectangle } from 'utils/map'
+import { getDefaultRectangleString, toRectangle } from 'utils/map-geometry'
 
 import type { Filters } from './types'
 
@@ -31,7 +31,7 @@ export const getMapRectangle = (bounds: LngLatBounds) => ({
 })
 
 export const getDefaultRectangle = () => ({
-  map: toRectangle(getDefaultBounds())
+  map: getDefaultRectangleString()
 })
 
 export const getMapPolygon = (polygon: Position[]) => ({

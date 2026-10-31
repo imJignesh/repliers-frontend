@@ -1,14 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { type Feature, type MultiLineString, type Position } from 'geojson'
-import { type LngLatLike } from 'mapbox-gl'
-
-import ExploreIcon from '@mui/icons-material/Explore'
-import { Box, Button, Stack, Typography } from '@mui/material'
+import { Box, Stack, Typography } from '@mui/material'
 
 import defaultLocation from '@configs/location'
-import { simplify } from '@turf/turf'
 
 import {
   type ApiBoardArea,
@@ -16,11 +10,21 @@ import {
   type ApiNeighborhood
 } from 'services/API'
 import { useMapOptions } from 'providers/MapOptionsProvider'
-import { getDefaultBounds, getLngLatCenter, getMapUrl } from 'utils/map'
+import {
+  cornersToApiBounds,
+  getCenterPoint,
+  getDefaultPolygonCorners,
+  getMapUrl,
+  toApiBounds
+} from 'utils/map-geometry'
 
 import { Breadcrumbs } from '..'
 
-import { CatalogMap, SeoDescription } from './components'
+// NOTE (audit RT08): the hover map preview (`CatalogMap` + `SeoDescription`
+// below, commented out) used to be imported here together with `@turf/turf`
+// and `utils/map`, which put Mapbox GL and Turf into the first load of every
+// location page although nothing rendered them. If the preview is restored,
+// load `simplify` from '@turf/simplify' and the map through `next/dynamic`.
 
 const CatalogHeader = ({
   count,
@@ -46,40 +50,17 @@ const CatalogHeader = ({
   const {
     position: { bounds }
   } = useMapOptions()
-  const defaultCenter = getLngLatCenter(bounds || getDefaultBounds())
-
-  const [center, setCenter] = useState<LngLatLike | null>(defaultCenter)
-  const [coordinates, setCoordinates] = useState<Position[][] | null>(null)
+  // Same value `getLngLatCenter(bounds || getDefaultBounds())` produced,
+  // computed without constructing a mapboxgl.LngLatBounds.
+  const { tl, br } = getDefaultPolygonCorners()
+  const defaultCenter = getCenterPoint(
+    bounds ? toApiBounds(bounds) : cornersToApiBounds(tl, br)
+  )
 
   const current = [defaultLocation.state, area, city, hood].filter(Boolean).at(-1)
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const mapLink = getMapUrl({ center: defaultCenter, zoom: 10 }) // WARN: temporary zoom level, calculate a new value based on bounds
-
-  const handleLinkFocus = (item: ApiNeighborhood | ApiBoardCity) => {
-    if (!item.coordinates || !item.coordinates?.length) {
-      setCenter(item.location)
-    } else {
-      const line: Feature<MultiLineString> = {
-        type: 'Feature',
-        geometry: {
-          type: 'MultiLineString',
-          coordinates: item.coordinates!
-        },
-        properties: {}
-      }
-
-      const tolerance = 0.001 // Adjust the tolerance level to suit your needs
-      const highQuality = false // Set to true for high-quality simplification (slower)
-      const simplified = simplify(line, { tolerance, highQuality })
-      const simplifiedCoords = simplified.geometry.coordinates
-      setCoordinates(simplifiedCoords)
-    }
-  }
-
-  const handleLinkBlur = () => {
-    setCoordinates(null)
-    setCenter(null)
-  }
 
   return (
     <Box>

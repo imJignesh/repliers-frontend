@@ -1,6 +1,12 @@
 import { toRem } from 'utils/theme'
 
-import '@fontsource/poppins/latin.css'
+// Only the weights the theme and components use (400, 500, 600, 700/bold).
+// `@fontsource/poppins/latin.css` declared all nine weights in the
+// render-blocking CSS bundle (audit RT08).
+import '@fontsource/poppins/latin-400.css'
+import '@fontsource/poppins/latin-500.css'
+import '@fontsource/poppins/latin-600.css'
+import '@fontsource/poppins/latin-700.css'
 import { type TypographyOptions } from '@mui/material/styles/createTypography'
 
 const typography: TypographyOptions = {

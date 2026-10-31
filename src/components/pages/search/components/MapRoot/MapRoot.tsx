@@ -29,8 +29,14 @@ import useBreakpoints from 'hooks/useBreakpoints'
 import useIntersectionObserver from 'hooks/useIntersectionObserver'
 import { getDefaultBounds, getMapStyleUrl } from 'utils/map'
 import { addPolygon, removePolygon } from 'utils/map'
+import { type LngLatPoint } from 'utils/map-geometry'
 import { createMap } from 'utils/map-init'
 import { getSeoUrl } from 'utils/properties'
+
+// Mapbox GL stylesheet travels with the code that creates a map, instead of
+// the root layout, so pages without a map do not block rendering on it
+// (audit RT08, October 2026).
+import 'mapbox-gl/dist/mapbox-gl.css'
 
 import {
   GridContent,
@@ -51,7 +57,8 @@ import {
 
 type MapRootProps = {
   zoom: number
-  center: LngLat | null
+  // plain { lng, lat } from MapOptionsProvider (LngLatLike); see utils/map-geometry
+  center: LngLatPoint | null
   polygon?: Position[] | null
   onMove: (bounds: LngLatBounds, center: LngLat, zoom: number) => void
   onLoad: (bounds: LngLatBounds, center: LngLat, zoom: number) => void

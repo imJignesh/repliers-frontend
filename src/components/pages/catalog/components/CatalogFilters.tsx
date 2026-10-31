@@ -30,8 +30,11 @@ import {
   ListingsCounter,
   SortModesSelect
 } from '@shared/Filters'
-import { AdvancedFiltersDialog } from '@shared/Dialogs'
-import { AdvancedFiltersButton } from '@pages/search/components/MapFilters/components'
+// Direct imports instead of the Dialogs / MapFilters barrels: those re-export
+// PropertyDialog (the whole listing page) and the AI search widgets, which put
+// Mapbox GL, recharts and the date pickers into every location page (audit RT08).
+import AdvancedFiltersDialog from '@shared/Dialogs/AdvancedFiltersDialog'
+import AdvancedFiltersButton from '@pages/search/components/MapFilters/components/AdvancedFiltersButton'
 import routes from '@configs/routes'
 
 import { type ApiSortBy, type ApiBoardArea, type ApiNeighborhood } from 'services/API'

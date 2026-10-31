@@ -24,18 +24,19 @@ import {
   type MapboxAddress,
   type Property
 } from 'services/API'
-import MapService, { MapSearch } from 'services/Map'
+import MapSearch from 'services/Map/MapSearch'
+import { getSharedMap } from 'services/Map/sharedMap'
 import { useLocations } from 'providers/LocationsProvider'
-import { type MapPosition } from 'providers/MapOptionsProvider'
 import useClientSide from 'hooks/useClientSide'
 import {
   calcBoundsAtZoom,
-  getCoords,
+  getCoordsPoint,
   getMapUrl,
   getZoom,
-  toMapboxBounds,
-  toMapboxPoint
-} from 'utils/map'
+  type LngLatPoint,
+  toBoundsPair,
+  toLngLatPoint
+} from 'utils/map-geometry'
 import { getSeoUrl } from 'utils/properties'
 import { getCatalogUrl } from 'utils/urls'
 
@@ -71,12 +72,17 @@ const Autosuggestion = ({
   const paramsPosition = useMemo(
     () => ({
       zoom: getZoom(searchParams),
-      center: getCoords(searchParams)
+      center: getCoordsPoint(searchParams)
     }),
     []
   )
-  const [position, setPosition] =
-    useState<Omit<MapPosition, 'bounds'>>(paramsPosition)
+  // Plain { lng, lat } objects are accepted everywhere Mapbox takes
+  // `LngLatLike`, so the header search box no longer needs the mapbox-gl
+  // runtime (audit RT08): the chunk is only loaded by pages with a map.
+  const [position, setPosition] = useState<{
+    zoom: number
+    center: LngLatPoint | null
+  }>(paramsPosition)
 
   const { searchLocations } = useLocations()
   const [open, setOpen] = useState(false)
@@ -89,7 +95,9 @@ const Autosuggestion = ({
   const [locations, setLocations] = useState<AutosuggestionOption[]>([])
   const [buildings, setBuildings] = useState<any[]>([])
 
-  const { map } = MapService
+  // Direct registry read instead of `MapService.map`: MapService drags the
+  // Mapbox GL runtime into every page through its marker/popup extensions.
+  const map = getSharedMap()
 
   const handleButtonClick = () => {
     if (map && position.center) {
@@ -275,12 +283,12 @@ const Autosuggestion = ({
     }
 
     const zoom = defaultAddressZoom
-    const center = toMapboxPoint(point)
+    const center = toLngLatPoint(point)
     const query = getAddressLabel(option)
 
     if (map) {
       const apiBounds = calcBoundsAtZoom(map, point, zoom)
-      const mapboxBounds = toMapboxBounds(apiBounds)
+      const mapboxBounds = toBoundsPair(apiBounds)
 
       setSearchString(query)
       setPosition({ zoom, center }) // save last focused result

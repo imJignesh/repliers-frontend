@@ -13,7 +13,6 @@ import { APISearch } from 'services/API'
 import { fetchFeatureOptions } from 'utils/features'
 
 import 'styles/globals.css'
-import 'mapbox-gl/dist/mapbox-gl.css'
 
 import Providers from './_providers'
 

@@ -21,8 +21,8 @@ import SearchProvider from 'providers/SearchProvider'
 import { useState, useEffect } from 'react'
 import MapOptionsProvider from 'providers/MapOptionsProvider'
 
-import MapService from 'services/Map'
-import CatalogMap from './components/CatalogMap'
+import dynamic from 'next/dynamic'
+import { getSharedMap } from 'services/Map/sharedMap'
 import { SkeletonCard } from '@shared/Property'
 import { useSearch } from 'providers/SearchProvider/SearchProvider'
 
@@ -36,6 +36,13 @@ import {
   HoodsOfCity,
   PopularSearches
 } from './components'
+
+// The catalog map is hidden until the visitor turns it on (localStorage flag),
+// so its Mapbox GL dependency (~520 KB gzip) is loaded on demand rather than
+// with the first paint of every location page (audit RT08, October 2026).
+const CatalogMap = dynamic(() => import('./components/CatalogMap'), {
+  ssr: false
+})
 
 const CatalogPageContent = ({
   page,
@@ -295,18 +302,33 @@ const CatalogPageInner = ({
                         <PropertyCard
                           key={index}
                           property={property}
+                          imageLoading={index < 2 ? 'eager' : 'lazy'}
                           showViewOnMap={true}
                           onViewOnMap={() => {
-                            if (property.map.latitude && property.map.longitude) {
-                              MapService.map?.flyTo({
-                                center: [Number(property.map.longitude), Number(property.map.latitude)],
-                                zoom: 16,
+                            if (
+                              property.map.latitude &&
+                              property.map.longitude
+                            ) {
+                              getSharedMap()?.flyTo({
+                                center: [
+                                  Number(property.map.longitude),
+                                  Number(property.map.latitude)
+                                ],
+                                zoom: 16
                               })
-                              MapService.showPopup(property.mlsNumber)
+                              // MapService owns markers/popups and pulls in the Mapbox
+                              // runtime; load it on demand (the map is already on screen).
+                              import('services/Map').then(
+                                ({ default: MapService }) =>
+                                  MapService.showPopup(property.mlsNumber)
+                              )
 
                               // NEW: Scroll to map on mobile when location icon clicked
                               if (isMobile && mapRef.current) {
-                                mapRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                                mapRef.current.scrollIntoView({
+                                  behavior: 'smooth',
+                                  block: 'start'
+                                })
                               }
                             }
                           }}
@@ -394,7 +416,11 @@ const CatalogPageInner = ({
                     ))
                   ) : (
                     listings.map((property, index) => (
-                      <PropertyCard key={index} property={property} />
+                      <PropertyCard
+                        key={index}
+                        property={property}
+                        imageLoading={index < 2 ? 'eager' : 'lazy'}
+                      />
                     ))
                   )}
                 </Stack>

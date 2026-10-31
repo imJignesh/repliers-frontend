@@ -1,3 +1,8 @@
+// Mapbox GL stylesheet travels with the code that creates a map, instead of
+// the root layout, so pages without a map do not block rendering on it
+// (audit RT08, October 2026).
+import 'mapbox-gl/dist/mapbox-gl.css'
+
 import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import mapboxgl, { Map as MapboxMap, Marker as MapboxMarker } from 'mapbox-gl'

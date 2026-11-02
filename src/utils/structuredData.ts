@@ -9,6 +9,7 @@ import {
 import { deriveBuildingProperty } from './properties/building'
 import { formatShortAddress } from './properties/formatters'
 import { getSeoUrl } from './properties/seo'
+import { type LocationCrumb } from './locationCrumbs'
 import {
   active,
   getBathrooms,
@@ -17,8 +18,7 @@ import {
   scrubbed,
   sold
 } from './properties'
-import { notNA } from './strings'
-import { getCDNPath, sanitizeUrl } from './urls'
+import { getCDNPath } from './urls'
 
 export type BreadcrumbItem = { name: string; url: string }
 
@@ -44,42 +44,23 @@ export const getBreadcrumbJsonLd = (items: BreadcrumbItem[]) => ({
 
 // Use the canonical, cumulative location hierarchy. Search-result URLs are UI
 // state and must not be advertised as breadcrumb destinations to crawlers.
+/**
+ * Breadcrumb trail for a property page. Location levels come only from the
+ * API's curated chain (see getLocationCrumbs); address text is never turned
+ * into a URL (audit RT03).
+ */
 export const getPropertyBreadcrumbItems = (
-  address: Pick<PropertyAddress, 'area' | 'city' | 'neighborhood'>,
+  locationCrumbs: LocationCrumb[],
   host: string,
   current: BreadcrumbItem
-): BreadcrumbItem[] => {
-  const { area, city, neighborhood } = address
-  const items: BreadcrumbItem[] = [
-    { name: 'For sale', url: host + routes.listings }
-  ]
-  const path: string[] = []
-
-  if (notNA(area)) {
-    path.push(sanitizeUrl(area))
-    items.push({
-      name: area,
-      url: `${host}${routes.listings}/${path.join('/')}`
-    })
-  }
-  if (notNA(city)) {
-    path.push(sanitizeUrl(city))
-    items.push({
-      name: city,
-      url: `${host}${routes.listings}/${path.join('/')}`
-    })
-  }
-  if (notNA(neighborhood)) {
-    path.push(sanitizeUrl(neighborhood))
-    items.push({
-      name: neighborhood,
-      url: `${host}${routes.listings}/${path.join('/')}`
-    })
-  }
-
-  items.push(current)
-  return items
-}
+): BreadcrumbItem[] => [
+  { name: 'For sale', url: host + routes.listings },
+  ...locationCrumbs.map((crumb) => ({
+    name: crumb.name,
+    url: host + crumb.url
+  })),
+  current
+]
 
 const getPostalAddress = (
   address: Pick<PropertyAddress, 'city' | 'state' | 'zip' | 'country'>,

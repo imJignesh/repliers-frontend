@@ -35,7 +35,8 @@ const CatalogHeader = ({
   areas,
   cities,
   hoods,
-  location
+  location,
+  locationSlugs
 }: {
   count: number
   viewMode?: 'listings' | 'buildings'
@@ -46,6 +47,7 @@ const CatalogHeader = ({
   cities: ApiBoardCity[]
   hoods: any[]
   location?: ApiBoardCity | ApiNeighborhood
+  locationSlugs?: string[]
 }) => {
   const {
     position: { bounds }
@@ -95,7 +97,12 @@ const CatalogHeader = ({
 
 
           </Box>
-          <Breadcrumbs area={area} city={city} hood={hood} />
+          <Breadcrumbs
+            area={area}
+            city={city}
+            hood={hood}
+            locationSlugs={locationSlugs}
+          />
           {/* <SeoDescription
             count={count}
             area={area}

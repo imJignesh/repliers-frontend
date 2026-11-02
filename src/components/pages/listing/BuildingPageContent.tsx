@@ -6,7 +6,7 @@ import React, { useEffect, useMemo } from 'react'
 import { Box, Container, Stack, Typography, Breadcrumbs, Link, Paper } from '@mui/material'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import NextLink from 'next/link'
-import { getCatalogUrl } from '../../../utils/urls'
+import { getBuildingPageLocationCrumbs } from 'utils/locationCrumbs'
 
 import { DetailsContainer } from '@shared/Containers'
 import {
@@ -71,7 +71,7 @@ const BuildingPageContent = ({
   const { agentRole } = useUser()
   const features = useFeatures()
   const { property } = useProperty()
-  const { address } = property
+  const locationCrumbs = getBuildingPageLocationCrumbs(property)
 
   const propertyDetails = useMemo(
     () => config[property.class]?.(property) || config.default(property),
@@ -123,36 +123,18 @@ const BuildingPageContent = ({
                   }
                 }}
               >
-                {address.area && (
+                {/* RT03: only levels the API resolved through the location tree */}
+                {locationCrumbs.map((crumb, i) => (
                   <Link
+                    key={crumb.url}
                     component={NextLink}
-                    href={getCatalogUrl(address.area)}
-                    color="text.secondary"
+                    href={crumb.url}
+                    color={i === locationCrumbs.length - 1 ? 'text.primary' : 'text.secondary'}
                     underline="hover"
                   >
-                    {address.area}
+                    {crumb.name}
                   </Link>
-                )}
-                {address.city && (
-                  <Link
-                    component={NextLink}
-                    href={address.area ? getCatalogUrl(address.area, address.city) : getCatalogUrl(address.city)}
-                    color="text.secondary"
-                    underline="hover"
-                  >
-                    {address.city}
-                  </Link>
-                )}
-                {address.neighborhood && (
-                  <Link
-                    component={NextLink}
-                    href={address.area ? getCatalogUrl(address.area, address.city, address.neighborhood) : getCatalogUrl(address.city, address.neighborhood)}
-                    color="text.primary"
-                    underline="hover"
-                  >
-                    {address.neighborhood}
-                  </Link>
-                )}
+                ))}
               </Breadcrumbs>
 
 

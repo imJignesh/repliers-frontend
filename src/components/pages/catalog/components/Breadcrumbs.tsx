@@ -4,41 +4,29 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import { Stack, Typography } from '@mui/material'
 
 import defaultLocation from '@configs/location'
-import routes from '@configs/routes'
-
-import { sanitizeUrl } from 'utils/urls'
 
 import { useSearch } from 'providers/SearchProvider/SearchProvider'
+import { getCatalogHeaderCrumbs } from 'utils/locationCrumbs'
 
 const Breadcrumbs = ({
   area,
   city,
-  hood
+  hood,
+  locationSlugs
 }: {
   area?: string
   city?: string
   hood?: string
+  locationSlugs?: string[]
 }) => {
   const { setLoading } = useSearch()
-  const crumbs = [defaultLocation.state, area, city, hood].filter(
-    (crumb) => crumb
-  ) as string[]
+  const crumbs = getCatalogHeaderCrumbs({
+    state: defaultLocation.state,
+    names: [area, city, hood],
+    locationSlugs
+  })
 
   if (crumbs.length === 1) return null
-
-  const crumbsLinks = crumbs.map((crumb, index) => {
-    // crumbs[0] is the state; the rest are positional location path segments
-    // (area / city / hood). Build the cumulative URL up to this crumb.
-    const segments = crumbs.slice(1, index + 1).map((c) => sanitizeUrl(c!))
-    const url = `${routes.listings}${segments.length ? '/' + segments.join('/') : ''}`
-    return (
-      <Link key={crumb} href={url} onClick={() => setLoading(true)}>
-        <Typography fontSize={14} fontWeight={500}>
-          {crumb}
-        </Typography>
-      </Link>
-    )
-  })
 
   return (
     <Stack
@@ -47,7 +35,13 @@ const Breadcrumbs = ({
       alignItems="center"
       divider={<ChevronRightIcon sx={{ fontSize: 18 }} />}
     >
-      {crumbsLinks}
+      {crumbs.map((crumb) => (
+        <Link key={crumb.url} href={crumb.url} onClick={() => setLoading(true)}>
+          <Typography fontSize={14} fontWeight={500}>
+            {crumb.name}
+          </Typography>
+        </Link>
+      ))}
     </Stack>
   )
 }

@@ -109,3 +109,57 @@ export const getBuildingHref = (
   building?.slug && building.published !== false
     ? `${routes.building}/${building.slug}`
     : null
+
+/**
+ * Header breadcrumbs for a location page (audit RT03). Links come only from
+ * the URL segments the route validated against the location tree; a display
+ * name is reused only when it matches its segment, otherwise the segment is
+ * title-cased. Without validated segments the names are used positionally,
+ * as before.
+ */
+export const getCatalogHeaderCrumbs = ({
+  state,
+  names,
+  locationSlugs
+}: {
+  state: string
+  names: Array<string | undefined>
+  locationSlugs?: string[]
+}): LocationCrumb[] => {
+  const key = (v: string) => v.toLowerCase().replace(/[^a-z0-9]/g, '')
+  const known = names.filter((n): n is string => !!n)
+  const root = { name: state, url: routes.listings }
+
+  if (locationSlugs?.length) {
+    return [
+      root,
+      ...locationSlugs.map((slug, i) => ({
+        name:
+          known.find((n) => key(n) === key(slug)) ||
+          slug
+            .split('-')
+            .filter(Boolean)
+            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' '),
+        url: `${routes.listings}/${locationSlugs.slice(0, i + 1).join('/')}`
+      }))
+    ]
+  }
+
+  const slugify = (v: string) =>
+    v
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .trim()
+      .replace(/[\s-]+/g, '-')
+  return [
+    root,
+    ...known.map((name, i) => ({
+      name,
+      url: `${routes.listings}/${known
+        .slice(0, i + 1)
+        .map(slugify)
+        .join('/')}`
+    }))
+  ]
+}

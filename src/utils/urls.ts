@@ -1,9 +1,9 @@
 import queryString from 'query-string'
 
 import apiConfig from '@configs/api'
+import content from '@configs/content'
 import { stepNames } from '@configs/estimate'
 import routes from '@configs/routes'
-import content from '@configs/content'
 
 import { joinNonEmpty } from 'utils/strings'
 
@@ -178,4 +178,27 @@ export const getEstimateUrl = (params: EstimateUrlParams) => {
     const routeString = joinNonEmpty(routeArr, '/').replace(/\/+/g, '/')
     return `${routeString}${signature && agentRole ? `?s=${signature}` : ''}` // signature should always be added as query param
   }
+}
+
+/**
+ * Link for a neighbourhood button in the location filter bar (audit RT03).
+ * Only the API's own path is trusted; names are never slugified into a
+ * hierarchy. Returns null when no verified path is known.
+ */
+export const getNeighborhoodUrl = (
+  name: string,
+  hoods: Array<{ name: string; path?: string }> = [],
+  filters: string[] = []
+): string | null => {
+  const key = name.toLowerCase().replace(/[^a-z0-9]/g, '')
+  const match = hoods.find(
+    (h) => h.name.toLowerCase().replace(/[^a-z0-9]/g, '') === key && h.path
+  )
+  if (!match?.path) return null
+  const segments = match.path
+    .replace(/^\/+/, '')
+    .replace(/^locations\//, '')
+    .split('/')
+    .filter(Boolean)
+  return segments.length ? getCatalogUrl(...segments, filters) : null
 }

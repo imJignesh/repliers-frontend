@@ -42,7 +42,7 @@ import { type Filters } from 'services/Search'
 import { useSearch } from 'providers/SearchProvider'
 import useBreakpoints from 'hooks/useBreakpoints'
 import useClientSide from 'hooks/useClientSide'
-import { getCatalogUrl, sanitizeUrl } from 'utils/urls'
+import { getCatalogUrl, getNeighborhoodUrl, sanitizeUrl } from 'utils/urls'
 import { capitalize } from 'utils/strings'
 import location, { citymap } from 'configs/defaults/location'
 
@@ -328,20 +328,15 @@ const CatalogFilters = ({
 
 
 
-  const getSubLocationUrl = (locationName: string) => {
+  // RT03: inside a location, link only through the API's own path for the
+  // neighbourhood; guessing a hierarchy from names produced 404 links.
+  const getSubLocationUrl = (locationName: string): string | null => {
     const filters = createFiltersArray({})
-    if (area && city) {
-      return getCatalogUrl(area, city, locationName, filters)
-    } else if (city) {
-      // We are in a city, clicking a neighborhood (Level 2)
-      return getCatalogUrl(city, locationName, filters)
-    } else if (area) {
-      // We are in a region, clicking a city/hood (Level 1+)
-      return getCatalogUrl(area, locationName, filters)
-    } else {
-      // clicking a city from the main list
-      return getCatalogUrl(locationName, '', filters)
+    if (area || city) {
+      return getNeighborhoodUrl(locationName, hoods, filters)
     }
+    // clicking a top-level area from the main list
+    return getCatalogUrl(locationName, '', filters)
   }
 
   const getSubLocations = (region: string) => {
@@ -576,6 +571,7 @@ const CatalogFilters = ({
                 ) : (
                   <>
                     {!locationTree && getSubLocations(selectedRegion)
+                      .filter((locationName) => getSubLocationUrl(locationName) !== null)
                       .sort((a, b) => {
                         const isAActive = normalize(hood) === normalize(a) || normalize(city) === normalize(a)
                         const isBActive = normalize(hood) === normalize(b) || normalize(city) === normalize(b)
@@ -587,7 +583,7 @@ const CatalogFilters = ({
                         <Box key={locationName} sx={{ m: 0, display: 'inline-flex' }}>
                           <Button
                             component={Link}
-                            href={getSubLocationUrl(locationName)}
+                            href={getSubLocationUrl(locationName) as string}
                             onClick={() => setLoading(true)}
                             variant={normalize(hood) === normalize(locationName) || normalize(city) === normalize(locationName) ? 'contained' : 'outlined'}
                             sx={{

@@ -56,7 +56,8 @@ const CatalogPageContent = ({
   areas,
   hoods,
   cities,
-  location
+  location,
+  locationSlugs
 }: {
   listings: Property[]
   count: number
@@ -70,6 +71,8 @@ const CatalogPageContent = ({
   hoods: any[]  // ApiNeighborhood[] or nested city items with neighborhoods
   cities: ApiBoardCity[]
   location?: ApiBoardCity | ApiNeighborhood
+  /** Location URL segments the route validated against the location tree (RT03) */
+  locationSlugs?: string[]
 
   urlFilters: string[]
   searchFilters: Partial<Filters>
@@ -98,6 +101,7 @@ const CatalogPageContent = ({
         hoods={hoods}
         cities={cities}
         location={location}
+        locationSlugs={locationSlugs}
       />
     </SearchProvider>
   )
@@ -115,7 +119,8 @@ const CatalogPageInner = ({
   areas,
   hoods,
   cities,
-  location
+  location,
+  locationSlugs
 }: {
   listings: Property[]
   count: number
@@ -129,6 +134,8 @@ const CatalogPageInner = ({
   hoods: any[]  // ApiNeighborhood[] or nested city items with neighborhoods
   cities: ApiBoardCity[]
   location?: ApiBoardCity | ApiNeighborhood
+  /** Location URL segments the route validated against the location tree (RT03) */
+  locationSlugs?: string[]
 
   urlFilters: string[]
   searchFilters: Partial<Filters>
@@ -213,6 +220,7 @@ const CatalogPageInner = ({
               cities={cities}
               hoods={hoods}
               location={location}
+              locationSlugs={locationSlugs}
             />
         </Container>
 

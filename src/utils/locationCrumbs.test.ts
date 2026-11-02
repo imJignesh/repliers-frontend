@@ -3,6 +3,7 @@ import routes from '@configs/routes'
 import {
   getBuildingHref,
   getBuildingPageLocationCrumbs,
+  getCatalogHeaderCrumbs,
   getLocationCrumbs,
   getPropertyLocationCrumbs
 } from './locationCrumbs'
@@ -131,5 +132,46 @@ describe('location breadcrumbs (audit RT03)', () => {
     )
     expect(getBuildingHref({ slug: '' })).toBeNull()
     expect(getBuildingHref(null)).toBeNull()
+  })
+})
+
+describe('getCatalogHeaderCrumbs (RT03)', () => {
+  const L = routes.listings
+
+  it('links only through validated segments, even when names are misordered', () => {
+    // Junction area page: the route resolved names as Junction / Toronto / West End
+    const crumbs = getCatalogHeaderCrumbs({
+      state: 'Ontario',
+      names: ['Junction', 'Toronto', 'West End'],
+      locationSlugs: ['toronto', 'west-end', 'junction-area']
+    })
+    expect(crumbs).toEqual([
+      { name: 'Ontario', url: L },
+      { name: 'Toronto', url: `${L}/toronto` },
+      { name: 'West End', url: `${L}/toronto/west-end` },
+      { name: 'Junction Area', url: `${L}/toronto/west-end/junction-area` }
+    ])
+  })
+
+  it('never links a name-derived path such as /locations/junction', () => {
+    const urls = getCatalogHeaderCrumbs({
+      state: 'Ontario',
+      names: ['CFB Rockcliffe and', 'Ottawa', 'Ottawa City'],
+      locationSlugs: ['ottawa', 'ottawa-city', 'cfb-rockcliffe-and-area']
+    }).map((c) => c.url)
+    expect(urls).not.toContain(`${L}/cfb-rockcliffe-and`)
+    expect(urls.at(-1)).toBe(`${L}/ottawa/ottawa-city/cfb-rockcliffe-and-area`)
+  })
+
+  it('keeps the positional behaviour without validated segments', () => {
+    expect(
+      getCatalogHeaderCrumbs({
+        state: 'Ontario',
+        names: ['Toronto', undefined]
+      })
+    ).toEqual([
+      { name: 'Ontario', url: L },
+      { name: 'Toronto', url: `${L}/toronto` }
+    ])
   })
 })

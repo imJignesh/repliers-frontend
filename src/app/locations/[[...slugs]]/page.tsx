@@ -275,6 +275,7 @@ const LocationsCatalogPage = async (props: {
         hoods={hoods as any}
         cities={citiesList}
         location={currentLocation}
+        locationSlugs={rawLocationSlugs}
         urlFilters={filters}
         searchFilters={searchFilters}
       />

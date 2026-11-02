@@ -3,6 +3,7 @@ import apiConfig from '@configs/api'
 import {
   getCDNPath,
   getEstimateUrl,
+  getNeighborhoodUrl,
   getProtocolHost,
   getYoutubeVideoId
 } from './urls'
@@ -234,5 +235,33 @@ describe('useEstimateUrl utils', () => {
       })
       expect(url).toBe('/estimate')
     })
+  })
+})
+
+describe('getNeighborhoodUrl (RT03)', () => {
+  const hoods = [
+    { name: 'Kanata', path: 'ottawa/ottawa-city/kanata' },
+    {
+      name: 'CFB Rockcliffe and Area',
+      path: '/locations/ottawa/ottawa-city/cfb-rockcliffe-and-area'
+    },
+    { name: 'No Path' }
+  ]
+
+  it('links through the API path', () => {
+    expect(getNeighborhoodUrl('Kanata', hoods)).toMatch(
+      /\/ottawa\/ottawa-city\/kanata$/
+    )
+  })
+
+  it('accepts a path with a locations prefix and matches names loosely', () => {
+    expect(getNeighborhoodUrl('cfb rockcliffe and area', hoods)).toMatch(
+      /\/ottawa\/ottawa-city\/cfb-rockcliffe-and-area$/
+    )
+  })
+
+  it('never invents a hierarchy from a name', () => {
+    expect(getNeighborhoodUrl('No Path', hoods)).toBeNull()
+    expect(getNeighborhoodUrl('Barrhaven', hoods)).toBeNull()
   })
 })

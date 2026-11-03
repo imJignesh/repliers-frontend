@@ -13,15 +13,16 @@ import {
   type ApiBoardCity,
   APILocations
 } from 'services/API'
+import { toCardListing } from 'utils/properties/cardListing'
 import { getCDNPath } from 'utils/urls'
 
+import { fetchCatalogAreas, validateCatalogSlugs } from './_data'
 import {
   filter as isFilterSegment,
   parseUrlFilters,
   parseUrlParams
 } from './_parsers'
 import { fetchListings, fetchLocations } from './_requests'
-import { fetchCatalogAreas, validateCatalogSlugs } from './_data'
 import { generateCatalogMetadata } from './_ssg'
 import { extractCities, extractLocation, refineLocation } from './_utils'
 
@@ -263,11 +264,10 @@ const LocationsCatalogPage = async (props: {
     }
   }
 
-  // Listing cards render as skeletons until hydration, so the first card photo
-  // (the page's Largest Contentful Paint element, audit RT08) was only requested
-  // after the JS bundle ran. Preload it from the server HTML at the exact URL the
-  // first card paints with: before the auth cookie is read on the client, every
-  // card renders blurred, which uses images[0] at the 'small' CDN class.
+  // The first card photo is the page's Largest Contentful Paint element (audit
+  // RT08). Preload it from the server HTML at the exact URL the first card
+  // paints with: before the auth cookie is read on the client, every card
+  // renders blurred, which uses images[0] at the 'small' CDN class.
   // React hoists <link> into <head>. Buildings view does not show listing cards.
   const firstCardPhoto =
     searchParams.type !== 'building' && listings[0]?.images?.[0]
@@ -285,7 +285,7 @@ const LocationsCatalogPage = async (props: {
         />
       )}
       <CatalogPageContent
-        listings={listings}
+        listings={listings.map(toCardListing)}
         count={count}
         page={page}
         area={area}

@@ -200,8 +200,10 @@ const CatalogPageInner = ({
 
   // While a page (or hood) is loading we must show skeletons, never an empty-state
   // message. `locationTree` is fetched client-side after mount/navigation, so until
-  // it resolves the buildings view is still loading.
-  const listingsLoading = loading || !isReady
+  // it resolves the buildings view is still loading. Listings arrive with the
+  // server render, so they paint in the HTML (RT08: the first card photo is the
+  // mobile LCP image and must not wait for hydration).
+  const listingsLoading = loading
   const buildingsLoading = loading || !isReady || locationTree === null
 
   return (

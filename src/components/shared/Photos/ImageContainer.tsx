@@ -24,13 +24,16 @@ const ImageContainer = ({
   index,
   blurred = false,
   blurVariant = 'card',
-  loading = 'lazy'
+  loading = 'lazy',
+  priority = false
 }: {
   src?: string
   icon: ImagePlaceholderIconType
   score?: number
   index?: number
   loading?: 'lazy' | 'eager'
+  // fetchpriority=high; set only for the first card photo of a catalog grid
+  priority?: boolean
   // container size prop is different from image size prop
   size: 'small' | 'medium' | 'large'
   blurred?: boolean
@@ -58,6 +61,7 @@ const ImageContainer = ({
           unoptimized
           layout="fill"
           loading={loading}
+          {...(priority && { fetchPriority: 'high' as const })}
           objectFit="cover"
           onLoadingComplete={() => setLoaded(true)}
           src={imageSrc}

@@ -951,7 +951,7 @@ describe('audit R06 listing labels', () => {
         lastStatus: 'Pc',
         updatedOn: '2026-10-28T10:49:10.000Z'
       } as any)
-    ).toMatch(/^Price Change \(last updated .*2026\)$/)
+    ).toMatch(/^Price Change, updated .*2026$/)
   })
 
   it('shows occupancy and unpadded storeys', () => {

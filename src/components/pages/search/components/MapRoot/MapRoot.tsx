@@ -361,7 +361,10 @@ const MapRoot = ({ zoom, center, polygon, onMove, onLoad }: MapRootProps) => {
         <SaveSearchCanvas />
         {(mobile || tablet) && (
           <>
-            <OpenDrawerButton onClick={handleOpenDrawerClick} />
+            <OpenDrawerButton
+              open={showDrawer}
+              onClick={handleOpenDrawerClick}
+            />
             {loading && <MobileCircularProgress />}
           </>
         )}

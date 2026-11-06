@@ -87,50 +87,51 @@ const AppointmentForm = () => {
             console.warn('Bot detected via honeypot')
             return // Skip submission for bots
         }
+        if (loading) return // already submitting: never send twice
         setFormTouched(true)
         if (!formValid) return
         setLoading(true)
+        // Audit R09: one try/catch/finally around CAPTCHA, preparation and
+        // submission, so any failure shows an error and re-enables the form.
+        try {
+            const recaptcha_token = await executeRecaptcha('appointment_submission')
 
-        const recaptcha_token = await executeRecaptcha('appointment_submission')
+            const { first_name, last_name, email, phone, date, time, is_open } = values
+            const currentUrl = typeof window !== 'undefined' ? window.location.href : ''
 
-        const { first_name, last_name, email, phone, date, time, is_open } = values
-        const currentUrl = typeof window !== 'undefined' ? window.location.href : ''
+            const appointmentDate = is_open ? "I'm Open" : date.format('YYYY-MM-DD')
+            const appointmentTime = is_open ? "I'm Open" : time.format('HH:mm')
 
-        const appointmentDate = is_open ? "I'm Open" : date.format('YYYY-MM-DD')
-        const appointmentTime = is_open ? "I'm Open" : time.format('HH:mm')
 
-        APIContact.captureAppointment({
-            first_name,
-            last_name,
-            email,
-            phone: sanitizePhoneNumber(phone),
-            url: currentUrl,
-            mls_number: mlsNumber,
-            appointment_date: appointmentDate,
-            appointment_time: appointmentTime,
-            listing_price: listPrice,
-            price: listPrice,
-            listing_neighbourhood: address?.neighborhood,
-            listing_city: address?.city,
-            mls_municipality: address?.district || address?.city,
-            postal_code: address?.zip,
-            contact_source: joinNonEmpty([address?.streetNumber, address?.streetName]),
-            beds: property?.details?.numBedrooms,
-            baths: property?.details?.numBathrooms,
-            recaptcha_token
-        })
-            .then(() => {
-                Cookies.set('rauthenticated', 'true', { expires: 365 })
-                showSnackbar('Appointment booked successfully!', 'success')
-                router.refresh()
+            await APIContact.captureAppointment({
+                first_name,
+                last_name,
+                email,
+                phone: sanitizePhoneNumber(phone),
+                url: currentUrl,
+                mls_number: mlsNumber,
+                appointment_date: appointmentDate,
+                appointment_time: appointmentTime,
+                listing_price: listPrice,
+                price: listPrice,
+                listing_neighbourhood: address?.neighborhood,
+                listing_city: address?.city,
+                mls_municipality: address?.district || address?.city,
+                postal_code: address?.zip,
+                contact_source: joinNonEmpty([address?.streetNumber, address?.streetName]),
+                beds: property?.details?.numBedrooms,
+                baths: property?.details?.numBathrooms,
+                recaptcha_token
             })
-            .catch((e) => {
-                showSnackbar(extractErrorMessage(e), 'error')
-            })
-            .finally(() => {
-                setLoading(false)
-                setFormTouched(false)
-            })
+            Cookies.set('rauthenticated', 'true', { expires: 365 })
+            showSnackbar('Appointment booked successfully!', 'success')
+            router.refresh()
+        } catch (e) {
+            showSnackbar(extractErrorMessage(e), 'error')
+        } finally {
+            setLoading(false)
+            setFormTouched(false)
+        }
     }
 
     return (

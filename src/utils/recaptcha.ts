@@ -57,11 +57,38 @@ export async function executeRecaptcha(action: string): Promise<string> {
         return '';
     }
 
+    // Audit R09: execute() previously had no rejection handler and no deadline,
+    // so a failing or never-settling reCAPTCHA left the enquiry button spinning.
+    // The whole step now always settles: a token, or '' (the API then rejects
+    // the submission and the form shows its error and re-enables).
     return new Promise((resolve) => {
-        window.grecaptcha.ready(() => {
-            window.grecaptcha.execute(siteKey, { action }).then((token: string) => {
-                resolve(token);
+        let settled = false;
+        const finish = (token: string) => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            resolve(token);
+        };
+        const timer = setTimeout(() => {
+            console.warn('reCAPTCHA execute timed out');
+            finish('');
+        }, RECAPTCHA_EXECUTE_TIMEOUT_MS);
+
+        try {
+            window.grecaptcha.ready(() => {
+                Promise.resolve()
+                    .then(() => window.grecaptcha.execute(siteKey, { action }))
+                    .then((token: string) => finish(token || ''))
+                    .catch((error: unknown) => {
+                        console.warn('reCAPTCHA execute failed', error);
+                        finish('');
+                    });
             });
-        });
+        } catch (error) {
+            console.warn('reCAPTCHA ready failed', error);
+            finish('');
+        }
     });
 }
+
+export const RECAPTCHA_EXECUTE_TIMEOUT_MS = 8000;

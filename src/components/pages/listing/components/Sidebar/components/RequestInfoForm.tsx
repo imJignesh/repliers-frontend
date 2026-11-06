@@ -66,48 +66,49 @@ const RequestInfoForm = () => {
       console.warn('Bot detected via honeypot')
       return // Skip submission for bots
     }
+    if (loading) return // already submitting: never send twice
     setFormTouched(true)
     if (!formValid) return
     setLoading(true)
+    // Audit R09: one try/catch/finally around CAPTCHA, preparation and
+    // submission, so any failure shows an error and re-enables the form.
+    try {
+      const recaptcha_token = await executeRecaptcha('lead_submission')
 
-    const recaptcha_token = await executeRecaptcha('lead_submission')
+      const { first_name, last_name, email, phone, message } = values
 
-    const { first_name, last_name, email, phone, message } = values
+      // Auto capture details
+      const currentUrl = typeof window !== 'undefined' ? window.location.href : ''
 
-    // Auto capture details
-    const currentUrl = typeof window !== 'undefined' ? window.location.href : ''
 
-    APIContact.captureLead({
-      first_name,
-      last_name,
-      email,
-      phone: sanitizePhoneNumber(phone),
-      message,
-      mls_number: mlsNumber,
-      url: currentUrl,
-      listing_price: listPrice,
-      price: listPrice,
-      listing_neighbourhood: address?.neighborhood,
-      listing_city: address?.city,
-      mls_municipality: address?.district || address?.city,
-      postal_code: address?.zip,
-      contact_source: joinNonEmpty([address?.streetNumber, address?.streetName]),
-      beds: property?.details?.numBedrooms,
-      baths: property?.details?.numBathrooms,
-      recaptcha_token
-    })
-      .then(() => {
-        Cookies.set('rauthenticated', 'true', { expires: 365 })
-        showSnackbar('Thank you! Your request has been sent.', 'success')
-        router.refresh()
+      await APIContact.captureLead({
+        first_name,
+        last_name,
+        email,
+        phone: sanitizePhoneNumber(phone),
+        message,
+        mls_number: mlsNumber,
+        url: currentUrl,
+        listing_price: listPrice,
+        price: listPrice,
+        listing_neighbourhood: address?.neighborhood,
+        listing_city: address?.city,
+        mls_municipality: address?.district || address?.city,
+        postal_code: address?.zip,
+        contact_source: joinNonEmpty([address?.streetNumber, address?.streetName]),
+        beds: property?.details?.numBedrooms,
+        baths: property?.details?.numBathrooms,
+        recaptcha_token
       })
-      .catch((e) => {
-        showSnackbar(extractErrorMessage(e), 'error')
-      })
-      .finally(() => {
-        setLoading(false)
-        setFormTouched(false)
-      })
+      Cookies.set('rauthenticated', 'true', { expires: 365 })
+      showSnackbar('Thank you! Your request has been sent.', 'success')
+      router.refresh()
+    } catch (e) {
+      showSnackbar(extractErrorMessage(e), 'error')
+    } finally {
+      setLoading(false)
+      setFormTouched(false)
+    }
   }
 
   return (

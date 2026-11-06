@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 
 import utc from 'dayjs/plugin/utc'
 
+import propertyConfig, { type ListingLastStatus } from '@configs/properties'
 import { type Property } from 'services/API'
 import {
   formatDate,
@@ -284,12 +285,25 @@ export function mapperCondoFees(property: Property) {
     })
       .format(parseFloat(maintenance))
       .replace('.00', '')
-    return !rounded.includes('NaN')
+    if (rounded.includes('NaN')) return null
+    // Audit R06: every recurring amount states its period. The feed does not
+    // always supply one; say so rather than guess.
+    return condoFeeFrequency
       ? joinNonEmpty([rounded, condoFeeFrequency], ' / ')
-      : null
+      : `${rounded} (Billing Period Not Provided)`
   }
   return null
 }
 
 export const mapperBasementDevelopment = (property: Property) =>
   property.details.basement2 === 'W/O' ? 'Walk-Out' : property.details.basement2
+
+/**
+ * Audit R06: show MLS last-status codes (Sc, Pc, New, ...) as plain English.
+ * Unknown codes are shown as received rather than invented.
+ */
+export const mapperLastStatus = (property: Property) => {
+  const code = property?.lastStatus as ListingLastStatus | undefined
+  if (!code) return null
+  return propertyConfig.listingLastStatusMapping[code] || code
+}

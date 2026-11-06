@@ -34,8 +34,24 @@ const ListPropertyPrice = ({ property }: { property: Property }) => {
           <ScrubbedPrice value={listPrice} />
         </Typography>
         {showOriginal && (
-          <Typography variant="h4" sx={{ textDecoration: 'line-through' }}>
-            {formatEnglishPrice(originalPrice)}
+          // Audit R06: name the struck-through figure so it is not read as a
+          // second current asking price.
+          <Typography variant="h4" component="span">
+            <Typography
+              component="span"
+              variant="body2"
+              color="text.hint"
+              sx={{ mr: 0.5 }}
+            >
+              Original list price
+            </Typography>
+            <Typography
+              component="span"
+              variant="h4"
+              sx={{ textDecoration: 'line-through' }}
+            >
+              {formatEnglishPrice(originalPrice)}
+            </Typography>
           </Typography>
         )}
       </Stack>

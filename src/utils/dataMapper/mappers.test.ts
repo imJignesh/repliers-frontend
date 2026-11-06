@@ -36,7 +36,8 @@ import {
   mapperTotalParking,
   formatYearBuiltValue,
   isAgeRange,
-  mapperYearBuilt
+  mapperYearBuilt,
+  mapperLastStatus
 } from './mappers'
 
 describe('mapperCategory', () => {
@@ -919,5 +920,26 @@ describe('mapperCondoFees', () => {
 
     const result = mapperCondoFees(property)
     expect(result).toBeNull()
+  })
+})
+
+describe('audit R06 listing labels', () => {
+  it('states when the condo fee period is missing', () => {
+    const property = {
+      condominium: { fees: { maintenance: '713.76' } },
+      raw: {}
+    } as any
+    expect(mapperCondoFees(property)).toBe(
+      '$713.76 (Billing Period Not Provided)'
+    )
+  })
+
+  it('shows MLS status codes in plain English', () => {
+    expect(mapperLastStatus({ lastStatus: 'Pc' } as any)).toBe('Price Change')
+    expect(mapperLastStatus({ lastStatus: 'Sc' } as any)).toBe(
+      'Sold Conditionally'
+    )
+    expect(mapperLastStatus({ lastStatus: 'Xyz' } as any)).toBe('Xyz')
+    expect(mapperLastStatus({} as any)).toBeNull()
   })
 })

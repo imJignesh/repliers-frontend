@@ -5,6 +5,7 @@ import { Box, Stack, Typography } from '@mui/material'
 import routes from '@configs/routes'
 import { useAuthenticated } from 'hooks/useAuthenticated'
 import { useScrollToContact } from 'hooks/useScrollToContact'
+import { useDialogContext } from 'providers/DialogProvider'
 
 import { DetailsContainer } from '@shared/Containers'
 
@@ -40,6 +41,13 @@ const HistoryDetails = () => {
   const { property } = useProperty()
   const authenticated = useAuthenticated()
   const scrollToContact = useScrollToContact()
+  // Audit R08: existing-account links open the visitor sign-in dialog (the
+  // same one as the menu's Sign in); only "Sign up" goes to registration.
+  const { showDialog } = useDialogContext()
+  const openSignIn = (e: React.MouseEvent) => {
+    e.preventDefault()
+    showDialog('auth')
+  }
   const { mlsNumber, history = [] } = property
   const soldProperty = sold(property)
   const shouldShowActiveItem = soldProperty
@@ -54,7 +62,7 @@ const HistoryDetails = () => {
         {!authenticated && (
           <Box>
             <Typography variant="body2" color="text.secondary">
-              Require you to be <Link href="#" onClick={scrollToContact} style={{ fontWeight: 'bold', color: 'inherit' }}>signed in</Link> to access price history. <Link href="#" onClick={scrollToContact} style={{ fontWeight: 'bold', color: 'inherit' }}>Sign up</Link> to Request Price full history.
+              Require you to be <Link href="#history" onClick={openSignIn} style={{ fontWeight: 'bold', color: 'inherit' }}>signed in</Link> to access price history. <Link href="#" onClick={scrollToContact} style={{ fontWeight: 'bold', color: 'inherit' }}>Sign up</Link> to Request Price full history.
             </Typography>
           </Box>
         )}

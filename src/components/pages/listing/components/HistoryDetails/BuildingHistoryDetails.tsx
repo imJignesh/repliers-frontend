@@ -10,6 +10,7 @@ import { scrubbed, active as isActive } from 'utils/properties'
 import { HistoryItem } from '.'
 import { useAuthenticated } from 'hooks/useAuthenticated'
 import { useScrollToContact } from 'hooks/useScrollToContact'
+import { useDialogContext } from 'providers/DialogProvider'
 
 // Helper to convert Property to HistoryItemType
 const getListingData = (property: Property): HistoryItemType => ({
@@ -27,6 +28,13 @@ const getListingData = (property: Property): HistoryItemType => ({
 
 const BuildingHistoryDetails = ({ history = [] }: { history?: Property[] }) => {
     const scrollToContact = useScrollToContact()
+    // Audit R08: existing-account links open the visitor sign-in dialog (the
+    // same one as the menu's Sign in); only "Sign up" goes to registration.
+    const { showDialog } = useDialogContext()
+    const openSignIn = (e: React.MouseEvent) => {
+      e.preventDefault()
+      showDialog('auth')
+    }
     // Filter out scrubbed entries and count them
     const visibleHistory = history.filter(item => {
         const pType = item.details?.propertyType?.toLowerCase() || ''
@@ -80,7 +88,7 @@ const BuildingHistoryDetails = ({ history = [] }: { history?: Property[] }) => {
                 {!authenticated && (
                     <Alert severity="info" sx={{ mb: 4, borderRadius: 2, '& .MuiAlert-message': { width: '100%' } }}>
                         <Typography variant="body2">
-                            Real estate boards require you to be signed in to access price history. <Link href="#" onClick={scrollToContact} style={{ fontWeight: 'bold', color: 'inherit', textDecoration: 'underline' }}>Sign up</Link> or <Link href="#" onClick={scrollToContact} style={{ fontWeight: 'bold', color: 'inherit', textDecoration: 'underline' }}>Log in</Link>
+                            Real estate boards require you to be signed in to access price history. <Link href="#" onClick={scrollToContact} style={{ fontWeight: 'bold', color: 'inherit', textDecoration: 'underline' }}>Sign up</Link> or <Link href="#history" onClick={openSignIn} style={{ fontWeight: 'bold', color: 'inherit', textDecoration: 'underline' }}>Log in</Link>
                         </Typography>
                     </Alert>
                 )}

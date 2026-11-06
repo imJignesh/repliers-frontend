@@ -275,7 +275,9 @@ const Footer = () => {
                 fontSize: { xs: '12px', sm: '13px', md: '14px' }
               }}
             >
-              All rights reserved {new Date().getFullYear()} &copy; {siteName} by Precondo. <br />
+              All rights reserved {new Date().getFullYear()} &copy; {siteName}
+              {/* Audit: siteName is already "Precondo"; avoid "Precondo by Precondo". */}
+              {siteName?.trim().toLowerCase() === 'precondo' ? '' : ' by Precondo'}. <br />
             </Typography>
           </Stack>
         </Stack>

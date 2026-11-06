@@ -19,6 +19,7 @@ import { formatFullAddress } from 'utils/properties'
 import { sanitizePhoneNumber } from 'utils/properties/sanitizers'
 import { joinNonEmpty } from 'utils/strings'
 import { validateEmail, validatePhone } from 'utils/validators'
+import { RecaptchaNotice } from 'components/atoms'
 
 
 
@@ -179,6 +180,7 @@ const RequestInfoForm = () => {
         >
           REGISTER NOW
         </Button>
+        <RecaptchaNotice />
 
 
 

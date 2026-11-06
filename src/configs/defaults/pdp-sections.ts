@@ -28,7 +28,8 @@ import {
   mapperTaxesYear,
   mapperTotalBeds,
   mapperTotalParking,
-  mapperYearBuilt
+  mapperYearBuilt,
+  mapperLastStatus
 } from 'utils/dataMapper/mappers'
 import { toAffirmative, toSafeNumber } from 'utils/formatters'
 import { scrubbed } from 'utils/properties'
@@ -71,7 +72,7 @@ const sections = {
       },
       {
         items: [
-          { label: 'pdp.fields.status', path: 'lastStatus' },
+          { label: 'pdp.fields.status', fn: mapperLastStatus },
           {
             label: 'pdp.fields.daysOnMarket',
             fn: mapperDaysOnMarket

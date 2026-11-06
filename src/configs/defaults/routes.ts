@@ -54,7 +54,8 @@ const rawRoutes = {
 
   // static pages
   cookies: '/r/cookies-policy',
-  privacy: '/r/privacy-policy',
+  // Audit R02: the site-wide policy (also the footer link) is the only one.
+  privacy: 'https://precondo.ca/privacy-policy/',
   terms: '/r/terms-of-use',
   sitemap: '/r/sitemap',
   accessibility: '/r/accessibility-statement',

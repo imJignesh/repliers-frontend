@@ -1,21 +1,10 @@
-import React from 'react'
-import { type Metadata } from 'next'
+import { permanentRedirect } from 'next/navigation'
 
-import Markdown from '@content/privacy-policy'
-import { StaticPageTemplate } from '@templates'
+import routes from '@configs/routes'
 
-const title = 'Privacy Policy'
+// Audit R02 (Nov 2026): the resale app no longer has its own privacy page
+// (it was an unfinished draft). Old links go to the site-wide policy that
+// the footer already uses.
+const PrivacyPolicyPage = () => permanentRedirect(routes.privacy)
 
-export const metadata: Metadata = {
-  title
-}
-
-const AboutPage = () => {
-  return (
-    <StaticPageTemplate title={title}>
-      <Markdown />
-    </StaticPageTemplate>
-  )
-}
-
-export default AboutPage
+export default PrivacyPolicyPage

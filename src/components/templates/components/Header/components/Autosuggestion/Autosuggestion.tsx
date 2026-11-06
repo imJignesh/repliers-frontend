@@ -39,6 +39,7 @@ import {
 } from 'utils/map-geometry'
 import { getSeoUrl } from 'utils/properties'
 import { getCatalogUrl } from 'utils/urls'
+import { closestLocation } from 'utils/closestLocation'
 
 import OptionAddress from './components/OptionAddress'
 import OptionArea from './components/OptionArea'
@@ -55,6 +56,7 @@ import {
 } from './utils'
 
 const { minCharsToSuggest } = searchConfig
+
 const { defaultAddressZoom } = mapConfig
 
 const Autosuggestion = ({
@@ -94,6 +96,12 @@ const Autosuggestion = ({
   const [address, setAddress] = useState<MapboxAddress[]>([])
   const [locations, setLocations] = useState<AutosuggestionOption[]>([])
   const [buildings, setBuildings] = useState<any[]>([])
+  // Audit R07: distinguish "no match" and "request failed" from loading, and
+  // offer a close location when the query looks like a misspelling.
+  const [failed, setFailed] = useState(false)
+  const [suggestion, setSuggestion] = useState<AutosuggestionOption | null>(
+    null
+  )
 
   // Direct registry read instead of `MapService.map`: MapService drags the
   // Mapbox GL runtime into every page through its marker/popup extensions.
@@ -116,6 +124,8 @@ const Autosuggestion = ({
     setBuildings([])
     setLocations([])
     setAddress([])
+    setFailed(false)
+    setSuggestion(null)
     setLoading(query.length >= minCharsToSuggest)
 
     if (query.length < minCharsToSuggest) return
@@ -131,8 +141,18 @@ const Autosuggestion = ({
         setLocations(trieLocations)
         setBuildings(results.buildings || [])
         setListings(results.listings || [])
+        if (
+          !trieLocations.length &&
+          !results.buildings?.length &&
+          !results.listings?.length
+        ) {
+          setSuggestion(closestLocation(trieQuery, searchLocations))
+        }
       } catch (error) {
-        if (current) console.error('Failed to fetch autosuggestions:', error)
+        if (current) {
+          console.error('Failed to fetch autosuggestions:', error)
+          setFailed(true)
+        }
       } finally {
         if (current) setLoading(false)
       }
@@ -179,6 +199,33 @@ const Autosuggestion = ({
     })
   }
 
+  if (
+    !loading &&
+    !options.length &&
+    searchString.trim().length >= minCharsToSuggest
+  ) {
+    if (failed) {
+      options.push({
+        type: 'message',
+        text: 'Search is unavailable right now. Please try again in a moment.'
+      })
+    } else {
+      options.push({
+        type: 'message',
+        text: suggestion
+          ? `No matches for "${searchString.trim()}". Did you mean:`
+          : `No matches for "${searchString.trim()}". Try a city, neighbourhood, street address or MLS® number.`
+      })
+      if (suggestion) {
+        options.push({
+          type: 'city',
+          source: suggestion.source,
+          parent: suggestion.parent
+        })
+      }
+    }
+  }
+
   // Ensure absolute max 9 results just in case (e.g. if address has items)
   if (options.length > 9) {
     options.length = 9
@@ -194,6 +241,16 @@ const Autosuggestion = ({
     switch (option.type) {
       case 'loader':
         return <OptionLoader key="loader" />
+      case 'message':
+        return (
+          <li
+            key="message"
+            role="status"
+            style={{ padding: '12px 16px', fontSize: 14, color: '#555' }}
+          >
+            {option.text}
+          </li>
+        )
       case 'city':
       case 'neighborhood':
         return <OptionArea key={key} props={otherProps} option={option} />
@@ -214,7 +271,8 @@ const Autosuggestion = ({
       {...params}
       variant="filled"
       // placeholder={t('Search.autosuggestPlaceholder')}
-      placeholder={'Search by Address, Neighbourhood, MLS #, Schools'}
+      // School search is not supported, so it is no longer advertised (R07).
+      placeholder={'Search by Address, Neighbourhood, MLS #'}
       autoComplete="off"
       slotProps={{
         input: {
@@ -235,7 +293,7 @@ const Autosuggestion = ({
         htmlInput: {
           ...params.inputProps,
           autoComplete: 'off',
-          'aria-label': 'Search by address, neighbourhood, MLS number, or school'
+          'aria-label': 'Search by address, neighbourhood or MLS number'
         }
       }}
     />
@@ -394,13 +452,20 @@ const Autosuggestion = ({
             }
           }}
           getOptionLabel={getOptionLabel}
+          getOptionDisabled={(option: any) =>
+            option?.type === 'message' || option?.type === 'loader'
+          }
           renderInput={renderInputElement}
           renderOption={renderOptionElement}
         />
         {showButton && (
           <Button
             variant="contained"
-            aria-label={typeof buttonTitle === "string" && buttonTitle ? buttonTitle : "Search listings"}
+            aria-label={
+              typeof buttonTitle === 'string' && buttonTitle
+                ? buttonTitle
+                : 'Search listings'
+            }
             onClick={handleButtonClick}
             sx={{ minWidth: 56 }}
           >

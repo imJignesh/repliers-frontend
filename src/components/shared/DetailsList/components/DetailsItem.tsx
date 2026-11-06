@@ -36,7 +36,8 @@ const DetailsItem = ({
       <ListItem sx={{ flex: lengthyValue ? '0 0 100%' : '0 0 50%' }}>
         <Typography variant="body2" fontWeight={600}>
           <ScrubbedText replace={scrubbedValue}>
-            {capitalize(String(value))}
+            {/* Keep the metre unit lowercase ("3.05 × 4.39 m"); capitalize() would make it "M". */}
+            {capitalize(String(value)).replace(/(\d) M$/, '$1 m')}
           </ScrubbedText>
         </Typography>
       </ListItem>

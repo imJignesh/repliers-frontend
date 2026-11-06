@@ -310,7 +310,7 @@ export const mapperLastStatus = (property: Property) => {
   // price-change date, so use its last listing update and call it that.
   if (code === 'Pc' && property.updatedOn) {
     const date = formatDate(property.updatedOn, { utc: true })
-    if (date) return `${label} (last updated ${date})`
+    if (date) return `${label}, updated ${date}`
   }
   return label
 }

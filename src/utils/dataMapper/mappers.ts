@@ -305,5 +305,25 @@ export const mapperBasementDevelopment = (property: Property) =>
 export const mapperLastStatus = (property: Property) => {
   const code = property?.lastStatus as ListingLastStatus | undefined
   if (!code) return null
-  return propertyConfig.listingLastStatusMapping[code] || code
+  const label = propertyConfig.listingLastStatusMapping[code] || code
+  // Audit R06: say when the price changed. The feed has no separate
+  // price-change date, so use its last listing update and call it that.
+  if (code === 'Pc' && property.updatedOn) {
+    const date = formatDate(property.updatedOn, { utc: true })
+    if (date) return `${label} (last updated ${date})`
+  }
+  return label
+}
+
+/** Audit R06: occupancy / possession, e.g. "Flexible", "TBD", "Immediate". */
+export const mapperOccupancy = (property: Property) => {
+  const value = String(property?.occupancy ?? '').trim()
+  return value || null
+}
+
+/** The feed pads building storeys ("09"); show 9. */
+export const mapperStories = (property: Property) => {
+  const raw = String(property?.condominium?.stories ?? '').trim()
+  if (!raw) return null
+  return /^\d+$/.test(raw) ? String(Number(raw)) : raw
 }

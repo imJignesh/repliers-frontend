@@ -109,7 +109,7 @@ const BuildingInfo = () => {
           >
             <BuildingInfoItem
               icon={SquareFootIcon}
-              label="Unit Size Range"
+              label="Unit Sizes in This Building"
               value={sizeRangeVal}
             />
           </Box>

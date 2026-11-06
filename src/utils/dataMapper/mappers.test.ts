@@ -37,7 +37,9 @@ import {
   formatYearBuiltValue,
   isAgeRange,
   mapperYearBuilt,
-  mapperLastStatus
+  mapperLastStatus,
+  mapperOccupancy,
+  mapperStories
 } from './mappers'
 
 describe('mapperCategory', () => {
@@ -941,5 +943,22 @@ describe('audit R06 listing labels', () => {
     )
     expect(mapperLastStatus({ lastStatus: 'Xyz' } as any)).toBe('Xyz')
     expect(mapperLastStatus({} as any)).toBeNull()
+  })
+
+  it('dates a price change with the last listing update', () => {
+    expect(
+      mapperLastStatus({
+        lastStatus: 'Pc',
+        updatedOn: '2026-10-28T10:49:10.000Z'
+      } as any)
+    ).toMatch(/^Price Change \(last updated .*2026\)$/)
+  })
+
+  it('shows occupancy and unpadded storeys', () => {
+    expect(mapperOccupancy({ occupancy: 'Flexible' } as any)).toBe('Flexible')
+    expect(mapperOccupancy({ occupancy: ' ' } as any)).toBeNull()
+    expect(mapperStories({ condominium: { stories: '09' } } as any)).toBe('9')
+    expect(mapperStories({ condominium: { stories: '12A' } } as any)).toBe('12A')
+    expect(mapperStories({ condominium: {} } as any)).toBeNull()
   })
 })

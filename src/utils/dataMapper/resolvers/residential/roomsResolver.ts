@@ -2,6 +2,7 @@ import propsConfig from '@configs/properties'
 
 import { type ApiRooms, type Property } from 'services/API'
 import { formatImperialDistance } from 'utils/formatters'
+import { roomUnitSuffix } from 'utils/roomUnits'
 import { capitalize, joinNonEmpty } from 'utils/strings'
 
 import { type DetailsGroupType, type DetailsItemType } from '../../types'
@@ -95,6 +96,7 @@ const transformFloorsByOrderAndLabel = (
 const roomsResolver = (property: Property) => {
   const floors = transformRoomsByFloors(property)
   const formatedFloors = transformFloorsByOrderAndLabel(floors)
+  const unit = roomUnitSuffix(Object.values(property.rooms || {}))
 
   return filterEmptyGroups(
     formatedFloors.map(([floor, rooms]) => {
@@ -107,9 +109,12 @@ const roomsResolver = (property: Property) => {
             .map((v) => (v === 'null' ? propsConfig.scrubbedDataString : v))
             .map(formatImperialDistance)
 
+          const size = joinNonEmpty(roomNullsToScrubs, ' × ')
+          // Audit: sizes had no unit. Only plain numeric pairs get one.
+          const numeric = /^[\d.]+( × [\d.]+)?$/.test(String(size))
           return {
             label: transformRoomLabels(label),
-            value: joinNonEmpty(roomNullsToScrubs, ' × ')
+            value: size && numeric ? `${size}${unit}` : size
           } as DetailsItemType
         })
       } as DetailsGroupType

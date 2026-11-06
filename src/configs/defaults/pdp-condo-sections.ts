@@ -26,7 +26,9 @@ import {
   mapperTotalBeds,
   mapperTotalParking,
   mapperYearBuilt,
-  mapperLastStatus
+  mapperLastStatus,
+  mapperOccupancy,
+  mapperStories
 } from 'utils/dataMapper/mappers'
 import { toAffirmative, toSafeNumber } from 'utils/formatters'
 import { scrubbed } from 'utils/properties'
@@ -81,6 +83,7 @@ const condoSections = {
       {
         items: [
           { label: 'pdp.fields.status', fn: mapperLastStatus },
+          { label: 'pdp.fields.occupancy', fn: mapperOccupancy },
           {
             label: 'pdp.fields.daysOnMarket',
             fn: mapperDaysOnMarket
@@ -113,7 +116,7 @@ const condoSections = {
           },
           {
             label: 'pdp.fields.storiesBuild',
-            path: 'condominium.stories'
+            fn: mapperStories
           },
           {
             label: 'pdp.fields.levelsUnit',

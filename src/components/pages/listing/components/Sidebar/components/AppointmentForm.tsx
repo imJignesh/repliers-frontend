@@ -31,6 +31,7 @@ import { formatPhoneNumber, formatPhoneNumberAsYouType } from 'utils/formatters'
 import { sanitizePhoneNumber } from 'utils/properties/sanitizers'
 import { joinNonEmpty } from 'utils/strings'
 import { validateEmail, validatePhone } from 'utils/validators'
+import { RecaptchaNotice } from 'components/atoms'
 
 
 
@@ -258,6 +259,7 @@ const AppointmentForm = () => {
                     >
                         Book a Viewing
                     </Button>
+                    <RecaptchaNotice />
 
 
 

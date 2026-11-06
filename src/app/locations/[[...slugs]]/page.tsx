@@ -15,6 +15,7 @@ import {
 } from 'services/API'
 import { toCardListing } from 'utils/properties/cardListing'
 import { getCDNPath } from 'utils/urls'
+import { parseCatalogQuery } from 'utils/catalogQuery'
 
 import { fetchCatalogAreas, validateCatalogSlugs } from './_data'
 import {
@@ -46,6 +47,7 @@ export type Params = {
 export type SearchParams = {
   page?: number
   type?: string
+  [key: string]: string | string[] | number | undefined
 }
 
 type LocationsPageProps = {
@@ -188,7 +190,12 @@ const LocationsCatalogPage = async (props: {
     )
   }
 
-  const searchFilters = parseUrlFilters(filters)
+  // Audit R01: price, date and year-built choices travel in the query string
+  // (see utils/catalogQuery); path facets keep type, status, sort and rooms.
+  const searchFilters = {
+    ...parseUrlFilters(filters),
+    ...parseCatalogQuery(searchParams as Record<string, string | undefined>)
+  }
   const targetForNeighborhoods = city || area
   const [{ listings, count }, dynamicData] = await Promise.all([
     fetchListings({ area, city, hood, filters: searchFilters, page }),

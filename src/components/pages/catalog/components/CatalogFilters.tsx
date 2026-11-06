@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useEffect, useState, useRef } from 'react'
 import {
@@ -43,6 +43,7 @@ import { useSearch } from 'providers/SearchProvider'
 import useBreakpoints from 'hooks/useBreakpoints'
 import useClientSide from 'hooks/useClientSide'
 import { getCatalogUrl, getNeighborhoodUrl, sanitizeUrl } from 'utils/urls'
+import { buildCatalogQuery } from 'utils/catalogQuery'
 import { capitalize } from 'utils/strings'
 import location, { citymap } from 'configs/defaults/location'
 
@@ -277,8 +278,8 @@ const CatalogFilters = ({
 
     if (sort && sort !== 'createdOnDesc') urlFilters.push('sort-' + sort)
 
-    if (f.minPrice) urlFilters.push(`above-${f.minPrice}`)
-    if (f.maxPrice) urlFilters.push(`below-${f.maxPrice}`)
+    // Price is carried in the query string (utils/catalogQuery): price path
+    // facets are retired and redirect to the location hub (audit R01).
     if (f.minBeds) urlFilters.push(`${f.minBeds}-bed`)
     if (f.minBaths) urlFilters.push(`${f.minBaths}-bath`)
     if (f.minGarageSpaces) urlFilters.push(`${f.minGarageSpaces}-garage`)
@@ -287,35 +288,48 @@ const CatalogFilters = ({
     return urlFilters
   }
 
-  // Effect to sync SearchProvider state with URL
+  // Effect to sync SearchProvider state with URL.
+  // Audit R01: compare the URL the filters describe with the current URL,
+  // so every supported field (including price, dates and year built) starts a
+  // navigation, and an unchanged Apply/Reset settles instead of leaving the
+  // results in a loading state that no navigation would ever clear.
+  const currentSearch = useSearchParams()
+  const describeUrl = (f: Partial<Filters>) => {
+    const query = new URLSearchParams(buildCatalogQuery(f))
+    query.sort()
+    return {
+      path: getCatalogUrl(area, city, hood, createFiltersArray(f)),
+      query
+    }
+  }
+  // Navigate only when the visitor changes the filters. When the URL changes
+  // first (Back/Forward, a shared link), the provider syncs its filters from
+  // the new URL and this effect must not push the previous filters back.
+  const lastFilters = useRef(filters)
   useEffect(() => {
     if (!clientSide) return
+    if (lastFilters.current === filters) return
+    lastFilters.current = filters
 
-    const keys: (keyof Filters)[] = [
-      'listingType',
-      'listingStatus',
-      'sortBy',
-      'minPrice',
-      'maxPrice',
-      'minBeds',
-      'minBaths',
-      'minGarageSpaces',
-      'minParkingSpaces'
-    ]
-
-    const filtersChanged = keys.some((key) => {
-      const v1 = filters[key] || (key.startsWith('min') || key === 'maxPrice' ? 0 : undefined)
-      const v2 = searchFilters[key] || (key.startsWith('min') || key === 'maxPrice' ? 0 : undefined)
-      return v1 !== v2
-    })
-
-    if (filtersChanged) {
-      setLoading(true)
-      const urlFilters = createFiltersArray(filters)
-      const newUrl = getCatalogUrl(area, city, hood, urlFilters)
-      router.push(newUrl)
+    // `searchFilters` is what the server parsed from the current URL, so
+    // building both through the same function compares like with like.
+    const target = describeUrl(filters)
+    const current = describeUrl(searchFilters)
+    if (
+      target.path === current.path &&
+      target.query.toString() === current.query.toString()
+    ) {
+      setLoading(false)
+      return
     }
-  }, [filters, searchFilters, city, hood, area, clientSide, router])
+
+    // Keep the listings/buildings view; any filter change returns to page 1.
+    const viewType = currentSearch.get('type')
+    if (viewType) target.query.set('type', viewType)
+    setLoading(true)
+    const qs = target.query.toString()
+    router.push(qs ? `${target.path}?${qs}` : target.path)
+  }, [filters, clientSide])
 
   const listingLocation = area || 'Ontario'
 

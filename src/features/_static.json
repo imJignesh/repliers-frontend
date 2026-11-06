@@ -1,7 +1,7 @@
 {
   "aiChat": true,
   "aiImageSearch": true,
-  "aiQuality": true,
+  "aiQuality": false,
   "aiSearch": true,
   "aiShowOnGrid": false,
   "aiSpaces": true,

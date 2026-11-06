@@ -74,21 +74,31 @@ class APIBase {
 
   async fetchJSON<T>(request: string, options?: RequestInit): Promise<T> {
     let response: Response | null = null
-    // there are few queries that has custom abort signal
 
-    if (options?.signal) {
-      response = await this.fetchRaw(request, options)
-    } else {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(
-        () => controller.abort(),
-        apiConfig.apiRequestTimeout
-      ) // 10 seconds
+    // Every request gets the deadline. A caller's own signal (e.g. search
+    // cancelling an obsolete request) is composed with it rather than
+    // replacing it, so a cancellable request can no longer hang forever
+    // (audit R01).
+    const controller = new AbortController()
+    const timeoutId = setTimeout(
+      () => controller.abort(),
+      apiConfig.apiRequestTimeout
+    )
+    const callerSignal = options?.signal
+    const forwardAbort = () => controller.abort()
+    if (callerSignal) {
+      if (callerSignal.aborted) controller.abort()
+      else callerSignal.addEventListener('abort', forwardAbort, { once: true })
+    }
 
+    try {
       response = await this.fetchRaw(request, {
         ...options,
         signal: controller.signal
-      }).finally(() => clearTimeout(timeoutId))
+      })
+    } finally {
+      clearTimeout(timeoutId)
+      callerSignal?.removeEventListener('abort', forwardAbort)
     }
 
     // Always parse the JSON response

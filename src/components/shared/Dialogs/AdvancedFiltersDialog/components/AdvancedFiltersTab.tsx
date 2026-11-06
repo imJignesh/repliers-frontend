@@ -2,7 +2,13 @@ import { Box, Stack, Typography } from '@mui/material'
 
 import { type Filters } from 'services/Search'
 
-import { DaysSelect, FilterButtonGroup, PricePicker, PriceSelect, YearBuiltSelect } from '.'
+import {
+  DaysSelect,
+  FilterButtonGroup,
+  PricePicker,
+  PriceSelect,
+  YearBuiltSelect
+} from '.'
 
 const bedsItems: [string, number][] = [
   ['1+ beds', 1],
@@ -25,11 +31,13 @@ const parkingItems: [string, number][] = [
 const AdvancedFiltersTab = ({
   dialogState,
   priceBuckets,
-  onChange
+  onChange,
+  onYearError
 }: {
   dialogState: Filters
   priceBuckets: Record<string, number>
   onChange: (mutation: Partial<Filters>) => void
+  onYearError?: (error: string | null) => void
 }) => {
   // helpers
   const {
@@ -75,22 +83,19 @@ const AdvancedFiltersTab = ({
       />
       <Box>
         <Typography fontWeight={500}>Price</Typography>
-        {Object.keys(priceBuckets).length > 0 ? (
+        {/* Audit R01: the slider moves in fixed buckets, so exact amounts
+            (e.g. $650,000-$700,000) are always enterable in the boxes below. */}
+        {Object.keys(priceBuckets).length > 0 && (
           <PricePicker
             variant="bars"
             buckets={priceBuckets}
             values={[minPrice || 0, maxPrice || 0]}
             onChange={handlePriceChange}
           />
-        ) : (
-          <Box pt={2}>
-            <PriceSelect
-              min={minPrice}
-              max={maxPrice}
-              onChange={onChange}
-            />
-          </Box>
         )}
+        <Box pt={2}>
+          <PriceSelect min={minPrice} max={maxPrice} onChange={onChange} />
+        </Box>
       </Box>
       <DaysSelect
         status={listingStatus}
@@ -102,6 +107,7 @@ const AdvancedFiltersTab = ({
         from={minYearBuilt}
         to={maxYearBuilt}
         onChange={onChange}
+        onError={onYearError}
       />
     </Stack>
   )

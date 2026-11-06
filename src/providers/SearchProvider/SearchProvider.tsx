@@ -15,6 +15,7 @@ import { defaultFilters } from '@configs/filters'
 import { type ApiQueryResponse, type Property } from 'services/API'
 import SearchService, { type Filters } from 'services/Search'
 import { sortPropertyScoredImages } from 'utils/properties'
+import { sameFilters, stableKey } from 'utils/filterEquality'
 
 import { type SavedResponse, type SearchContextType } from './types'
 
@@ -32,10 +33,12 @@ const emptySavedResponse = {
 const SearchProvider = ({
   filters,
   polygon,
+  syncFilters = false,
   children
 }: {
   filters?: Filters
   polygon?: Position[]
+  syncFilters?: boolean
   children?: React.ReactNode
 }) => {
   const [loading, setLoading] = useState(false)
@@ -55,10 +58,30 @@ const SearchProvider = ({
     setLoading(true)
   }, [])
 
+  // Latest committed filters, so setFilters can compare synchronously.
+  const filtersRef = useRef(searchFilters)
+  filtersRef.current = searchFilters
+
   const setFilters = (next: React.SetStateAction<Filters>) => {
+    const value = typeof next === 'function' ? next(filtersRef.current) : next
+    // Audit R01: an unchanged Apply/Reset used to clear the results and wait
+    // for a navigation that never came, leaving blank cards.
+    if (sameFilters(value, filtersRef.current)) return
+    filtersRef.current = value
     clearResults()
-    updateFilters(next)
+    updateFilters(value)
   }
+
+  // Pages whose filters come from the URL (catalog) pass syncFilters so that
+  // Back/Forward and shared links replace the in-memory filters instead of
+  // the stale state pushing the old URL back.
+  const filtersKey = syncFilters ? stableKey(filters || {}) : ''
+  useEffect(() => {
+    if (!syncFilters || !filters) return
+    if (sameFilters(filters, filtersRef.current)) return
+    filtersRef.current = filters
+    updateFilters(filters)
+  }, [filtersKey])
 
   const [searchPolygon, setPolygon] = useState<Position[] | null>(
     polygon || null
@@ -86,7 +109,16 @@ const SearchProvider = ({
       return newFilters
     })
 
-  const resetFilters = () => setFilters(defaultFilters)
+  // Reset clears the search criteria but keeps the place being browsed.
+  const resetFilters = () =>
+    setFilters((prev) => ({
+      ...defaultFilters,
+      ...(prev.area !== undefined ? { area: prev.area } : {}),
+      ...(prev.city !== undefined ? { city: prev.city } : {}),
+      ...(prev.neighborhood !== undefined
+        ? { neighborhood: prev.neighborhood }
+        : {})
+    }))
 
   const clearPolygon = () => setPolygon(null)
 

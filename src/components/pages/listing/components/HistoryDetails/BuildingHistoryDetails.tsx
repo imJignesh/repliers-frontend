@@ -60,7 +60,7 @@ const BuildingHistoryDetails = ({ history = [] }: { history?: Property[] }) => {
     const authenticated = useAuthenticated()
 
     const groups = React.useMemo(() => {
-        const grouped: Record<string, { label: string, items: typeof sortedHistory, listed: number, sold: number }> = {}
+        const grouped: Record<string, { label: string, items: typeof sortedHistory, listed: number, sold: number, conditional: number }> = {}
 
         sortedHistory.forEach(item => {
             const d = new Date(item.timestamps?.listingUpdated || item.listDate)
@@ -70,12 +70,15 @@ const BuildingHistoryDetails = ({ history = [] }: { history?: Property[] }) => {
             const label = d.toLocaleString('default', { month: 'short', year: 'numeric' })
 
             if (!grouped[key]) {
-                grouped[key] = { label, items: [], listed: 0, sold: 0 }
+                grouped[key] = { label, items: [], listed: 0, sold: 0, conditional: 0 }
             }
 
             grouped[key].items.push(item)
             grouped[key].listed++
             if (item.lastStatus === 'Sld') grouped[key].sold++
+            // Audit: a "0 Sold" header above a "Sold Conditionally" row read as
+            // a contradiction; count conditional sales on their own.
+            if (item.lastStatus === 'Sc') grouped[key].conditional++
         })
 
         return Object.keys(grouped).sort().reverse().map(k => grouped[k])
@@ -96,6 +99,7 @@ const BuildingHistoryDetails = ({ history = [] }: { history?: Property[] }) => {
                     <Box key={group.label}>
                         <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2, ml: 0, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.95rem' }}>
                             {group.label} — {group.listed} Listed | {group.sold} Sold
+                            {group.conditional > 0 && ` | ${group.conditional} Sold Conditionally`}
                         </Typography>
                         <Stack spacing={2}>
                             {group.items.map((item, index) => {

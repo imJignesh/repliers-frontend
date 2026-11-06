@@ -30,7 +30,11 @@ const GridFilters = () => {
           <ListingsCounter filters={filters} count={count} />
         )}
       </Box>
-      <SortModesSelect filters={filters} onChange={handleSortChange} />
+      {/* Audit: the Map/Grid toggle (MapFiltersBar, absolute, 107px wide at
+          right 24-32px) covered the sort value at 1440px. Keep clear of it. */}
+      <Box sx={{ mr: { md: '128px', lg: '136px' } }}>
+        <SortModesSelect filters={filters} onChange={handleSortChange} />
+      </Box>
     </FiltersTransitionContainer>
   )
 }

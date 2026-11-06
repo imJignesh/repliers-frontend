@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import CloseIcon from '@mui/icons-material/Close'
 import {
   Box,
+  FormHelperText,
   IconButton,
   InputAdornment,
   Stack,
@@ -12,51 +13,52 @@ import {
 import SelectLabel from 'components/atoms/SelectLabel'
 
 import { type Filters } from 'services/Search'
-import { toSafeNumber } from 'utils/formatters'
 
-const minYear = 1500
-const maxYear = new Date().getFullYear()
-
-const parseYear = (value: string) => {
-  const parsed = toSafeNumber(value)
-  return parsed > minYear && parsed < maxYear ? parsed : ''
-}
+import { getYearBuiltError, parseYear, maxYear } from 'utils/yearBuilt'
 
 const YearBuiltSelect = ({
   from,
   to,
-  onChange
+  onChange,
+  onError
 }: {
   from?: number | null
   to?: number | null
   onChange: (filters: Filters) => void
+  onError?: (error: string | null) => void
 }) => {
-  const [fromYear, setFromYear] = useState(from || '')
-  const [toYear, setToYear] = useState(to || '')
+  const [fromYear, setFromYear] = useState<string>(from ? String(from) : '')
+  const [toYear, setToYear] = useState<string>(to ? String(to) : '')
 
-  const handleFromChange = (e: any) => {
-    const { value } = e.target
-    const parsed = parseYear(value)
-    setFromYear(value)
-    if (parsed) onChange({ minYearBuilt: parsed })
+  const error = getYearBuiltError(fromYear, toYear)
+
+  useEffect(() => {
+    onError?.(error)
+  }, [error])
+
+  const update = (nextFrom: string, nextTo: string) => {
+    setFromYear(nextFrom)
+    setToYear(nextTo)
+    const minYearBuilt = parseYear(nextFrom) ?? undefined
+    const maxYearBuilt = parseYear(nextTo) ?? undefined
+    // Keep the search in step with what is on screen: an invalid bound is
+    // removed rather than leaving the previous valid value applied.
+    onChange({ minYearBuilt, maxYearBuilt })
   }
 
-  const clearFromYear = () => {
-    setFromYear('')
-    onChange({ minYearBuilt: undefined })
-  }
+  const adornment = (value: string, clear: () => void, label: string) =>
+    value ? (
+      <IconButton sx={{ mr: -1 }} onClick={clear} aria-label={label}>
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    ) : null
 
-  const handleToChange = (e: any) => {
-    const { value } = e.target
-    const parsed = parseYear(value)
-    setToYear(value)
-    if (parsed) onChange({ maxYearBuilt: parsed })
-  }
-
-  const clearToYear = () => {
-    setToYear('')
-    onChange({ maxYearBuilt: undefined })
-  }
+  const inputProps = (label: string) => ({
+    inputMode: 'numeric' as const,
+    maxLength: 4,
+    'aria-label': label,
+    'aria-invalid': Boolean(error)
+  })
 
   return (
     <Box>
@@ -66,24 +68,19 @@ const YearBuiltSelect = ({
           sx={{ flex: 1 }}
           value={fromYear}
           placeholder="Any"
-          onChange={handleFromChange}
+          error={Boolean(error)}
+          onChange={(e) => update(e.target.value, toYear)}
           slotProps={{
             input: {
               startAdornment: (
                 <InputAdornment position="start">From</InputAdornment>
               ),
-              endAdornment: fromYear ? (
-                <IconButton sx={{ mr: -1 }} onClick={clearFromYear}>
-                  <CloseIcon fontSize="small" />
-                </IconButton>
-              ) : null,
-              inputProps: {
-                inputMode: 'numeric',
-                pattern: '[12][0-9]{3}',
-                maxLength: 4,
-                min: minYear,
-                max: maxYear
-              }
+              endAdornment: adornment(
+                fromYear,
+                () => update('', toYear),
+                'Clear year built from'
+              ),
+              inputProps: inputProps('Year built from')
             }
           }}
         />
@@ -92,28 +89,28 @@ const YearBuiltSelect = ({
           sx={{ flex: 1 }}
           placeholder={maxYear.toString()}
           value={toYear}
-          onChange={handleToChange}
+          error={Boolean(error)}
+          onChange={(e) => update(fromYear, e.target.value)}
           slotProps={{
             input: {
               startAdornment: (
                 <InputAdornment position="start">To</InputAdornment>
               ),
-              endAdornment: toYear ? (
-                <IconButton sx={{ mr: -1 }} onClick={clearToYear}>
-                  <CloseIcon fontSize="small" />
-                </IconButton>
-              ) : null,
-              inputProps: {
-                inputMode: 'numeric',
-                pattern: '[12][0-9]{3}',
-                maxLength: 4,
-                min: minYear,
-                max: maxYear
-              }
+              endAdornment: adornment(
+                toYear,
+                () => update(fromYear, ''),
+                'Clear year built to'
+              ),
+              inputProps: inputProps('Year built to')
             }
           }}
         />
       </Stack>
+      {error && (
+        <FormHelperText error role="alert">
+          {error}
+        </FormHelperText>
+      )}
     </Box>
   )
 }

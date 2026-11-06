@@ -6,17 +6,23 @@ import { pluralize } from 'utils/strings'
 
 const FilterActions = ({
   count,
+  invalid = false,
   onReset,
   onSubmit
 }: {
   count: number | null
+  invalid?: boolean
   onReset: () => void
   onSubmit: () => void
 }) => {
-  const showLabel = `Show ${pluralize(toSafeNumber(count), {
-    one: '1 listing',
-    many: '$ listings'
-  })}`
+  const showLabel = invalid
+    ? 'Fix highlighted filters'
+    : count !== null && count < 0
+      ? 'Show listings'
+      : `Show ${pluralize(toSafeNumber(count), {
+          one: '1 listing',
+          many: '$ listings'
+        })}`
 
   return (
     <DialogActions>
@@ -37,7 +43,8 @@ const FilterActions = ({
           size="large"
           variant="contained"
           onClick={onSubmit}
-          loading={count === null}
+          disabled={invalid}
+          loading={!invalid && count === null}
           sx={{ whiteSpace: 'nowrap', minWidth: 192, width: '50%', px: 1 }}
         >
           {showLabel}

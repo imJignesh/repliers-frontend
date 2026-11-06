@@ -79,6 +79,7 @@ const CatalogPageContent = ({
 }) => {
   return (
     <SearchProvider
+      syncFilters
       filters={
         {
           ...searchFilters,

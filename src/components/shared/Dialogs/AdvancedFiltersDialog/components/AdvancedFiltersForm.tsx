@@ -53,6 +53,13 @@ const AdvancedFiltersForm = ({
   }
 
   const [count, setCount] = useState<number | null>(null)
+  const [yearError, setYearError] = useState<string | null>(null)
+  const priceReversed = Boolean(
+    dialogState.minPrice &&
+    dialogState.maxPrice &&
+    dialogState.minPrice > dialogState.maxPrice
+  )
+  const invalid = Boolean(yearError) || priceReversed
 
   // Price Buckets
   const [priceBuckets, setPriceBuckets] = useState({})
@@ -64,18 +71,18 @@ const AdvancedFiltersForm = ({
   }
 
   const handleSubmit = () => {
+    if (invalid) return
     setFilters({ ...filters, ...dialogState })
     onSubmit?.()
   }
 
   const fetchBucketsCounts = async () => {
+    // Audit R01: never show the previous selection's count as if it matched
+    // the current one; the button shows a spinner until the new count arrives.
+    setCount(null)
     const { bounds } = position
     const hasLocation =
-      bounds ||
-      polygon ||
-      filters.city ||
-      filters.area ||
-      filters.neighborhood
+      bounds || polygon || filters.city || filters.area || filters.neighborhood
 
     // remove price filters from the request
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -89,18 +96,23 @@ const AdvancedFiltersForm = ({
 
     try {
       if (hasLocation) {
-        const response = await SearchService.fetch({
-          ...requestFilters,
-          ...dialogState,
-          aggregates: 'listPrice',
-          ...mapParams
-        }, { cancelGroup: 'filters' })
+        const response = await SearchService.fetch(
+          {
+            ...requestFilters,
+            ...dialogState,
+            aggregates: 'listPrice',
+            ...mapParams
+          },
+          { cancelGroup: 'filters' }
+        )
 
         if (response) {
           const { aggregates: { listPrice } = {} } = response
           if (listPrice) {
             const priceBuckets = mergeBuckets(
-              filters.listingStatus === 'rent' ? listPrice.lease : listPrice.sale
+              filters.listingStatus === 'rent'
+                ? listPrice.lease
+                : listPrice.sale
             )
             setPriceBuckets(priceBuckets)
           } else {
@@ -111,15 +123,24 @@ const AdvancedFiltersForm = ({
         setPriceBuckets({})
       }
 
-      const response2 = await SearchService.fetch({
-        ...filters,
-        ...dialogState,
-        ...(hasLocation ? mapParams : {})
-      }, { cancelGroup: 'filters' })
+      if (invalid) {
+        setCount(0)
+        return
+      }
+      const response2 = await SearchService.fetch(
+        {
+          ...filters,
+          ...dialogState,
+          ...(hasLocation ? mapParams : {})
+        },
+        { cancelGroup: 'filters' }
+      )
       if (response2) setCount(response2.count)
     } catch (error) {
       if (error !== 'disabled' && (error as any)?.name !== 'AbortError') {
         console.error('[AdvancedFiltersForm] fetchBucketsCounts error:', error)
+        // Count unknown: let the visitor apply anyway rather than spin forever.
+        setCount(-1)
       }
     }
   }
@@ -157,6 +178,7 @@ const AdvancedFiltersForm = ({
               dialogState={dialogState}
               priceBuckets={priceBuckets}
               onChange={handleDialogStateChange}
+              onYearError={setYearError}
             />
           )}
 
@@ -171,6 +193,7 @@ const AdvancedFiltersForm = ({
 
       <FilterActions
         count={count}
+        invalid={invalid}
         onReset={handleReset}
         onSubmit={handleSubmit}
       />

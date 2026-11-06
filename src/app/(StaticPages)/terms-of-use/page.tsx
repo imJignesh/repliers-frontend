@@ -1,23 +1,10 @@
-import React from 'react'
-import { type Metadata } from 'next'
+import { permanentRedirect } from 'next/navigation'
 
-import Markdown from '@content/terms-of-use'
-import { StaticPageTemplate } from '@templates'
+import routes from '@configs/routes'
 
-const title = 'Terms of Use'
+// Audit R02 (Nov 2026): the resale app no longer has its own terms page
+// (it was an unfinished draft). Old links go to the site-wide Terms of
+// Service that the footer already uses.
+const TermsOfUsePage = () => permanentRedirect(routes.terms)
 
-export const metadata: Metadata = {
-  title
-}
-
-// TODO: Make this page customizable per Config
-
-const AboutPage = () => {
-  return (
-    <StaticPageTemplate title={title}>
-      <Markdown />
-    </StaticPageTemplate>
-  )
-}
-
-export default AboutPage
+export default TermsOfUsePage

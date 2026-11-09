@@ -1,4 +1,4 @@
-import { cleanManagement, getBuildingSizeRange } from './buildingFacts'
+import { cleanManagement, getBuildingScale, getBuildingSizeRange } from './buildingFacts'
 
 describe('building facts (audit RT02)', () => {
   it('does not present build years or scale as management', () => {
@@ -38,5 +38,16 @@ describe('building facts (audit RT02)', () => {
       getBuildingSizeRange({ size_range: null, price_sqft: '-' })
     ).toBeNull()
     expect(getBuildingSizeRange(null)).toBeNull()
+  })
+})
+
+describe('getBuildingScale (audit R03)', () => {
+  it('holds back a scale with more floors than units', () => {
+    expect(getBuildingScale('Floors: 122 | Total Units: 7')).toBeNull()
+  })
+  it('keeps plausible or partial scales', () => {
+    expect(getBuildingScale('Floors: 24 | Total Units: 314')).toBe('Floors: 24 | Total Units: 314')
+    expect(getBuildingScale('Floors: 7')).toBe('Floors: 7')
+    expect(getBuildingScale('')).toBeNull()
   })
 })

@@ -117,6 +117,11 @@ describe('building unit totals (audit RT07)', () => {
       })
     ).toBe(1204)
   })
+  it('ignores a self-contradicting Building Scale (audit R03)', () => {
+    expect(
+      getBuildingUnitTotal({ floors_units: 'Floors: 122 | Total Units: 7' })
+    ).toBeNull()
+  })
   it('returns null rather than guessing when no total is recorded', () => {
     expect(getBuildingUnitTotal(null)).toBeNull()
     expect(getBuildingUnitTotal({})).toBeNull()

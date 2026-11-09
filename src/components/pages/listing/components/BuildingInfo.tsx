@@ -9,7 +9,10 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import { Box, Stack, Typography } from '@mui/material'
 
 import { useProperty } from 'providers/PropertyProvider'
-import { getBuildingSizeRange } from 'utils/properties/buildingFacts'
+import {
+  getBuildingScale,
+  getBuildingSizeRange
+} from 'utils/properties/buildingFacts'
 import { scrubbed } from 'utils/properties'
 
 const BuildingInfoItem = ({
@@ -79,12 +82,14 @@ const BuildingInfo = () => {
   // RT02: the stored "price_sqft" is a unit size range, not a price.
   const sizeRangeVal = getBuildingSizeRange(building)
   const avgPriceSqftVal = getSqftValue(building.avg_price_sqft)
+  // Audit R03: hide a Building Scale that contradicts itself (122 floors, 7 units).
+  const buildingScale = getBuildingScale(building.floors_units)
 
   const hasData =
     sizeRangeVal !== null ||
     avgPriceSqftVal !== null ||
     (building.built_year_ext && !scrubbed(building.built_year_ext)) ||
-    (building.floors_units && !scrubbed(building.floors_units))
+    (buildingScale && !scrubbed(buildingScale))
 
   if (!hasData) return null
 
@@ -158,7 +163,7 @@ const BuildingInfo = () => {
           <BuildingInfoItem
             icon={ApartmentIcon}
             label="Building Scale"
-            value={building.floors_units}
+            value={buildingScale}
           />
         </Box>
       </Box>

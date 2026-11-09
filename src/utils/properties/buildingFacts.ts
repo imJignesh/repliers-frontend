@@ -41,3 +41,23 @@ export const getBuildingSizeRange = (
   building?: BuildingFacts | null
 ): string | null =>
   asSizeRange(building?.size_range) ?? asSizeRange(building?.price_sqft)
+
+/**
+ * Audit R03 (4 and 6 Nov 2026): 875 Queen East's sheet row reads
+ * "Floors: 122 | Total Units: 7" while its description says 7 storeys and
+ * 118 units. A building cannot have more floors than units, so such a summary
+ * contradicts itself and is held back (not shown, not used in structured
+ * data) until the building sheet is corrected.
+ */
+export const getBuildingScale = (value?: string | null): string | null => {
+  const text = String(value ?? '').trim()
+  if (!text) return null
+  const read = (re: RegExp) => {
+    const m = re.exec(text)
+    return m ? Number(m[1].replace(/,/g, '')) : null
+  }
+  const floors = read(/floors?\s*:\s*([\d,]+)/i)
+  const units = read(/total\s*units\s*:\s*([\d,]+)/i)
+  if (floors !== null && units !== null && units > 0 && floors > units) return null
+  return text
+}

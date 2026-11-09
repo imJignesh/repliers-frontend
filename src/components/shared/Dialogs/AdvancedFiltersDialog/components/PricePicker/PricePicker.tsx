@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { Box, CircularProgress, Slider, Stack, Typography } from '@mui/material'
 
@@ -32,6 +32,7 @@ const PricePicker = ({
 
   const [pickerMin, setPickerMin] = useState(0)
   const [pickerMax, setPickerMax] = useState(lastIndex)
+  const latest = useRef<[number, number]>([0, lastIndex])
 
   const min = 0
   const max = lastIndex
@@ -77,6 +78,7 @@ const PricePicker = ({
       positionMin = positionMax - minRange
     }
 
+    latest.current = [positionMin, positionMax]
     if (positionMin === pickerMin && positionMax === pickerMax) return
 
     setPickerMin(positionMin)
@@ -84,20 +86,28 @@ const PricePicker = ({
   }
 
   const handleChangeCommitted = () => {
-    const minPrice = parseFloat(bucketKeys[pickerMin])
+    // Audit R01 (6 Nov 2026 retest): keyboard keys (Home/End/arrows) fire
+    // onChange and onChangeCommitted in the same event, before the state above
+    // re-renders. Reading pickerMin/pickerMax here committed the old position,
+    // so the thumb snapped back. Use the position onChange just computed.
+    const [committedMin, committedMax] = latest.current
+    const minPrice = parseFloat(bucketKeys[committedMin])
     // return 0 if max price thumb reaches the end
     const maxPrice =
-      pickerMax === lastIndex ? 0 : parseFloat(bucketKeys[pickerMax])
+      committedMax === lastIndex ? 0 : parseFloat(bucketKeys[committedMax])
 
     onChange?.([minPrice, maxPrice])
   }
 
   useEffect(() => {
     const [minValue, maxValue] = values
-    setPickerMin(getBucketIndex(toSafeNumber(minValue), bucketKeys))
-    setPickerMax(
-      !maxValue ? lastIndex : getBucketIndex(toSafeNumber(maxValue), bucketKeys)
-    )
+    const nextMin = getBucketIndex(toSafeNumber(minValue), bucketKeys)
+    const nextMax = !maxValue
+      ? lastIndex
+      : getBucketIndex(toSafeNumber(maxValue), bucketKeys)
+    latest.current = [nextMin, nextMax]
+    setPickerMin(nextMin)
+    setPickerMax(nextMax)
   }, [values, buckets])
 
   if (!bucketKeys.length)

@@ -7,6 +7,7 @@ import defaultLocation from '@configs/location'
 
 import { useSearch } from 'providers/SearchProvider/SearchProvider'
 import { getCatalogHeaderCrumbs } from 'utils/locationCrumbs'
+import useKeepCatalogFilters from 'hooks/useKeepCatalogFilters'
 
 const Breadcrumbs = ({
   area,
@@ -20,6 +21,8 @@ const Breadcrumbs = ({
   locationSlugs?: string[]
 }) => {
   const { setLoading } = useSearch()
+  // Audit R01: breadcrumbs keep the visitor's current filters.
+  const keepFilters = useKeepCatalogFilters()
   const crumbs = getCatalogHeaderCrumbs({
     state: defaultLocation.state,
     names: [area, city, hood],
@@ -36,7 +39,7 @@ const Breadcrumbs = ({
       divider={<ChevronRightIcon sx={{ fontSize: 18 }} />}
     >
       {crumbs.map((crumb) => (
-        <Link key={crumb.url} href={crumb.url} onClick={() => setLoading(true)}>
+        <Link key={crumb.url} href={keepFilters(crumb.url) as string} onClick={() => setLoading(true)}>
           <Typography fontSize={14} fontWeight={500}>
             {crumb.name}
           </Typography>

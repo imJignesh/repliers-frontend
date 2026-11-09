@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { type ApiNeighborhood } from 'services/API'
 import { capitalize } from 'utils/strings'
 import { getCatalogUrl } from 'utils/urls'
+import useKeepCatalogFilters from 'hooks/useKeepCatalogFilters'
 
 import { GroupTemplate } from '.'
 
@@ -20,6 +21,8 @@ const HoodsOfCity = ({
   city: string
   isArea?: boolean
 }) => {
+  // Audit R01: neighbourhood links keep the visitor's current filters.
+  const keepFilters = useKeepCatalogFilters()
   if (!city || !hoods.length) return null
 
   const hasNested = isArea && hoods.some((h) => h.neighborhoods && h.neighborhoods.length > 0)
@@ -40,7 +43,7 @@ const HoodsOfCity = ({
                 sx={{ fontSize: '1.1rem', fontWeight: 700, mb: 1.5 }}
               >
                 <Link
-                  href={getCatalogUrl(cityHood.name)}
+                  href={keepFilters(getCatalogUrl(cityHood.name)) as string}
                   style={{ textDecoration: 'none', color: 'inherit' }}
                 >
                   {capitalize(cityHood.name)}
@@ -71,7 +74,7 @@ const HoodsOfCity = ({
                       }}
                     >
                       <Link
-                        href={getCatalogUrl(cityHood.name, hood.name)}
+                        href={keepFilters(getCatalogUrl(cityHood.name, hood.name)) as string}
                         style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center' }}
                       >
                         {hood.name.replaceAll('/', ' / ')}

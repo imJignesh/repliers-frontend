@@ -46,6 +46,7 @@ import { getCatalogUrl, getNeighborhoodUrl, sanitizeUrl } from 'utils/urls'
 import { buildCatalogQuery } from 'utils/catalogQuery'
 import { capitalize } from 'utils/strings'
 import location, { citymap } from 'configs/defaults/location'
+import useKeepCatalogFilters from 'hooks/useKeepCatalogFilters'
 
 const statusItems: Array<[ListingStatus, string]> = [
   ['active', 'For Sale'],
@@ -294,6 +295,8 @@ const CatalogFilters = ({
   // navigation, and an unchanged Apply/Reset settles instead of leaving the
   // results in a loading state that no navigation would ever clear.
   const currentSearch = useSearchParams()
+  // Audit R01: location links keep the visitor's current filters.
+  const keepFilters = useKeepCatalogFilters()
   const describeUrl = (f: Partial<Filters>) => {
     const query = new URLSearchParams(buildCatalogQuery(f))
     query.sort()
@@ -345,7 +348,8 @@ const CatalogFilters = ({
   // RT03: inside a location, link only through the API's own path for the
   // neighbourhood; guessing a hierarchy from names produced 404 links.
   const getSubLocationUrl = (locationName: string): string | null => {
-    const filters = createFiltersArray({})
+    // Bare location; keepFilters() adds the visitor's current filters.
+    const filters: string[] = []
     if (area || city) {
       return getNeighborhoodUrl(locationName, hoods, filters)
     }
@@ -531,7 +535,7 @@ const CatalogFilters = ({
               <Button
                 key={region}
                 component={Link}
-                href={getCatalogUrl(region, '', createFiltersArray({}))}
+                href={keepFilters(getCatalogUrl(region)) as string}
                 onClick={() => setLoading(true)}
                 variant="outlined"
                 sx={{
@@ -597,7 +601,7 @@ const CatalogFilters = ({
                         <Box key={locationName} sx={{ m: 0, display: 'inline-flex' }}>
                           <Button
                             component={Link}
-                            href={getSubLocationUrl(locationName) as string}
+                            href={keepFilters(getSubLocationUrl(locationName)) as string}
                             onClick={() => setLoading(true)}
                             variant={normalize(hood) === normalize(locationName) || normalize(city) === normalize(locationName) ? 'contained' : 'outlined'}
                             sx={{
@@ -647,7 +651,7 @@ const CatalogFilters = ({
                               >
                                 <Button
                                   component={Link}
-                                  href={`${routes.listings}/${locationTree.slug}/${group.slug}`}
+                                  href={keepFilters(`${routes.listings}/${locationTree.slug}/${group.slug}`) as string}
                                   onClick={() => setLoading(true)}
                                   sx={{
                                     textTransform: 'none',
@@ -771,7 +775,7 @@ const CatalogFilters = ({
                           clickable
                           onClick={() => {
                             setLoading(true)
-                            const url = `${routes.listings}/${locationTree.slug}/${activeGroup.slug}/${child.slug}`
+                            const url = keepFilters(`${routes.listings}/${locationTree.slug}/${activeGroup.slug}/${child.slug}`) as string
                             router.push(url)
                           }}
                           sx={{

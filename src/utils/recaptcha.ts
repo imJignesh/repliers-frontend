@@ -12,26 +12,51 @@ declare global {
 function loadRecaptchaScript(siteKey: string): Promise<void> {
     if (window.grecaptcha) return Promise.resolve();
 
+    // Audit R09 (6 Nov 2026 retest): only the existing-script branch had a
+    // deadline. A newly added script whose load/error never fired left the
+    // enquiry button pending forever. Both branches now share one deadline and
+    // settle exactly once, clearing their timers and listeners.
     return new Promise((resolve, reject) => {
-        // Check if script tag already exists (queued but not yet executed)
+        let settled = false;
+        let interval: ReturnType<typeof setInterval> | undefined;
+        let script: HTMLScriptElement | null = null;
+
+        const cleanup = () => {
+            clearTimeout(deadline);
+            if (interval) clearInterval(interval);
+            if (script) {
+                script.removeEventListener('load', onLoad);
+                script.removeEventListener('error', onError);
+            }
+        };
+        const settle = (error?: Error) => {
+            if (settled) return;
+            settled = true;
+            cleanup();
+            if (error) reject(error);
+            else resolve();
+        };
+        const onLoad = () => settle();
+        const onError = () => settle(new Error('Failed to load reCAPTCHA'));
+        const deadline = setTimeout(
+            () => settle(new Error('reCAPTCHA load timeout')),
+            RECAPTCHA_LOAD_TIMEOUT_MS
+        );
+
+        // Script tag exists (queued but not yet executed): poll for readiness.
         if (document.querySelector(`script[src*="recaptcha/api.js"]`)) {
-            // Script tag exists but hasn't finished — poll for readiness
-            const interval = setInterval(() => {
-                if (window.grecaptcha) {
-                    clearInterval(interval);
-                    resolve();
-                }
+            interval = setInterval(() => {
+                if (window.grecaptcha) settle();
             }, 100);
-            setTimeout(() => { clearInterval(interval); reject(new Error('reCAPTCHA load timeout')); }, 10000);
             return;
         }
 
-        const script = document.createElement('script');
+        script = document.createElement('script');
         script.src = `https://www.google.com/recaptcha/api.js?render=${siteKey}`;
         script.async = true;
         script.defer = true;
-        script.onload = () => resolve();
-        script.onerror = () => reject(new Error('Failed to load reCAPTCHA'));
+        script.addEventListener('load', onLoad);
+        script.addEventListener('error', onError);
         document.body.appendChild(script);
     });
 }
@@ -92,3 +117,4 @@ export async function executeRecaptcha(action: string): Promise<string> {
 }
 
 export const RECAPTCHA_EXECUTE_TIMEOUT_MS = 8000;
+export const RECAPTCHA_LOAD_TIMEOUT_MS = 10000;

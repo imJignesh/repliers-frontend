@@ -1,3 +1,4 @@
+import { getBuildingScale } from 'utils/properties/buildingFacts'
 import routes from '@configs/routes'
 
 import {
@@ -135,8 +136,9 @@ export const getBuildingUnitTotal = (
   if (!building) return null
   const explicit = Number(building.total_units)
   if (Number.isInteger(explicit) && explicit > 0) return explicit
+  // Audit R03: a self-contradicting Building Scale is not a verified total.
   const match = /total\s*units\s*:\s*([\d,]+)/i.exec(
-    building.floors_units || ''
+    getBuildingScale(building.floors_units) || ''
   )
   if (!match) return null
   const parsed = Number(match[1].replace(/,/g, ''))

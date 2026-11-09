@@ -13,6 +13,7 @@ import {
   FullAddressInfo,
   ImageInsights,
   ListedPropertyPrice,
+  ListingNotices,
   ListPropertyPrice,
   PropertyIcons,
   ShowcaseCards,
@@ -44,6 +45,7 @@ const HomeHeaderInfo = () => {
         }}
       >
         <Stack spacing={2}>
+          <ListingNotices property={property} />
           <Stack
             spacing={2}
             direction="row"

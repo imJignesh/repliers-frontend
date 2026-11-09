@@ -349,6 +349,10 @@ export interface Property {
   listPrice: string
   daysOnMarket: string
   occupancy: string
+  /** Audit R04: set on an older record of a unit that has been relisted. */
+  supersededBy?: { mlsNumber: string; listPrice?: string | number; listDate?: string }
+  /** Audit R03: facts held back because the record contradicts itself. */
+  factWarnings?: { bedrooms?: string }
   listDate: string
   updatedOn: string
   lastStatus: ListingLastStatus

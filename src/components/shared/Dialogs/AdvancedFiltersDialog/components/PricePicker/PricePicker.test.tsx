@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 import React, { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 
@@ -54,4 +55,32 @@ it('keeps the announced value in step with the selected price range', () => {
   expect(max.value).toBe('4')
   expect(min.getAttribute('aria-valuetext')).toBe('Minimum price $200K')
   expect(max.getAttribute('aria-valuetext')).toBe('Maximum price $400K+')
+})
+
+// Audit R01 (6 Nov 2026 retest): Home/ArrowLeft on the maximum thumb left it
+// at the top because the commit read the pre-keypress position.
+it('commits the keyboard position of the maximum thumb', () => {
+  const onChange = jest.fn()
+  act(() =>
+    root.render(
+      <PricePicker
+        buckets={buckets}
+        values={[0, 0]}
+        variant="bars"
+        minRange={1}
+        onChange={onChange}
+      />
+    )
+  )
+  const [, max] = thumbs()
+  act(() => {
+    max.focus()
+    max.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }))
+  })
+  expect(onChange).toHaveBeenLastCalledWith([0, 300000])
+
+  act(() => {
+    max.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }))
+  })
+  expect(onChange).toHaveBeenLastCalledWith([0, 100000])
 })

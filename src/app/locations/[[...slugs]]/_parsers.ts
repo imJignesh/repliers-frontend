@@ -253,3 +253,39 @@ export const parseUrlFilters = (filters: string[]) => {
     listingType: parseListingType(filters)
   }
 }
+/**
+ * Audit R01 (6 Nov 2026 retest): retired price facets (/condos-below-600000)
+ * used to redirect to the bare location, so saved budget links lost their
+ * budget. They now redirect to the same search with the price in the query
+ * string, which is how the catalog carries price today. Other facets (beds,
+ * sort) stay in the path; existing query values win, except page.
+ */
+export const legacyPriceRedirect = (
+  listingsRoute: string,
+  locationSlugs: string[],
+  filters: string[],
+  query: Record<string, string | string[] | number | undefined> = {}
+): string | null => {
+  const isPrice = (f: string) => f.startsWith('above-') || f.startsWith('below-')
+  if (!filters.some(isPrice)) return null
+
+  const { minPrice, maxPrice } = parseUrlFilters(filters.filter(isPrice))
+  const rest = filters.filter((f) => !isPrice(f))
+
+  const params = new URLSearchParams()
+  Object.entries(query).forEach(([key, value]) => {
+    if (key === 'page' || value === undefined) return
+    ;(Array.isArray(value) ? value : [value]).forEach((v) =>
+      params.append(key, String(v))
+    )
+  })
+  if (minPrice && !params.has('minPrice')) params.set('minPrice', String(minPrice))
+  if (maxPrice && !params.has('maxPrice')) params.set('maxPrice', String(maxPrice))
+
+  const path =
+    listingsRoute +
+    (locationSlugs.length ? `/${locationSlugs.join('/')}` : '') +
+    (rest.length ? `/${rest.join('-')}` : '')
+  const q = params.toString()
+  return q ? `${path}?${q}` : path
+}

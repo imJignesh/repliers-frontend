@@ -25,6 +25,7 @@ import dynamic from 'next/dynamic'
 import { getSharedMap } from 'services/Map/sharedMap'
 import { SkeletonCard } from '@shared/Property'
 import { useSearch } from 'providers/SearchProvider/SearchProvider'
+import { hasNarrowingFilters } from 'utils/catalogQuery'
 
 import {
   Breadcrumbs,
@@ -141,7 +142,11 @@ const CatalogPageInner = ({
   urlFilters: string[]
   searchFilters: Partial<Filters>
 }) => {
-  const { loading, setLoading } = useSearch()
+  const { loading, setLoading, resetFilters } = useSearch()
+  // Audit R01: an empty filtered search offers Reset instead of a 404.
+  const onResetEmpty = hasNarrowingFilters(searchFilters as any)
+    ? resetFilters
+    : undefined
   const [showMap, setShowMap] = useState(false)
   // View mode is driven by the URL: ?type=building → buildings, otherwise listings.
   // This makes pagination unambiguous — removing &type=building paginates listings.
@@ -349,7 +354,7 @@ const CatalogPageInner = ({
                     )}
                   </Stack>
                 ) : (
-                  <EmptyCatalogListings />
+                  <EmptyCatalogListings onReset={onResetEmpty} />
                 )
               ) : (
                 <Stack
@@ -438,7 +443,7 @@ const CatalogPageInner = ({
                   )}
                 </Stack>
               ) : (
-                <EmptyCatalogListings />
+                <EmptyCatalogListings onReset={onResetEmpty} />
               )
             ) : (
               <Stack

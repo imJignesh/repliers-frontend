@@ -20,6 +20,7 @@ import { parseCatalogQuery } from 'utils/catalogQuery'
 import { fetchCatalogAreas, validateCatalogSlugs } from './_data'
 import {
   filter as isFilterSegment,
+  legacyPriceRedirect,
   parseUrlFilters,
   parseUrlParams
 } from './_parsers'
@@ -93,21 +94,16 @@ const LocationsCatalogPage = async (props: {
   } = parseUrlParams(slugs)
 
   // Price facets were never linked or included in the sitemap and duplicate
-  // their parent location's search intent. Retire every legacy above/below
-  // price URL with a permanent redirect to the clean location hub.
-  if (
-    filters.some(
-      (filter) => filter.startsWith('above-') || filter.startsWith('below-')
-    )
-  ) {
-    const locationSlugs = (slugs ?? []).filter(
-      (segment) => !isFilterSegment(segment)
-    )
-    permanentRedirect(
-      routes.listings +
-        (locationSlugs.length ? `/${locationSlugs.join('/')}` : '')
-    )
-  }
+  // their parent location's search intent, so they stay retired. Audit R01:
+  // redirect them to the same search with the price in the query string
+  // instead of the bare hub, so old saved budget links keep the budget.
+  const priceRedirect = legacyPriceRedirect(
+    routes.listings,
+    (slugs ?? []).filter((segment) => !isFilterSegment(segment)),
+    filters,
+    searchParams
+  )
+  if (priceRedirect) permanentRedirect(priceRedirect)
 
   // ─── Slug validation ────────────────────────────────────────────────────────
   // Extract the raw URL segments that are location slugs (not filters / listing
@@ -210,16 +206,11 @@ const LocationsCatalogPage = async (props: {
   if (page > 1 && !listings.length && searchParams.type !== 'building')
     notFound()
 
-  // An empty *generated facet* has no indexable result and must 404 rather than
-  // render an empty catalog at 200 (e.g. .../alderwood/condos-above-500k).
-  //
-  // This deliberately only fires when the URL carries filter segments. A bare
-  // location hub with zero active listings stays 200: those are legitimate,
-  // linked pages whose inventory comes and goes, and 404ing them would drop
-  // real locations out of the index every time a neighbourhood emptied out.
-  if (!listings.length && filters.length && searchParams.type !== 'building') {
-    notFound()
-  }
+  // Audit R01 (6 Nov 2026 retest): a valid search with no matches used to
+  // 404, which dropped the visitor's filters and left Back stuck on the error
+  // page. It now renders the empty state (HTTP 200) with filters and a Reset
+  // button; generateCatalogMetadata marks it noindex so empty facets still
+  // stay out of search engines. Unknown locations still 404 above.
 
   const byCount = (a: any, b: any) => b.activeCount - a.activeCount
 

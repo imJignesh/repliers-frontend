@@ -5,6 +5,7 @@ import routes from '@configs/routes'
 
 import { type ApiBoardArea, type ApiBoardCity } from 'services/API'
 import { formatEnglishPrice } from 'utils/formatters'
+import { parseCatalogQuery } from 'utils/catalogQuery'
 import { sanitizeUrl } from 'utils/urls'
 
 import { filter as isFilterSegment, parseUrlFilters, parseUrlParams } from './_parsers'
@@ -86,11 +87,16 @@ export const generateCatalogMetadata = async ({
   // Refine location
   const { area, city, hood } = refineLocation(finalAreas, urlArea, urlCity, urlHood, unknowns)
 
+  const queryFilters = parseCatalogQuery(
+    searchParams as Record<string, string | undefined>
+  )
+  const hasSearchFilters =
+    filters.length > 0 || Object.keys(queryFilters).length > 0
   const { count, listPrice, listings } = await fetchListings({
     area,
     city,
     hood,
-    filters: parseUrlFilters(filters),
+    filters: { ...parseUrlFilters(filters), ...queryFilters },
     page
   })
 
@@ -175,8 +181,10 @@ export const generateCatalogMetadata = async ({
     openGraph: {
       url: host + routes.listings + (slugs?.length ? '/' + slugs.join('/') : '')
     },
+    // Audit R01: empty filtered searches render for visitors (HTTP 200) but
+    // are kept out of the index, as the former 404 did.
     robots: {
-      index: true,
+      index: !(hasSearchFilters && !Number(count)),
       follow: true
     }
   }

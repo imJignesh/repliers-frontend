@@ -97,3 +97,16 @@ export const buildCatalogQuery = (filters: Partial<Filters>) => {
   })
   return params.toString()
 }
+
+/**
+ * Audit R01: true when the visitor narrowed the search beyond the catalog's
+ * defaults (active condos, newest first), e.g. beds, baths, price or dates.
+ */
+export const hasNarrowingFilters = (filters: Record<string, unknown> | null | undefined) =>
+  Object.entries(filters || {}).some(([key, value]) => {
+    if (value === undefined || value === null || value === '') return false
+    if (key === 'sortBy') return false
+    if (key === 'listingStatus') return value !== 'active'
+    if (key === 'listingType') return value !== 'condo'
+    return true
+  })

@@ -47,6 +47,7 @@ import { buildCatalogQuery } from 'utils/catalogQuery'
 import { capitalize } from 'utils/strings'
 import location, { citymap } from 'configs/defaults/location'
 import useKeepCatalogFilters from 'hooks/useKeepCatalogFilters'
+import { locationCount } from 'utils/locationCount'
 
 const statusItems: Array<[ListingStatus, string]> = [
   ['active', 'For Sale'],
@@ -58,6 +59,7 @@ const normalize = (str?: string) => str ? str.toLowerCase().replace(/[^a-z0-9]/g
 
 // Helper to return accurate counts
 const formatCount = (n: number) => String(n)
+
 
 const CatalogFilters = ({
   count,
@@ -295,6 +297,12 @@ const CatalogFilters = ({
   // navigation, and an unchanged Apply/Reset settles instead of leaving the
   // results in a loading state that no navigation would ever clear.
   const currentSearch = useSearchParams()
+  const isHoodActive = (child: { name?: string; slug?: string }) =>
+    normalize(hood) === normalize(child.name) ||
+    normalize(hood) === normalize(child.slug) ||
+    normalize(city) === normalize(child.name) ||
+    normalize(city) === normalize(child.slug)
+
   // Audit R01: location links keep the visitor's current filters.
   const keepFilters = useKeepCatalogFilters()
   const describeUrl = (f: Partial<Filters>) => {
@@ -629,7 +637,7 @@ const CatalogFilters = ({
                     {/* New Hierarchical Groups View */}
                     {locationTree && locationTree.children && (
                       <>
-                        {locationTree.children.filter((group: any) => group.listing_count > 0 || group.building_count > 0).map((group: any) => {
+                        {locationTree.children.filter((group: any) => locationCount(group, viewMode) > 0 || group.id === activeGroupId).map((group: any) => {
                           const isActive = activeGroupId === group.id
                           return (
                             <Box key={group.id} sx={{ m: 0, display: 'inline-flex' }}>
@@ -685,7 +693,7 @@ const CatalogFilters = ({
                                       color: isActive ? 'inherit' : 'text.secondary'
                                     }}
                                   >
-                                    {formatCount(group.listing_count > 0 ? group.listing_count : group.building_count)}
+                                    {formatCount(locationCount(group, viewMode))}
                                   </Box>
                                 </Button>
                                 <Box
@@ -747,8 +755,8 @@ const CatalogFilters = ({
               if (activeGroup && activeGroup.children && activeGroup.children.length > 0) {
                 return (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, p: 1, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 2 }}>
-                    {activeGroup.children.filter((child: any) => child.listing_count > 0 || child.building_count > 0).map((child: any) => {
-                      const isChildActive = normalize(hood) === normalize(child.name) || normalize(hood) === normalize(child.slug) || normalize(city) === normalize(child.name) || normalize(city) === normalize(child.slug)
+                    {activeGroup.children.filter((child: any) => locationCount(child, viewMode) > 0 || isHoodActive(child)).map((child: any) => {
+                      const isChildActive = isHoodActive(child)
                       return (
                         <Chip
                           key={child.id}
@@ -768,7 +776,7 @@ const CatalogFilters = ({
                                   color: isChildActive ? 'inherit' : 'text.secondary'
                                 }}
                               >
-                                {formatCount(child.listing_count > 0 ? child.listing_count : child.building_count)}
+                                {formatCount(locationCount(child, viewMode))}
                               </Box>
                             </Stack>
                           }

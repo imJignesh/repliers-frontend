@@ -188,6 +188,39 @@ const CatalogFilters = ({
   // Audit follow-up: the Buildings tab ignored the search filters.
   const buildingsQuery = useMemo(() => buildingFilterQuery(searchFilters), [searchFilters])
 
+  // The building list request for the current place, page and filters.
+  const buildingsListUrl = (page: number, query: string): string | null => {
+    if (!selectedRegion) return null
+    const precondoUrl = process.env.NEXT_PUBLIC_PRECONDO_URL || 'https://app.precondo.ca'
+    const slug = sanitizeUrl(selectedRegion)
+    const localityName = hood || city
+    const localitySlug = localityName ? sanitizeUrl(localityName) : slug
+    // Only add locality if it's different from the area/region name to ensure we get all child buildings
+    let url = localityName && normalize(localityName) !== normalize(selectedRegion)
+      ? `${precondoUrl}/api/buildings/area/${slug}/locality/${localitySlug}`
+      : `${precondoUrl}/api/buildings/area/${slug}`
+    // Buildings are paginated server-side; the visitor's filters keep only
+    // buildings with a matching listing.
+    url += `?page=${page}`
+    if (query) url += `&${query}`
+    return url
+  }
+
+  // Filter drawer in the Buildings view: "Show N buildings" for the draft filters.
+  const countBuildings = async (draft: Partial<Filters>): Promise<number> => {
+    const url = buildingsListUrl(1, buildingFilterQuery(draft))
+    if (!url) return -1
+    try {
+      const response = await fetch(url)
+      if (!response.ok) return response.status === 422 ? 0 : -1
+      const data = await response.json()
+      const total = Number(data?.total)
+      return Number.isFinite(total) ? total : -1
+    } catch {
+      return -1
+    }
+  }
+
   useEffect(() => {
     if (selectedRegion) {
       const slug = sanitizeUrl(selectedRegion)
@@ -209,15 +242,7 @@ const CatalogFilters = ({
 
       const precondoUrl = process.env.NEXT_PUBLIC_PRECONDO_URL || 'https://app.precondo.ca'
 
-      let buildingsApiUrl = `${precondoUrl}/api/buildings/area/${slug}`;
-      // Only add locality if it's different from the area/region name to ensure we get all child buildings
-      if (localityName && normalize(localityName) !== normalize(selectedRegion)) {
-        buildingsApiUrl = `${precondoUrl}/api/buildings/area/${slug}/locality/${buildingsSlug}`;
-      }
-      // Buildings are paginated server-side (100/page)
-      buildingsApiUrl += `?page=${buildingsPage}`;
-      // The visitor's filters: only buildings with a matching listing.
-      if (buildingsQuery) buildingsApiUrl += `&${buildingsQuery}`;
+      const buildingsApiUrl = buildingsListUrl(buildingsPage, buildingsQuery) as string
 
       Promise.all([
         fetch(`${precondoUrl}/api/locations/area/${slug}`).then((res) => res.json()),
@@ -819,7 +844,9 @@ const CatalogFilters = ({
           </Box>
         )}
 
-      <AdvancedFiltersDialog />
+      <AdvancedFiltersDialog
+        countBuildings={viewMode === 'buildings' ? countBuildings : undefined}
+      />
     </>
   )
 }

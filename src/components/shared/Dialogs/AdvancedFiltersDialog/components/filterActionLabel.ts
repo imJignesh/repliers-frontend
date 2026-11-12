@@ -13,8 +13,8 @@ export const filterActionLabel = (
 ) =>
   invalid
     ? 'Fix highlighted filters'
-    : count !== null && count < 0
-      ? `Show ${noun}s`
+    : count === null || count < 0
+      ? `Show ${noun}s` // still counting, or count unknown: never a stale or zero number
       : `Show ${pluralize(toSafeNumber(count), {
           one: `1 ${noun}`,
           many: `$ ${noun}s`

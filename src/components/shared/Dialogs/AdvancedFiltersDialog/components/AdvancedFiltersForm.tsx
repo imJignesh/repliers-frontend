@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Box, DialogContent, DialogTitle } from '@mui/material'
 
@@ -29,11 +29,18 @@ import {
 
 const AdvancedFiltersForm = ({
   onSubmit,
-  onReset
+  onReset,
+  countBuildings
 }: {
   onSubmit: () => void
   onReset: () => void
+  /**
+   * Catalog Buildings view: count buildings with a listing matching the draft
+   * filters (-1 when unknown), so the button says "Show N buildings".
+   */
+  countBuildings?: (filters: Filters) => Promise<number>
 }) => {
+  const countRequest = useRef(0)
   const [tab, setTab] = useState('advanced')
   const { position } = useMapOptions()
   const { filters, polygon, setFilters, resetFilters } = useSearch()
@@ -127,6 +134,13 @@ const AdvancedFiltersForm = ({
         setCount(0)
         return
       }
+      if (countBuildings) {
+        // Ignore an older request that finishes after a newer one.
+        const request = ++countRequest.current
+        const buildings = await countBuildings({ ...filters, ...dialogState })
+        if (request === countRequest.current) setCount(buildings)
+        return
+      }
       const response2 = await SearchService.fetch(
         {
           ...filters,
@@ -193,6 +207,7 @@ const AdvancedFiltersForm = ({
 
       <FilterActions
         count={count}
+        noun={countBuildings ? 'building' : 'listing'}
         invalid={invalid}
         onReset={handleReset}
         onSubmit={handleSubmit}

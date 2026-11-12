@@ -1,28 +1,23 @@
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import { Box, Button, DialogActions, Stack } from '@mui/material'
 
-import { toSafeNumber } from 'utils/formatters'
-import { pluralize } from 'utils/strings'
+import { filterActionLabel } from './filterActionLabel'
 
 const FilterActions = ({
   count,
   invalid = false,
+  noun = 'listing',
   onReset,
   onSubmit
 }: {
   count: number | null
   invalid?: boolean
+  /** What the count is of: listings, or buildings in the catalog's Buildings view. */
+  noun?: 'listing' | 'building'
   onReset: () => void
   onSubmit: () => void
 }) => {
-  const showLabel = invalid
-    ? 'Fix highlighted filters'
-    : count !== null && count < 0
-      ? 'Show listings'
-      : `Show ${pluralize(toSafeNumber(count), {
-          one: '1 listing',
-          many: '$ listings'
-        })}`
+  const showLabel = filterActionLabel(count, invalid, noun)
 
   return (
     <DialogActions>

@@ -19,6 +19,12 @@ const BuildingCard = ({ building }: BuildingCardProps) => {
 
     const imageUrl = building.cover_photo_url || building.coverPhotoUrl || 'https://stage25.precondo.ca/precondo_main_image.webp'
     const linkUrl = building.link || `/r/building/${slug}`
+    // With search filters applied, the API returns how many of the building's
+    // listings match them; show that instead of the building's total.
+    const matching = typeof building === 'string' ? null : building.matching_listings
+    const filtered = matching !== null && matching !== undefined
+    const count = Number(filtered ? matching : building.listing_count) || 0
+    const plural = count === 1 ? 'Listing' : 'Listings'
 
     return (
         <CardContainer size="normal" mlsNumber={slug}>
@@ -34,7 +40,7 @@ const BuildingCard = ({ building }: BuildingCardProps) => {
                         images={[imageUrl]}
                         icon="house"
                     />
-                    {building.listing_count > 0 && (
+                    {count > 0 && (
                         <Box sx={{
                             position: 'absolute',
                             top: 12,
@@ -51,7 +57,7 @@ const BuildingCard = ({ building }: BuildingCardProps) => {
                             border: '1px solid rgba(255, 255, 255, 0.2)',
                             zIndex: 2
                         }}>
-                            {building.listing_count} {building.listing_count === 1 ? 'Listing' : 'Listings'}
+                            {count} {filtered ? `Matching ${plural}` : plural}
                         </Box>
                     )}
                 </Box>
@@ -74,7 +80,7 @@ const BuildingCard = ({ building }: BuildingCardProps) => {
                     }}>
                         {address}
                     </Typography>
-                    {building.listing_count > 0 && (
+                    {count > 0 && (
                         <Typography variant="caption" sx={{
                             color: 'primary.main',
                             fontWeight: 600,
@@ -89,7 +95,7 @@ const BuildingCard = ({ building }: BuildingCardProps) => {
                                 borderRadius: '50%',
                                 display: 'inline-block'
                             }} />
-                            {building.listing_count} Active {building.listing_count === 1 ? 'Listing' : 'Listings'}
+                            {count} {filtered ? 'Matching' : 'Active'} {plural}
                         </Typography>
                     )}
                 </Box>

@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import {
   Box,
   Button,
@@ -48,6 +48,7 @@ import { capitalize } from 'utils/strings'
 import location, { citymap } from 'configs/defaults/location'
 import useKeepCatalogFilters from 'hooks/useKeepCatalogFilters'
 import { locationCount } from 'utils/locationCount'
+import { buildingFilterQuery } from 'utils/buildingFilterQuery'
 
 const statusItems: Array<[ListingStatus, string]> = [
   ['active', 'For Sale'],
@@ -184,17 +185,21 @@ const CatalogFilters = ({
     }
   }, [city, area, areas])
 
+  // Audit follow-up: the Buildings tab ignored the search filters.
+  const buildingsQuery = useMemo(() => buildingFilterQuery(searchFilters), [searchFilters])
+
   useEffect(() => {
     if (selectedRegion) {
       const slug = sanitizeUrl(selectedRegion)
       const localityName = hood || city // Provide locality via hood or city
       const buildingsSlug = localityName ? sanitizeUrl(localityName) : slug
 
-      // Avoid re-fetching if we already have the correct data (same location AND page)
+      // Avoid re-fetching if we already have the correct data (same location, page AND filters)
       if (locationTree &&
         (locationTree.slug === slug || locationTree.name.toLowerCase() === selectedRegion.toLowerCase()) &&
         locationTree.buildingsSlug === buildingsSlug &&
-        locationTree.buildingsPage === buildingsPage
+        locationTree.buildingsPage === buildingsPage &&
+        (locationTree.buildingsQuery ?? '') === buildingsQuery
       ) {
         if (onLocationTreeChange) onLocationTreeChange(locationTree)
         return
@@ -211,6 +216,8 @@ const CatalogFilters = ({
       }
       // Buildings are paginated server-side (100/page)
       buildingsApiUrl += `?page=${buildingsPage}`;
+      // The visitor's filters: only buildings with a matching listing.
+      if (buildingsQuery) buildingsApiUrl += `&${buildingsQuery}`;
 
       Promise.all([
         fetch(`${precondoUrl}/api/locations/area/${slug}`).then((res) => res.json()),
@@ -221,6 +228,7 @@ const CatalogFilters = ({
             const locationData = locationDataFull.data
             locationData.buildingsSlug = buildingsSlug
             locationData.buildingsPage = buildingsPage
+            locationData.buildingsQuery = buildingsQuery
             locationData.buildingsTotal = buildingsList.total ?? (Array.isArray(buildingsList) ? buildingsList.length : 0)
             locationData.buildingsPerPage = buildingsList.per_page ?? 100
 
@@ -258,7 +266,7 @@ const CatalogFilters = ({
       setLocationTree(null)
       if (onLocationTreeChange) onLocationTreeChange(null)
     }
-  }, [selectedRegion, locationTree, buildingsPage])
+  }, [selectedRegion, locationTree, buildingsPage, buildingsQuery])
 
   const createFiltersArray = (f: Partial<Filters> = filters) => {
     const urlFilters: string[] = []

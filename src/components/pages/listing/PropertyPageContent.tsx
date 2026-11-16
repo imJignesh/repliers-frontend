@@ -102,7 +102,7 @@ const PropertyPageContent = ({
           justifyContent="space-between"
           direction={{ xs: 'column', md: 'row' }}
         >
-          <Stack spacing={2} sx={{ flex: 1, width: '100%' }}>
+          <Stack spacing={2} sx={{ flex: 1, width: '100%', minWidth: 0 }}>
             <Typography
               variant="h1"
               style={{ fontSize: '1.7rem', margin: 0, lineHeight: 1 }}

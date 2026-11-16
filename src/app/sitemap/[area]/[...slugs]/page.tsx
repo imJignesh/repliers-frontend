@@ -58,12 +58,14 @@ const NeighborhoodSitemapPage = async ({ params }: Props) => {
     const rawLocationSlugs = [area, ...(slugs ?? [])]
 
     // Fetch data for the neighborhood in parallel including slug validation
-    const [listings, buildings, areas, slugValidation] = await Promise.all([
-        APILocations.fetchNeighborhoodListings(neighborhood, parentCity, area),
+    const [listingLinks, buildings, areas, slugValidation] = await Promise.all([
+        APILocations.fetchNeighborhoodListingLinks(neighborhood, parentCity, area),
         APILocations.fetchNeighborhoodBuildings(neighborhood, parentCity, area),
         APILocations.fetchAreas(),
         APILocations.validateSlugs(rawLocationSlugs)
     ])
+    const listings = listingLinks.map((l) => l.entry)
+    const canonicalPath = new Map(listingLinks.map((l) => [l.entry, l.path]))
 
     const hasInvalidSlug = rawLocationSlugs.some((slug) => slug in slugValidation && slugValidation[slug] === null)
     if (hasInvalidSlug) notFound()
@@ -178,9 +180,11 @@ const NeighborhoodSitemapPage = async ({ params }: Props) => {
                                 .replace(/\s+/g, '-')
                                 .replace(/-+/g, '-')
 
+                            // T10: link the listing's canonical URL so it does not 301.
+                            const path = canonicalPath.get(listing)
                             return {
                                 name: displayName,
-                                link: `/r/listing/${linkSlug}`,
+                                link: `/r/listing/${path || linkSlug}`,
                                 rel: 'nofollow,noindex'
                             }
                         })}

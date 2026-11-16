@@ -72,7 +72,12 @@ const content = {
     location: {
       title: '{{neighborhood}} Condos For Sale, {{city}} | Precondo',
       description:
-        'Browse {{listingCount}} condos for sale in {{neighborhood}}, {{city}}. See photos, floor plans, prices from ${{startingPrice}} & get listing alerts on Precondo.'
+        'Browse {{listingCount}} {{condoNoun}} for sale in {{neighborhood}}, {{city}}. See photos, floor plans, prices from ${{startingPrice}} & get listing alerts on Precondo.',
+      // T03 (Nov full-site audit): no "Browse 0 condos … prices from $ &".
+      descriptionNoPrice:
+        'Browse {{listingCount}} {{condoNoun}} for sale in {{neighborhood}}, {{city}}. See photos, floor plans & get listing alerts on Precondo.',
+      descriptionEmpty:
+        'Explore condo buildings in {{neighborhood}}, {{city}} on Precondo. No condos are listed for sale here right now; get alerts when new listings appear.'
     }
   },
   estimateMetadata: {

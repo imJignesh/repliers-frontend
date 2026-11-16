@@ -127,6 +127,7 @@ export const generateCatalogMetadata = async ({
     fullLocation,
     lowestPrice,
     startingPrice: minPrice && minPrice >= 100000 ? formatEnglishPrice(minPrice).replace('$', '') : '',
+    condoNoun: Number(count) === 1 ? 'condo' : 'condos',
     neighborhood: hood || '',
     city: displayCity,
     siteName: content.siteName
@@ -158,8 +159,13 @@ export const generateCatalogMetadata = async ({
     }
   }
 
-  const description = templates.description
-    ? interpolate(templates.description)
+  const descriptionTemplate = !Number(count)
+    ? templates.descriptionEmpty || templates.description
+    : variables.startingPrice
+      ? templates.description
+      : templates.descriptionNoPrice || templates.description
+  const description = descriptionTemplate
+    ? interpolate(descriptionTemplate)
     : `Find ${count} ${catalogTitle} in ${fullLocation}. Visit ${content.siteName} to see photos, prices & neighbourhood info.${lowestPrice}`
 
   const cleanDescription = description

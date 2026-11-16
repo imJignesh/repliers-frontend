@@ -12,7 +12,6 @@ export {
 export { default as JsonLd } from './JsonLd'
 export { default as LoadingContent } from './LoadingContent'
 export { default as LoadingView } from './LoadingView'
-export { default as PhoneLink } from './PhoneLink'
 export { default as ProfileAvatar } from './ProfileAvatar'
 export { default as RecaptchaNotice } from './RecaptchaNotice'
 export { default as ScrubbedDate } from './ScrubbedDate'

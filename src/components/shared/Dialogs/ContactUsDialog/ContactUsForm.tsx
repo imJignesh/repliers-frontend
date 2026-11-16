@@ -15,10 +15,9 @@ import { APIContact, type ErrorCause } from 'services/API'
 import { useUser } from 'providers/UserProvider'
 import useBreakpoints from 'hooks/useBreakpoints'
 import useSnackbar from 'hooks/useSnackbar'
-import { formatPhoneNumberAsYouType } from 'utils/formatters'
-import { sanitizePhoneNumber } from 'utils/properties/sanitizers'
 import { joinNonEmpty } from 'utils/strings'
 import { validateEmail, validatePhone } from 'utils/validators'
+import { formatPhoneNumberAsYouType, sanitizePhoneNumber } from 'utils/phone'
 
 const ContactUsForm = ({
   mode = 'contactUs',

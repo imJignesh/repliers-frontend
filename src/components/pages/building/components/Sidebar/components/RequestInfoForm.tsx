@@ -13,13 +13,12 @@ import { useProperty } from 'providers/PropertyProvider'
 import { useUser } from 'providers/UserProvider'
 import useSnackbar from 'hooks/useSnackbar'
 import { extractErrorMessage } from 'utils/errors'
-import { formatPhoneNumber, formatPhoneNumberAsYouType } from 'utils/formatters'
 import { formatFullAddress } from 'utils/properties'
-import { sanitizePhoneNumber } from 'utils/properties/sanitizers'
 import { joinNonEmpty } from 'utils/strings'
 import { validateEmail, validatePhone } from 'utils/validators'
 
 import AgreementText from './AgreementText'
+import { formatPhoneNumber, formatPhoneNumberAsYouType, sanitizePhoneNumber } from 'utils/phone'
 
 const getFormData = (form: any, message: string) => {
   const { phone, email, fname, lname } = form

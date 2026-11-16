@@ -4,8 +4,8 @@ import { TableCell, Typography } from '@mui/material'
 import { Stack } from '@mui/system'
 
 import type { ApiAgentsCreateParams, FubUser } from 'services/API'
-import { formatPhoneNumber } from 'utils/formatters'
-import { sanitizeEmail, sanitizePhoneNumber } from 'utils/properties/sanitizers'
+import { sanitizeEmail } from 'utils/properties/sanitizers'
+import { formatPhoneNumber, sanitizePhoneNumber } from 'utils/phone'
 
 interface StatusCellProps {
   fubUser: FubUser

@@ -2,7 +2,8 @@ import React from 'react'
 
 import { Link, Skeleton, Stack, Typography } from '@mui/material'
 
-import { PhoneLink, ProfileAvatar } from 'components/atoms'
+import { ProfileAvatar } from 'components/atoms'
+import PhoneLink from 'components/atoms/PhoneLink'
 
 export type ProfileDetails = {
   fname: string

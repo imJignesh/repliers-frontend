@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Link, Stack, Typography } from '@mui/material'
 
-import { PhoneLink } from 'components/atoms'
+import PhoneLink from 'components/atoms/PhoneLink'
 
 import { useAgentEstimates } from 'providers/AgentEstimatesProvider'
 

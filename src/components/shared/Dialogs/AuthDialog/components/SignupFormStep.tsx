@@ -6,9 +6,9 @@ import { Button, Grid2, Stack, TextField } from '@mui/material'
 import { joiResolver } from '@hookform/resolvers/joi'
 
 import { type LogInRequest, type SignUpRequest } from 'services/API'
-import { formatPhoneNumber, formatPhoneNumberAsYouType } from 'utils/formatters'
 
 import { signupSchema } from '../schemas'
+import { formatPhoneNumber, formatPhoneNumberAsYouType } from 'utils/phone'
 
 const SignupFormStep = ({
   visible = false,

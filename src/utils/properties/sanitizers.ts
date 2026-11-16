@@ -1,6 +1,3 @@
-import parsePhoneNumber from 'libphonenumber-js'
-
-import i18nConfig from '@configs/i18n'
 import propsConfig from '@configs/properties'
 
 import { type PropertyAddress } from 'services/API'
@@ -17,32 +14,6 @@ export const sanitizeStreetNumber = (value: string) => {
 
 export const sanitizeAddress = (address: PropertyAddress) =>
   slugifyAddress(address)
-
-export const sanitizePhoneNumber = (value: string | null | undefined) => {
-  if (!value) return ''
-  try {
-    const phoneNumber =
-      parsePhoneNumber(value, i18nConfig.phoneNumberLocale) ||
-      parsePhoneNumber(value)
-
-    if (phoneNumber) {
-      // If it's the default country, we might want to strip the + as per original logic,
-      // but if it's international, we MUST keep it.
-      if (
-        phoneNumber.country === i18nConfig.phoneNumberLocale &&
-        !value.startsWith('+')
-      ) {
-        return phoneNumber.number.replace('+', '')
-      }
-      return phoneNumber.number // Keep + for international or if user explicitly typed it
-    }
-  } catch (e) {
-    // ignore error
-  }
-
-  // Fallback: just return the value with only digits and +
-  return value.replace(/[^\d+]/g, '')
-}
 
 export const sanitizeEmail = (value: string | null | undefined) => {
   if (!value) return ''

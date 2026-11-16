@@ -20,6 +20,11 @@ const content = {
     height: 100
   },
   siteSplashscreen: 'https://precondo.ca/r/precondo_main_image.webp',
+  // Centre crop (600x798) of siteSplashscreen for phones: the banner is a
+  // tall portrait box there, so phones only ever see this middle strip.
+  // 60 KB instead of 160 KB, same pixels on screen.
+  siteSplashscreenMobile:
+    'https://precondo.ca/r/precondo_main_image_mobile.webp',
   loginSplashscreen: 'https://precondo.ca/r/precondo_main_image.webp',
   siteName: 'Precondo',
   siteDefaultBrokerageName: 'IRISE',

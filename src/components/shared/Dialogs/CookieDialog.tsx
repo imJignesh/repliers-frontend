@@ -27,13 +27,24 @@ const CookieDialog = () => {
     hideDialog()
   }
 
+  // T07 (Nov full-site audit): closing with X or a click outside also counts
+  // as "continuing", per the notice text, so the banner stays closed instead of
+  // coming back on every page.
+  const handleDismiss = () => {
+    try {
+      if (!localStorage.getItem(cookieKey)) localStorage.setItem(cookieKey, 'dismissed')
+    } catch {
+      /* storage blocked: the banner may show again, nothing else breaks */
+    }
+  }
+
   useEffect(() => {
     const cookieAccepted = !!localStorage.getItem(cookieKey)
     if (!cookieAccepted) showDialog()
   }, [])
 
   return (
-    <BaseResponsiveDialog name={dialogName}>
+    <BaseResponsiveDialog name={dialogName} onClose={handleDismiss}>
       <DialogTitle>Cookie Consent</DialogTitle>
       <DialogContent
         sx={{

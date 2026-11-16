@@ -51,6 +51,26 @@ class APILocations extends APIBase {
         }
     }
 
+    /**
+     * Same listings as fetchNeighborhoodListings, each with its canonical path
+     * (T10, Nov full-site audit). Falls back to path: null on an older backend.
+     */
+    async fetchNeighborhoodListingLinks(neighborhood: string, city?: string, area?: string): Promise<{ entry: string; path: string | null }[]> {
+        try {
+            const slug = toAreaSlug(neighborhood)
+            const params = new URLSearchParams({ paths: '1' })
+            if (city) params.append('city', city)
+            if (area) params.append('area', area)
+            const rows = await this.fetchJSON<any[]>(`/area/${slug}/listings?${params.toString()}`)
+            return (rows || []).map((row) =>
+                typeof row === 'string' ? { entry: row, path: null } : { entry: String(row.entry ?? ''), path: row.path || null }
+            )
+        } catch (error) {
+            console.error(`[APILocations] error fetching listing links for ${neighborhood}`, error)
+            return []
+        }
+    }
+
     async fetchNeighborhoodBuildings(neighborhood: string, city?: string, area?: string): Promise<any[]> {
         try {
             const slug = toAreaSlug(neighborhood)

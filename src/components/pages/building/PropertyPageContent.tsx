@@ -97,7 +97,7 @@ const PropertyPageContent = ({
           justifyContent="space-between"
           direction={{ xs: 'column', md: 'row' }}
         >
-          <Stack spacing={2} sx={{ flex: 1, width: '100%' }}>
+          <Stack spacing={2} sx={{ flex: 1, width: '100%', minWidth: 0 }}>
             <Breadcrumbs
               separator={<NavigateNextIcon fontSize="small" />}
               sx={{

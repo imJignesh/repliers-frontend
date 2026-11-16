@@ -14,7 +14,7 @@ const SimilarPropertyCarousel = ({
   if (properties.length === 0) return null
 
   return (
-    <Box bgcolor="background.default" p={1} pt={4} mt={2} mb={-4} mx={-1}>
+    <Box bgcolor="background.default" py={1} pt={4} mt={2} mb={-4}>
       <Container>
         <PropertyCarousel
           title="Similar properties"

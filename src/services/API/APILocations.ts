@@ -1,4 +1,5 @@
 import APIBase from './APIBase'
+import { toAreaSlug } from 'utils/areaSlug'
 
 export type AreaCity = {
     name: string
@@ -27,7 +28,7 @@ class APILocations extends APIBase {
 
     async fetchAreaNeighborhoods(area: string, withCounts: boolean = false): Promise<any[]> {
         try {
-            const slug = area.toLowerCase().replace(/[\s\u2011]+/g, '-')
+            const slug = toAreaSlug(area)
             const query = withCounts ? '?with_counts=1' : ''
             return await this.fetchJSON<any[]>(`/area/${slug}${query}`)
         } catch (error) {
@@ -38,7 +39,7 @@ class APILocations extends APIBase {
 
     async fetchNeighborhoodListings(neighborhood: string, city?: string, area?: string): Promise<string[]> {
         try {
-            const slug = neighborhood.toLowerCase().replace(/[\s\u2011]+/g, '-')
+            const slug = toAreaSlug(neighborhood)
             const params = new URLSearchParams()
             if (city) params.append('city', city)
             if (area) params.append('area', area)
@@ -52,7 +53,7 @@ class APILocations extends APIBase {
 
     async fetchNeighborhoodBuildings(neighborhood: string, city?: string, area?: string): Promise<any[]> {
         try {
-            const slug = neighborhood.toLowerCase().replace(/[\s\u2011]+/g, '-')
+            const slug = toAreaSlug(neighborhood)
             const params = new URLSearchParams()
             if (city) params.append('city', city)
             if (area) params.append('area', area)

@@ -1,14 +1,18 @@
 import React from 'react'
+import { headers } from 'next/headers'
 import type { Metadata } from 'next'
 
-import PageTemplate from 'components/templates/PageTemplate'
-import HomePageContent from '@pages/home'
 import content from '@configs/content'
 import routes from '@configs/routes'
+import HomePageContent from '@pages/home'
+import {
+  BANNER_DESKTOP_MEDIA,
+  BANNER_MOBILE_MEDIA
+} from '@pages/home/components/HomePageBanner/BannerImage'
+
+import PageTemplate from 'components/templates/PageTemplate'
 
 import { fetchFeatures } from 'utils/features'
-
-import { headers } from 'next/headers'
 import { getProtocolHost } from 'utils/urls'
 
 // NOTE: Dynamically generate metadata for the Estimate Landing Page based on feature flags.
@@ -51,13 +55,22 @@ const HomePage = async (props: any) => {
       {/*
         The banner photo is the Largest Contentful Paint element on phones
         (audit RT08). Preload it from the server HTML so the browser requests
-        it before any script runs; React hoists this <link> into <head>.
-        BannerImage also marks the <img> with fetchPriority="high".
+        it before any script runs; React hoists these <link>s into <head>.
+        The media queries match BannerImage's <picture>, so each device
+        preloads only the file it will show.
       */}
       <link
         rel="preload"
         as="image"
+        href={content.siteSplashscreenMobile}
+        media={BANNER_MOBILE_MEDIA}
+        fetchPriority="high"
+      />
+      <link
+        rel="preload"
+        as="image"
         href={content.siteSplashscreen}
+        media={BANNER_DESKTOP_MEDIA}
         fetchPriority="high"
       />
       <PageTemplate>

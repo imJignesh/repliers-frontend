@@ -202,8 +202,12 @@ const FeaturedProperties = () => {
           </Typography>
           <Box
             component="img"
-            src="pc-partners.png"
+            src="pc-partners.webp"
             alt="Featured In"
+            loading="lazy"
+            decoding="async"
+            width={918}
+            height={416}
             sx={{
               width: '100%',
               maxWidth: { xs: '100%', sm: '600px', md: '600px' },

@@ -16,7 +16,7 @@ import {
   type FormValues
 } from '@configs/estimate'
 import { defaultValues } from '@configs/estimate'
-import { schema } from '@configs/estimate'
+import schema from '@configs/estimate/schema'
 import { joiResolver } from '@hookform/resolvers/joi'
 
 import { useUser } from 'providers/UserProvider'

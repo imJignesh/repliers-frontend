@@ -11,7 +11,8 @@ import {
 
 import routes from '@configs/routes'
 
-import { DateLabel, PhoneLink } from 'components/atoms'
+import { DateLabel } from 'components/atoms'
+import PhoneLink from 'components/atoms/PhoneLink'
 
 import { useAgentClients } from 'providers/AgentClientsProvider'
 

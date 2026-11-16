@@ -19,8 +19,6 @@ import { useUser } from 'providers/UserProvider'
 import useAnalytics from 'hooks/useAnalytics'
 import useClientSide from 'hooks/useClientSide'
 import useSnackbar from 'hooks/useSnackbar'
-import { formatPhoneNumberAsYouType } from 'utils/formatters'
-import { sanitizePhoneNumber } from 'utils/properties/sanitizers'
 
 import {
   expiredOtpErrorMessage,
@@ -39,6 +37,7 @@ import {
   TermsAndPrivacy,
   ThirdPartyLoginForm
 } from '.'
+import { formatPhoneNumberAsYouType, sanitizePhoneNumber } from 'utils/phone'
 
 export type AuthFlow = 'login' | 'signup'
 export type AuthStep = 'input' | 'verify'

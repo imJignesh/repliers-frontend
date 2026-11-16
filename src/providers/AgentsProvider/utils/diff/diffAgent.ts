@@ -3,7 +3,7 @@ import type {
   ApiRplAgent,
   FubUserDiff
 } from 'services/API'
-import { formatPhoneNumber } from 'utils/formatters'
+import { formatPhoneNumber } from 'utils/phone'
 
 const comparePhoneNumbers = (phone1: string, phone2: string): boolean => {
   return formatPhoneNumber(phone1) === formatPhoneNumber(phone2)

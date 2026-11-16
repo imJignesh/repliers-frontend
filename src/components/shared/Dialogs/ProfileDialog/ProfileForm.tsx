@@ -22,10 +22,9 @@ import type { ApiUserProfile } from 'services/API'
 import { useFeatures } from 'providers/FeaturesProvider'
 import { useUser } from 'providers/UserProvider'
 import useSnackbar from 'hooks/useSnackbar'
-import { formatPhoneNumberAsYouType } from 'utils/formatters'
-import { sanitizePhoneNumber } from 'utils/properties/sanitizers'
 
 import schema from './schema'
+import { formatPhoneNumberAsYouType, sanitizePhoneNumber } from 'utils/phone'
 
 const ProfileForm = ({
   embedded = false,

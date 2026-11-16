@@ -1,6 +1,6 @@
 import { Link } from '@mui/material'
+import { formatPhoneNumber } from 'utils/phone'
 
-import { formatPhoneNumber } from 'utils/formatters'
 
 const PhoneLink = ({ phone }: { phone: string }) => {
   return (

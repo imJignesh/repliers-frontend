@@ -7,11 +7,11 @@ import { joiResolver } from '@hookform/resolvers/joi'
 import { GoogleAuthButton } from '@shared/Buttons'
 
 import { type LogInRequest } from 'services/API'
-import { formatPhoneNumber, formatPhoneNumberAsYouType } from 'utils/formatters'
 
 import { loginSchema } from '../schemas'
 
 import { OrDivider } from '.'
+import { formatPhoneNumber, formatPhoneNumberAsYouType } from 'utils/phone'
 
 const LoginFormStep = ({
   visible = true,

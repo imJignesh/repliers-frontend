@@ -20,12 +20,11 @@ import { APIContact, type ErrorCause } from 'services/API'
 import { useEstimate } from 'providers/EstimateProvider'
 import { useUser } from 'providers/UserProvider'
 import useSnackbar from 'hooks/useSnackbar'
-import { formatPhoneNumberAsYouType } from 'utils/formatters'
-import { sanitizePhoneNumber } from 'utils/properties/sanitizers'
 import { joinNonEmpty } from 'utils/strings'
 import { validateEmail, validatePhone } from 'utils/validators'
 
 import Profile from './Profile'
+import { formatPhoneNumberAsYouType, sanitizePhoneNumber } from 'utils/phone'
 
 const getFormData = (form: any) => {
   const { phone, email, fname, lname } = form

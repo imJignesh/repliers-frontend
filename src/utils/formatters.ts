@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import parsePhoneNumber, { AsYouType } from 'libphonenumber-js'
 
 import i18nConfig from '@configs/i18n'
 import propsConfig from '@configs/properties'
@@ -8,39 +7,6 @@ import { parseFootInch } from './numbers'
 import { scrubbed } from './properties'
 
 export type Primitive = string | number | boolean | bigint | null | undefined
-
-export const formatPhoneNumber = (value: string | null | undefined) => {
-  if (!value) return ''
-  try {
-    const phoneNumber = parsePhoneNumber(value, i18nConfig.phoneNumberLocale) || parsePhoneNumber(value)
-    if (!phoneNumber) return value
-
-    // If it's international or not the default country, use international format
-    if (phoneNumber.country !== i18nConfig.phoneNumberLocale || value.startsWith('+')) {
-      return phoneNumber.formatInternational()
-    }
-
-    return phoneNumber.formatNational()
-  } catch (e) {
-    return value
-  }
-}
-
-export const formatPhoneNumberAsYouType = (
-  newVal: string,
-  currentVal: string | null = ''
-) => {
-  // backspace handling
-  if (newVal.length < (currentVal || '').length) return newVal
-  
-  // If it starts with +, use generic international formatting
-  // Otherwise use default locale
-  const asYouType = newVal.startsWith('+') 
-    ? new AsYouType() 
-    : new AsYouType(i18nConfig.phoneNumberLocale)
-    
-  return asYouType.input(newVal)
-}
 
 type FormatDateOptions = {
   template?: string

@@ -63,14 +63,40 @@ export const getPropertyBreadcrumbItems = (
   current
 ]
 
+/**
+ * Audit 4 T11: the feed's `city` is often a Toronto district ("Downtown",
+ * "Midtown | Central", "North York") or "Hamilton City". schema.org
+ * addressLocality is the municipality, so Toronto districts become
+ * "Toronto" and a trailing " City" is dropped.
+ */
+export const getAddressLocality = (
+  address: Partial<Pick<PropertyAddress, 'city' | 'area'>>
+): string => {
+  if (
+    String(address.area || '')
+      .trim()
+      .toLowerCase() === 'toronto'
+  ) {
+    return 'Toronto'
+  }
+  return String(address.city || '')
+    .replace(/\s+city$/i, '')
+    .trim()
+}
+
 const getPostalAddress = (
-  address: Pick<PropertyAddress, 'city' | 'state' | 'zip' | 'country'>,
+  address: Partial<
+    Pick<PropertyAddress, 'city' | 'area' | 'state' | 'zip' | 'country'>
+  >,
   streetAddress: string
 ) => ({
   '@type': 'PostalAddress',
   ...(streetAddress ? { streetAddress } : {}),
-  ...(address.city ? { addressLocality: address.city } : {}),
-  ...(address.state ? { addressRegion: address.state } : {}),
+  ...(getAddressLocality(address)
+    ? { addressLocality: getAddressLocality(address) }
+    : {}),
+  // Every /r/ listing is in Ontario; the feed often leaves state empty.
+  addressRegion: address.state || 'ON',
   ...(!scrubbed(address.zip) && address.zip ? { postalCode: address.zip } : {}),
   addressCountry: address.country || 'CA'
 })
@@ -243,6 +269,45 @@ export const getBuildingJsonLd = (
       }
     })
 
+  const images = p.images?.length
+    ? { image: p.images.slice(0, 6).map((img) => getCDNPath(img, 'large')) }
+    : {}
+
+  const complex = {
+    '@type': 'ApartmentComplex',
+    '@id': buildingId,
+    name: buildingName,
+    url,
+    address: getPostalAddress(p.address, buildingAddress),
+    ...getGeo(p.map),
+    ...(totalUnits
+      ? {
+          numberOfAccommodationUnits: {
+            '@type': 'QuantitativeValue',
+            value: totalUnits
+          }
+        }
+      : {}),
+    ...(availableUnits
+      ? {
+          numberOfAvailableAccommodationUnits: {
+            '@type': 'QuantitativeValue',
+            value: availableUnits
+          }
+        }
+      : {})
+  }
+
+  // Audit 4 T11: a building with nothing for sale is a place, not a listing.
+  if (!availableUnits || !(min && max)) {
+    return {
+      '@context': 'https://schema.org',
+      ...complex,
+      ...(description ? { description } : {}),
+      ...images
+    }
+  }
+
   return {
     '@context': 'https://schema.org',
     '@type': 'RealEstateListing',
@@ -250,33 +315,8 @@ export const getBuildingJsonLd = (
     url,
     name: buildingName,
     ...(description ? { description } : {}),
-    ...(p.images?.length
-      ? { image: p.images.slice(0, 6).map((img) => getCDNPath(img, 'large')) }
-      : {}),
-    about: {
-      '@type': 'ApartmentComplex',
-      '@id': buildingId,
-      name: buildingName,
-      url,
-      address: getPostalAddress(p.address, buildingAddress),
-      ...getGeo(p.map),
-      ...(totalUnits
-        ? {
-            numberOfAccommodationUnits: {
-              '@type': 'QuantitativeValue',
-              value: totalUnits
-            }
-          }
-        : {}),
-      ...(availableUnits
-        ? {
-            numberOfAvailableAccommodationUnits: {
-              '@type': 'QuantitativeValue',
-              value: availableUnits
-            }
-          }
-        : {})
-    },
+    ...images,
+    about: complex,
     ...(min && max
       ? {
           offers: {

@@ -52,6 +52,7 @@ import { type ApiQueryResponse, type Property } from 'services/API'
 import {
   getBuildingJsonLd,
   getBuildingUnitTotal,
+  getAddressLocality,
   getListingJsonLd
 } from './structuredData'
 
@@ -228,5 +229,37 @@ describe('listing structured data vocabulary (audit RT07)', () => {
     expect(data.about.numberOfBedrooms).toBe(2)
     expect(data.about.numberOfBedroomsTotal).toBeUndefined()
     expect(data.offers.price).toBe(649000)
+  })
+})
+
+describe('building address and type (audit 4 T11)', () => {
+  it('uses the municipality, not the Toronto district, as addressLocality', () => {
+    expect(getAddressLocality({ area: 'Toronto', city: 'Downtown' })).toBe('Toronto')
+    expect(getAddressLocality({ area: 'Toronto', city: 'Midtown | Central' })).toBe('Toronto')
+    expect(getAddressLocality({ area: 'Hamilton', city: 'Hamilton City' })).toBe('Hamilton')
+    expect(getAddressLocality({ area: 'Peel', city: 'Mississauga' })).toBe('Mississauga')
+  })
+
+  it('gives every building address a region', () => {
+    const data = getBuildingJsonLd(
+      buildingResponse({ name: 'X' }, [unit({ address: { ...unit().address, state: '' } } as any)]),
+      'https://precondo.ca',
+      'X',
+      'x'
+    ) as any
+    expect(data.about.address.addressLocality).toBe('Toronto')
+    expect(data.about.address.addressRegion).toBe('ON')
+  })
+
+  it('makes a building with nothing for sale an ApartmentComplex, not a listing', () => {
+    const empty = {
+      ...buildingResponse({ name: 'Gotham Lofts' }, [unit()]),
+      count: 0,
+      statistics: {}
+    } as any
+    const data = getBuildingJsonLd(empty, 'https://precondo.ca', 'Gotham Lofts', 'gotham') as any
+    expect(data['@type']).toBe('ApartmentComplex')
+    expect(data.offers).toBeUndefined()
+    expect(data.name).toBe('Gotham Lofts')
   })
 })

@@ -25,6 +25,8 @@ import {
   parseUrlParams
 } from './_parsers'
 import { fetchListings, fetchLocations } from './_requests'
+import { fetchLocationLinks } from './_links'
+import LocationLinks from 'components/pages/catalog/components/LocationLinks'
 import { generateCatalogMetadata } from './_ssg'
 import { extractCities, extractLocation, refineLocation } from './_utils'
 
@@ -193,11 +195,13 @@ const LocationsCatalogPage = async (props: {
     ...parseCatalogQuery(searchParams as Record<string, string | undefined>)
   }
   const targetForNeighborhoods = city || area
-  const [{ listings, count }, dynamicData] = await Promise.all([
+  const [{ listings, count }, dynamicData, locationLinks] = await Promise.all([
     fetchListings({ area, city, hood, filters: searchFilters, page }),
     targetForNeighborhoods
       ? APILocations.fetchAreaNeighborhoods(targetForNeighborhoods, true)
-      : Promise.resolve([])
+      : Promise.resolve([]),
+    // Audit 4 T09: crawlable neighbourhood and building links.
+    fetchLocationLinks(rawLocationSlugs)
   ])
 
   // Don't 404 paginated building views — buildings paginate independently of
@@ -296,6 +300,11 @@ const LocationsCatalogPage = async (props: {
         locationSlugs={rawLocationSlugs}
         urlFilters={filters}
         searchFilters={searchFilters}
+      />
+      <LocationLinks
+        groups={locationLinks.groups}
+        buildings={locationLinks.buildings}
+        placeName={hood || city || area || 'Ontario'}
       />
     </PageTemplate>
   )

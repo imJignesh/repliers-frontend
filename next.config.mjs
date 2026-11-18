@@ -36,10 +36,33 @@ const nextConfig = {
   },
 
   async headers() {
-    return ['/listing/:path*', '/r/listing/:path*'].map((source) => ({
+    const noindex = ['/listing/:path*', '/r/listing/:path*'].map((source) => ({
       source,
       headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }]
     }))
+    // Audit 4 T05: area and building pages render per request and answer
+    // "private, no-store", so every visit rebuilt them. Their HTML is the same
+    // for every visitor (no server cookie reads), so let Vercel's CDN keep it
+    // for 5 minutes and serve the stale copy for an hour while it rebuilds.
+    // Vercel-CDN-Cache-Control outranks the page's Cache-Control and is not
+    // passed on to browsers or Cloudflare. RSC navigation requests are left out.
+    // Header rules in vercel.json were not applied to this Next.js project.
+    const cdnCache = [
+      '/locations/:path*',
+      '/r/locations/:path*',
+      '/building/:path*',
+      '/r/building/:path*'
+    ].map((source) => ({
+      source,
+      missing: [{ type: 'header', key: 'rsc' }],
+      headers: [
+        {
+          key: 'Vercel-CDN-Cache-Control',
+          value: 'max-age=300, stale-while-revalidate=3600'
+        }
+      ]
+    }))
+    return [...noindex, ...cdnCache]
   },
 
   trailingSlash: false,

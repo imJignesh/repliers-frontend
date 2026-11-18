@@ -72,6 +72,34 @@ class APIBase {
     }
   }
 
+  /**
+   * Audit 4 T05: public, visitor-independent data (area tree, slug checks,
+   * neighbourhood lists). Sent without the visitor's cookies or token, so on
+   * the server Next's data cache can share one copy for `revalidate` seconds
+   * instead of every page render waiting on the API. In the browser this is
+   * a plain fetch.
+   */
+  async fetchPublicJSON<T>(request: string, revalidate: number): Promise<T> {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(
+      () => controller.abort(),
+      apiConfig.apiRequestTimeout
+    )
+    try {
+      const response = await fetch(this.getAbsoluteUrl(request), {
+        headers: { Accept: 'application/json' },
+        signal: controller.signal,
+        ...(typeof window === 'undefined' ? { next: { revalidate } } : {})
+      } as RequestInit)
+      if (!response.ok) {
+        throw { status: response.status, data: null }
+      }
+      return (await response.json()) as T
+    } finally {
+      clearTimeout(timeoutId)
+    }
+  }
+
   async fetchJSON<T>(request: string, options?: RequestInit): Promise<T> {
     let response: Response | null = null
 

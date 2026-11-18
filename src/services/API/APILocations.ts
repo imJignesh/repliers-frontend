@@ -16,10 +16,32 @@ export type Area = {
     listing_count?: number
 }
 
+// Audit 4 T05: the header and the mobile menu each asked for the area tree,
+// so every page load fetched it twice. In the browser, share one request
+// for five minutes.
+let browserAreas: { at: number; promise: Promise<Area[]> } | null = null
+const BROWSER_AREAS_TTL_MS = 5 * 60 * 1000
+
 class APILocations extends APIBase {
     async fetchAreas(): Promise<Area[]> {
+        if (typeof window !== 'undefined') {
+            if (browserAreas && Date.now() - browserAreas.at < BROWSER_AREAS_TTL_MS) {
+                return browserAreas.promise
+            }
+            const promise = this.fetchAreasOnce()
+            browserAreas = { at: Date.now(), promise }
+            // A failed load is not kept: the next caller tries again.
+            promise.then((areas) => {
+                if (!areas.length && browserAreas?.promise === promise) browserAreas = null
+            })
+            return promise
+        }
+        return this.fetchAreasOnce()
+    }
+
+    private async fetchAreasOnce(): Promise<Area[]> {
         try {
-            return await this.fetchJSON<Area[]>('/areas')
+            return await this.fetchPublicJSON<Area[]>('/areas', 600)
         } catch (error) {
             console.error('[APILocations] error fetching areas', error)
             return []
@@ -30,7 +52,7 @@ class APILocations extends APIBase {
         try {
             const slug = toAreaSlug(area)
             const query = withCounts ? '?with_counts=1' : ''
-            return await this.fetchJSON<any[]>(`/area/${slug}${query}`)
+            return await this.fetchPublicJSON<any[]>(`/area/${slug}${query}`, 600)
         } catch (error) {
             console.error(`[APILocations] error fetching neighborhoods for ${area}`, error)
             return []
@@ -44,7 +66,7 @@ class APILocations extends APIBase {
             if (city) params.append('city', city)
             if (area) params.append('area', area)
             const query = params.toString() ? `?${params.toString()}` : ''
-            return await this.fetchJSON<string[]>(`/area/${slug}/listings${query}`)
+            return await this.fetchPublicJSON<string[]>(`/area/${slug}/listings${query}`, 300)
         } catch (error) {
             console.error(`[APILocations] error fetching listings for ${neighborhood}`, error)
             return []
@@ -96,8 +118,9 @@ class APILocations extends APIBase {
         if (!slugs.length) return {}
         try {
             const q = encodeURIComponent(slugs.join(','))
-            return await this.fetchJSON<Record<string, string | null>>(
-                `/locations/validate?slugs=${q}`
+            return await this.fetchPublicJSON<Record<string, string | null>>(
+                `/locations/validate?slugs=${q}`,
+                3600
             )
         } catch (error) {
             console.error('[APILocations] error validating slugs', slugs, error)
@@ -114,8 +137,9 @@ class APILocations extends APIBase {
     async lookupRedirect(sourcePath: string): Promise<{ source: string; destination: string } | null> {
         if (!sourcePath) return null
         try {
-            return await this.fetchJSON<{ source: string; destination: string } | null>(
-                `/redirects/lookup?source=${encodeURIComponent(sourcePath)}`
+            return await this.fetchPublicJSON<{ source: string; destination: string } | null>(
+                `/redirects/lookup?source=${encodeURIComponent(sourcePath)}`,
+                3600
             )
         } catch (error) {
             console.error('[APILocations] error looking up redirect for', sourcePath, error)

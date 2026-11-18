@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { Badge, Button, Skeleton } from '@mui/material'
+import { Badge, Box, Button, Skeleton } from '@mui/material'
 
 import IcoSettings from '@icons/IcoSettings'
 
@@ -25,7 +25,7 @@ const AdvancedFiltersButton = ({ size, sx }: { size: 'medium' | 'small'; sx?: an
       <Skeleton
         variant="rounded"
         sx={{
-          width: { xs: 46, sm: 140 },
+          width: { xs: 46, sm: 140, md: 52, lg: 140 },
           height: { xs: 38, sm: 48 },
           ...sx
         }}
@@ -46,10 +46,21 @@ const AdvancedFiltersButton = ({ size, sx }: { size: 'medium' | 'small'; sx?: an
           size="medium"
           variant="outlined"
           onClick={showDialog}
+          aria-label="Filters"
           startIcon={<IcoSettings />}
-          sx={{ width: { xs: 46, sm: 140 }, ...sx }}
+          sx={{
+            // Audit 4 T14: between 900 and 1199px the map column is narrower
+            // than the filter row, and the full-width button covered the
+            // "N condos available for sale" count. Show the icon only there.
+            width: { xs: 46, sm: 140, md: 52, lg: 140 },
+            minWidth: { md: 0 },
+            '& .MuiButton-startIcon': { mr: { md: 0, lg: 1 }, ml: { md: 0, lg: -0.5 } },
+            ...sx
+          }}
         >
-          Filters
+          <Box component="span" sx={{ display: { xs: 'inline', md: 'none', lg: 'inline' } }}>
+            Filters
+          </Box>
         </Button>
       ) : (
         <Button

@@ -35,7 +35,8 @@ const config = {
     Lc: 'Leased Conditionally',
     Pc: 'Price Change',
     Ext: 'Extension',
-    New: 'New'
+    // Audit 4 C04: MLS "New" means no status change since listing, not a new listing.
+    New: 'Active'
   } as Record<ListingLastStatus, string>
 }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 
 import { Button, Stack, TextField, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
@@ -61,6 +61,15 @@ const RequestInfoForm = () => {
 
   const formValid = validFirstName && validLastName && validPhone && validEmail
 
+  // Audit 4 T13: after a failed submit, move focus to the first invalid field.
+  const formRef = useRef<HTMLFormElement>(null)
+  const focusFirstInvalid = () =>
+    setTimeout(() => {
+      formRef.current
+        ?.querySelector<HTMLElement>('[aria-invalid="true"]')
+        ?.focus()
+    }, 0)
+
   const handleSubmit = async () => {
     if (values.hp_website) {
       console.warn('Bot detected via honeypot')
@@ -68,7 +77,10 @@ const RequestInfoForm = () => {
     }
     if (loading) return // already submitting: never send twice
     setFormTouched(true)
-    if (!formValid) return
+    if (!formValid) {
+      focusFirstInvalid()
+      return
+    }
     setLoading(true)
     // Audit R09: one try/catch/finally around CAPTCHA, preparation and
     // submission, so any failure shows an error and re-enables the form.
@@ -112,7 +124,7 @@ const RequestInfoForm = () => {
   }
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); handleSubmit() }} autoComplete="off">
+    <form ref={formRef} onSubmit={(e) => { e.preventDefault(); handleSubmit() }} noValidate>
       <input type="hidden" name="price" value={listPrice || ''} />
       <input type="hidden" name="mls_municipality" value={address?.district || address?.city || ''} />
       <input type="hidden" name="postal_code" value={address?.zip || ''} />
@@ -125,6 +137,7 @@ const RequestInfoForm = () => {
         <TextField
           fullWidth
           name="first_name"
+          autoComplete="given-name"
           label="First Name"
           value={values.first_name}
           onChange={handleInputChange}
@@ -134,6 +147,7 @@ const RequestInfoForm = () => {
         <TextField
           fullWidth
           name="last_name"
+          autoComplete="family-name"
           label="Last Name"
           value={values.last_name}
           onChange={handleInputChange}
@@ -143,17 +157,19 @@ const RequestInfoForm = () => {
         <TextField
           fullWidth
           name="email"
+          autoComplete="email"
           type="email"
           label="Email"
           value={values.email}
           onChange={handleInputChange}
           error={formTouched && !validEmail}
-          helperText={formTouched && !validEmail ? 'Enter valid email' : ''}
+          helperText={formTouched && !validEmail ? (values.email ? 'Enter a valid email' : 'Required field') : ''}
         />
         <TextField
           fullWidth
           type="tel"
           name="phone"
+          autoComplete="tel"
           label="Phone"
           placeholder="+1 (555) 555-1234"
           value={values.phone}

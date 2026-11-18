@@ -3,6 +3,7 @@ import { type PropertyAddress } from 'services/API'
 import { property1, property2, property3 } from './__mocks__'
 import {
   formatFullAddress,
+  formatListingHeading,
   formatMetadata,
   formatMultiLineText,
   formatOpenHouseTimeRange,
@@ -85,5 +86,36 @@ describe('utils/properties/formatters', () => {
     expect(formatMultiLineText(text4)).toMatch(
       /<p[^>]*>This is a single line text with divider.<\/p>/
     )
+  })
+})
+
+describe('private addresses (audit 4 C04)', () => {
+  const hidden = {
+    ...property1,
+    address: {
+      city: 'Downtown',
+      neighborhood: 'Waterfront Communities C1',
+      streetNumber: null,
+      streetName: null,
+      unitNumber: null
+    },
+    images: ['a.jpg'],
+    details: { ...property1.details, propertyType: 'Condo Apt' }
+  } as any
+
+  it('gives the page a heading instead of an empty H1', () => {
+    expect(formatListingHeading(hidden)).toBe(
+      'Condo Apt in Waterfront Communities C1'
+    )
+    expect(formatListingHeading(property1)).toBe(
+      formatShortAddress(property1.address)
+    )
+  })
+
+  it('never writes "at ," in the description', () => {
+    const meta = formatMetadata(hidden, 'https://precondo.ca')
+    expect(meta.title).toContain('Address not disclosed')
+    expect(meta.description).not.toMatch(/at\s*,/)
+    expect(meta.description).toContain('Waterfront Communities C1')
   })
 })

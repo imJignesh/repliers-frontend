@@ -39,9 +39,10 @@ export function mapperDaysOnMarket(property: Property) {
       ? toSafeNumber(property.daysOnMarket)
       : (property.listDate ? Math.abs(dayjs(property.listDate).diff(dayjs(), 'day')) : 0)
     return pluralize(days, {
+      // Audit 4 C04: the label is "Days on Market", so "137 days", not "137 Days Ago".
       zero: 'listed today',
-      one: '$ day ago',
-      many: '$ days ago'
+      one: '$ day',
+      many: '$ days'
     })
   }
   return null
@@ -186,14 +187,46 @@ export function formatYearBuiltValue(value: string | null | undefined): string |
   return value
 }
 
+/**
+ * Audit 4 C04: the MLS age ("New", "0-5") can contradict the building's own
+ * build year ("Age: New" on a building built in 2014). When the building
+ * sheet has a year, show that instead of the MLS age.
+ */
+export function getBuildingYear(property: Property): string | null {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const text = String((property as any)?.building?.built_year_ext ?? '')
+  const match = /\b(1[89]\d{2}|20\d{2})\b/.exec(text)
+  return match ? match[1] : null
+}
+
+export function resolveYearBuilt(property: Property): {
+  label: 'pdp.fields.age' | 'pdp.fields.yearBuilt'
+  value: string | null
+  isAge: boolean
+} {
+  const { yearBuilt } = property.details || ({} as Property['details'])
+  const buildingYear = getBuildingYear(property)
+  if (isAgeRange(yearBuilt) && buildingYear) {
+    return { label: 'pdp.fields.yearBuilt', value: buildingYear, isAge: false }
+  }
+  const isAge = isAgeRange(yearBuilt)
+  return {
+    label: isAge ? 'pdp.fields.age' : 'pdp.fields.yearBuilt',
+    value: formatYearBuiltValue(yearBuilt),
+    isAge
+  }
+}
+
 export function mapperYearBuilt(property: Property) {
-  const { yearBuilt } = property.details
-  const value = formatYearBuiltValue(yearBuilt)
-  const label = isAgeRange(yearBuilt) ? 'pdp.fields.age' : 'pdp.fields.yearBuilt'
+  const { label, value } = resolveYearBuilt(property)
   return { label, value }
 }
 
 export function mapperConstructionYearBuilt(property: Property) {
+  const resolved = resolveYearBuilt(property)
+  if (!resolved.isAge && getBuildingYear(property) === resolved.value && resolved.value) {
+    return { label: resolved.label, value: resolved.value }
+  }
   const { yearBuilt } = property.details
   const ageDescription = property.raw?.AgeDescription
   const formattedYear = formatYearBuiltValue(yearBuilt)
@@ -288,9 +321,10 @@ export function mapperCondoFees(property: Property) {
     if (rounded.includes('NaN')) return null
     // Audit R06: every recurring amount states its period. The feed does not
     // always supply one; say so rather than guess.
+    // Audit 4 C04: when the feed gives no period, show the amount alone.
     return condoFeeFrequency
       ? joinNonEmpty([rounded, condoFeeFrequency], ' / ')
-      : `${rounded} (Billing Period Not Provided)`
+      : rounded
   }
   return null
 }

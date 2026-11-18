@@ -62,7 +62,7 @@ const HistoryDetails = () => {
         {!authenticated && (
           <Box>
             <Typography variant="body2" color="text.secondary">
-              Require you to be <Link href="#history" onClick={openSignIn} style={{ fontWeight: 'bold', color: 'inherit' }}>signed in</Link> to access price history. <Link href="#" onClick={scrollToContact} style={{ fontWeight: 'bold', color: 'inherit' }}>Sign up</Link> to Request Price full history.
+              <Link href="#history" onClick={openSignIn} style={{ fontWeight: 'bold', color: 'inherit' }}>Sign in</Link> to see the full price history, or <Link href="#" onClick={scrollToContact} style={{ fontWeight: 'bold', color: 'inherit' }}>contact us</Link> to request it.
             </Typography>
           </Box>
         )}

@@ -2,8 +2,11 @@
 
 import React from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 
-import { Box } from '@mui/material'
+import { Box, Button, Stack } from '@mui/material'
+
+import routes from '@configs/routes'
 
 import Yoda from 'assets/common/yoda.svg'
 
@@ -23,8 +26,25 @@ const Page40XTemplate = ({ errorCode = 404 }: { errorCode?: ErrorCode }) => {
   return (
     <PageTemplate>
       <FullscreenView title={String(errorCode)} subtitle={phrases[errorCode]}>
+        {/* Audit 4 T14: give visitors a way on from a missing page. */}
         <Box pt={2}>
-
+          {errorCode === 404 && (
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              spacing={1.5}
+              justifyContent="center"
+            >
+              <Button component={Link} href={routes.map} variant="contained">
+                Search condos on the map
+              </Button>
+              <Button component={Link} href={routes.listings} variant="outlined">
+                Browse areas
+              </Button>
+              <Button component={Link} href={routes.home} variant="outlined">
+                Home
+              </Button>
+            </Stack>
+          )}
         </Box>
       </FullscreenView>
     </PageTemplate>

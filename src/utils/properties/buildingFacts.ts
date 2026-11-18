@@ -59,5 +59,23 @@ export const getBuildingScale = (value?: string | null): string | null => {
   const floors = read(/floors?\s*:\s*([\d,]+)/i)
   const units = read(/total\s*units\s*:\s*([\d,]+)/i)
   if (floors !== null && units !== null && units > 0 && floors > units) return null
+  // Audit 4 C03: "Floors: | Total Units:" (no numbers) is an empty fact.
+  if (!/\d/.test(text)) return null
+  if (/floors?\s*:/i.test(text) || /total\s*units\s*:/i.test(text)) {
+    const parts = [
+      floors !== null ? `Floors: ${floors}` : null,
+      units !== null ? `Total Units: ${units}` : null
+    ].filter(Boolean)
+    return parts.length ? parts.join(' | ') : null
+  }
   return text
+}
+
+/**
+ * Audit 4 C03: the sheet's build year is "Built: 2014" or a bare "Built:".
+ * Returns the text only when it carries a year.
+ */
+export const getBuiltYear = (value?: string | null): string | null => {
+  const text = String(value ?? '').trim()
+  return /\d/.test(text) ? text : null
 }

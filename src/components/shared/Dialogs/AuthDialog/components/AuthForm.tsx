@@ -243,6 +243,9 @@ const AuthForm = ({
           <Stack spacing={4}>
             {errorMessage && (
               <Typography
+                // Audit 4 T13: announce the error to screen readers.
+                role="alert"
+                id="auth-form-error"
                 variant="body2"
                 color="error.main"
                 textAlign="center"

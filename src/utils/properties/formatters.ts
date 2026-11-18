@@ -74,6 +74,21 @@ export const formatFullAddress = (
   ).replace(/\s+/g, ' ')
 }
 
+/**
+ * Audit 4 C04: some sellers ask for the street address to be kept private,
+ * which left listing pages with an empty H1. Fall back to the property type
+ * and neighbourhood so the page always has a heading.
+ */
+export const formatListingHeading = (property: Property): string => {
+  const short = formatShortAddress(property.address || {}).trim()
+  if (short) return short
+  const type = getSeoType(property.details?.propertyType || '') || 'Condo'
+  const place = capitalize(
+    property.address?.neighborhood || property.address?.city || ''
+  )
+  return place ? `${type} in ${place}` : type
+}
+
 export const formatMetadata = (
   property: Property,
   host?: string | null,
@@ -106,9 +121,10 @@ export const formatMetadata = (
     neighborhood: capitalize(neighborhood || ''),
     city: capitalize(city || ''),
     address:
-      type === 'building'
+      (type === 'building'
         ? formatBuildingAddress(address, true)
-        : formatShortAddress(address, true),
+        : formatShortAddress(address, true)
+      ).trim() || 'Address not disclosed',
     price: formattedPrice,
     beds: beds.count.toString(),
     baths: baths.count.toString(),
@@ -136,9 +152,16 @@ export const formatMetadata = (
     .replace(/,(\s*\|)/g, '$1')
     .replace(/,\s*$/g, '')
 
-  let finalDescription = templates.description
-    ? interpolate(templates.description)
-    : description
+  const addressHidden = !formatShortAddress(address, true).trim()
+  let finalDescription =
+    type === 'listing' && addressHidden
+      ? // Audit 4 C04: no "Check out Condo Apt at , …" when the address is private.
+        interpolate(
+          'Check out this {{propertyType}} for sale in {{neighborhood}}, {{city}}. The seller has asked to keep the street address private.'
+        )
+      : templates.description
+        ? interpolate(templates.description)
+        : description
   finalDescription = scrubbed(finalDescription)
     ? propsConfig.scrubbedDescriptionLabel
     : finalDescription

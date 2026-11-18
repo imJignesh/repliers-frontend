@@ -32,7 +32,7 @@ import {
 } from 'utils/locationCrumbs'
 import { scrubbed } from 'utils/properties'
 
-import { formatShortAddress } from '../../../utils/properties/formatters'
+import { formatListingHeading } from '../../../utils/properties/formatters'
 
 import {
   AppliancesDetails,
@@ -64,7 +64,6 @@ const PropertyPageContent = ({
   const { agentRole } = useUser()
   const features = useFeatures()
   const { similarProperties, property } = useProperty()
-  const { address } = property
   const building = (
     property as {
       building?: { name: string; slug: string; published?: boolean }
@@ -107,7 +106,7 @@ const PropertyPageContent = ({
               variant="h1"
               style={{ fontSize: '1.7rem', margin: 0, lineHeight: 1 }}
             >
-              {formatShortAddress(address)}
+              {formatListingHeading(property)}
             </Typography>
 
             <Breadcrumbs

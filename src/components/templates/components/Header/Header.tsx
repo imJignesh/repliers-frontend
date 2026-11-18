@@ -88,8 +88,10 @@ const Header = () => {
                   </IconButton>
                 )}
 
-                {/* Toolbar menu */}
-                <ToolbarMenu sx={{ display: { xs: 'none', md: 'flex' } }} />
+                {/* Toolbar menu (audit 4 T13: inside a nav landmark) */}
+                <Box component="nav" aria-label="Main" sx={{ display: { xs: 'none', md: 'flex' } }}>
+                  <ToolbarMenu sx={{ display: 'flex' }} />
+                </Box>
 
                 {/* Desktop Neighbourhoods Button only */}
                 <PopupState variant="popover" popupId="desktop-neighbourhoods">

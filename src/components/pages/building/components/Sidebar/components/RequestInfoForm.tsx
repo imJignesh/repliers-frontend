@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 
 import { Button, Stack, TextField } from '@mui/material'
 import Grid from '@mui/material/Grid2'
@@ -60,9 +60,22 @@ const RequestInfoForm = () => {
 
   const formValid = validName && validPhone && validEmail
 
-  const handleSubmit = () => {
+  // Audit 4 T13: after a failed submit, move focus to the first invalid field.
+  const formRef = useRef<HTMLFormElement>(null)
+  const focusFirstInvalid = () =>
+    setTimeout(() => {
+      formRef.current
+        ?.querySelector<HTMLElement>('[aria-invalid="true"]')
+        ?.focus()
+    }, 0)
+
+  const handleSubmit = (event?: React.SyntheticEvent) => {
+    event?.preventDefault()
     setFormTouched(true)
-    if (!formValid) return
+    if (!formValid) {
+      focusFirstInvalid()
+      return
+    }
     setLoading(true)
 
     const { name, email, phone, message } = values
@@ -93,7 +106,7 @@ const RequestInfoForm = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit} autoComplete="off">
+    <form ref={formRef} onSubmit={handleSubmit} noValidate>
       <input type="hidden" name="price" value={listPrice || ''} />
       <Stack spacing={2}>
         <Grid container columns={2} spacing={2}>
@@ -101,6 +114,7 @@ const RequestInfoForm = () => {
             <TextField
               fullWidth
               name="name"
+              autoComplete="name"
               label="Name"
               value={values.name}
               onChange={handleInputChange}
@@ -118,12 +132,13 @@ const RequestInfoForm = () => {
             <TextField
               fullWidth
               name="email"
+              autoComplete="email"
               type="email"
               label="Email"
               value={values.email}
               onChange={handleInputChange}
               error={formTouched && !validEmail}
-              helperText={formTouched && !validEmail ? 'Enter valid email' : ''}
+              helperText={formTouched && !validEmail ? (values.email ? 'Enter a valid email' : 'Required field') : ''}
             />
           </Grid>
           <Grid size={{ xs: 2, sm: 1, md: 2 }}>
@@ -131,6 +146,7 @@ const RequestInfoForm = () => {
               fullWidth
               type="tel"
               name="phone"
+              autoComplete="tel"
               label="Phone"
               placeholder="+1 (555) 555-1234"
               value={values.phone}

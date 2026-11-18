@@ -30,7 +30,7 @@ const content = {
   siteDefaultBrokerageName: 'IRISE',
   siteKeywords: ['Precondo', 'Precondos for sale in Canada'],
   siteDescription:
-    "Welcome to Precondo, your exclusive access to all the new and upcoming condos in Canada. Everything you'll need when it comes to properties for Sale & Preconstruction Properties!",
+    'Search resale condos for sale across Toronto, the GTA and Ontario on Precondo. See photos, prices, building details and price history, and get alerts for new listings.',
   siteFooterDescription:
     'Our mission is to make the MLS more valuable while remaining committed to the needs of local markets. We do this by delivering exceptional customer service and striving for continuous innovation.',
   siteFullscreenFooter: '',
@@ -43,7 +43,8 @@ const content = {
   siteMetadata: {
     title: {
       template: '%s',
-      default: 'Precondo | Search & Analyze All Condos in Canada' // fallback
+      // Audit 4 C06: /r/ lists Ontario resale condos, not all of Canada.
+      default: 'Condos for Sale in Ontario | Precondo' // fallback
     },
     // metadataBase: new URL('https://smartmls.com/'), // canonical URL
     generator: 'Precondo',
@@ -59,7 +60,7 @@ const content = {
     //   telephone: false
     // },
     description:
-      "Welcome to Precondo, your exclusive access to all the new and upcoming condos in Canada. Everything you'll need when it comes to properties for Sale & Preconstruction Properties!",
+      'Search resale condos for sale across Toronto, the GTA and Ontario on Precondo. See photos, prices, building details and price history, and get alerts for new listings.',
     icons: {
       icon: 'https://precondo.ca/r/favicon.ico'
     }

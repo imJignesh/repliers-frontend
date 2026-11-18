@@ -23,7 +23,7 @@ const { siteName, siteFooterDescription, siteFooterLogo: logo } = content
 
 const Footer = () => {
   return (
-    <Box bgcolor="#000" py={{ xs: 4, sm: 5, md: 6 }} px={{ xs: 2, sm: 3 }} className="footer">
+    <Box component="footer" bgcolor="#000" py={{ xs: 4, sm: 5, md: 6 }} px={{ xs: 2, sm: 3 }} className="footer">
       <Container maxWidth="lg">
         <Stack spacing={{ xs: 4, md: 2 }}>
           <Stack

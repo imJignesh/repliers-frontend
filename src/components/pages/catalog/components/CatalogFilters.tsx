@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { useEffect, useMemo, useState, useRef } from 'react'
+import { type MouseEvent, useEffect, useMemo, useState, useRef } from 'react'
 import {
   Box,
   Button,
@@ -790,9 +790,13 @@ const CatalogFilters = ({
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, p: 1, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 2 }}>
                     {activeGroup.children.filter((child: any) => locationCount(child, viewMode) > 0 || isHoodActive(child)).map((child: any) => {
                       const isChildActive = isHoodActive(child)
+                      // Audit 4 T08: a real link (crawlable, opens in a new tab), not a div button.
+                      const childUrl = keepFilters(`${routes.listings}/${locationTree.slug}/${activeGroup.slug}/${child.slug}`) as string
                       return (
                         <Chip
                           key={child.id}
+                          component={Link}
+                          href={childUrl}
                           label={
                             <Stack direction="row" alignItems="center" gap={0.5}>
                               <span>{child.name}</span>
@@ -814,16 +818,23 @@ const CatalogFilters = ({
                             </Stack>
                           }
                           clickable
-                          onClick={() => {
+                          onClick={(event: MouseEvent) => {
+                            if (event.metaKey || event.ctrlKey || event.shiftKey) return
                             setLoading(true)
-                            const url = keepFilters(`${routes.listings}/${locationTree.slug}/${activeGroup.slug}/${child.slug}`) as string
-                            router.push(url)
                           }}
                           sx={{
                             borderRadius: '4px',
-                            height: 28,
-                            flex: 1,
-                            minWidth: 'calc(25% - 8px)', // Ensure at least 4 per row on desktop if possible
+                            // Audit 4 T08: size to the full name on phones instead of clipping it.
+                            height: 'auto',
+                            minHeight: 28,
+                            flex: { xs: '0 1 auto', sm: 1 },
+                            minWidth: { xs: 0, sm: 'calc(25% - 8px)' },
+                            maxWidth: '100%',
+                            '& .MuiChip-label': {
+                              whiteSpace: { xs: 'normal', sm: 'nowrap' },
+                              overflow: 'visible',
+                              py: 0.5
+                            },
                             bgcolor: isChildActive ? 'primary.main' : 'white',
                             color: isChildActive ? 'white' : 'text.primary',
                             border: '1px solid',

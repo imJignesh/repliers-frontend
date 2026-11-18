@@ -12,8 +12,7 @@ import {
   mapperTotalBeds,
   mapperBaths,
   mapperTotalParking,
-  formatYearBuiltValue,
-  isAgeRange
+  resolveYearBuilt
 } from 'utils/dataMapper/mappers'
 import { type DetailsGroupType } from 'utils/dataMapper'
 import { usePropertyDetails } from 'providers/PropertyDetailsProvider'
@@ -50,10 +49,10 @@ const RoomsDetails = ({ rooms }: { rooms?: DetailsGroupType[] }) => {
     { label: 'Garage', value: details.garage },
     { label: 'A/C', value: details.airConditioning },
     { label: 'Heating', value: details.heating },
-    {
-      label: isAgeRange(details.yearBuilt) ? 'Age' : 'Year Built',
-      value: formatYearBuiltValue(details.yearBuilt)
-    },
+    (() => {
+      const year = resolveYearBuilt(property)
+      return { label: year.isAge ? 'Age' : 'Year Built', value: year.value }
+    })(),
   ].filter(f => f.value && f.value !== '0' && f.value !== '0 + 0' && f.value !== 'null' && f.value !== 'N')
 
   // NOTE: If both facts are empty AND roomsData is empty, return null

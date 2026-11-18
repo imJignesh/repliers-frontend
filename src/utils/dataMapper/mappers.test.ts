@@ -61,7 +61,7 @@ describe('mapperCategory', () => {
 })
 
 describe('mapperDaysOnMarket', () => {
-  it('should contains number of days ago for unsold property', () => {
+  it('shows the number of days for an unsold property', () => {
     const property: Property = {
       lastStatus: 'New',
       listDate: '2024-09-30T00:00:00.000Z',
@@ -69,7 +69,7 @@ describe('mapperDaysOnMarket', () => {
     } as unknown as Property
 
     const result = mapperDaysOnMarket(property)
-    expect(result).toContain('days ago')
+    expect(result).toMatch(/^\d+ days$/)
   })
 
   it('should return null if the property is sold', () => {
@@ -926,18 +926,17 @@ describe('mapperCondoFees', () => {
 })
 
 describe('audit R06 listing labels', () => {
-  it('states when the condo fee period is missing', () => {
+  it('shows the condo fee alone when the period is missing', () => {
     const property = {
       condominium: { fees: { maintenance: '713.76' } },
       raw: {}
     } as any
-    expect(mapperCondoFees(property)).toBe(
-      '$713.76 (Billing Period Not Provided)'
-    )
+    expect(mapperCondoFees(property)).toBe('$713.76')
   })
 
   it('shows MLS status codes in plain English', () => {
     expect(mapperLastStatus({ lastStatus: 'Pc' } as any)).toBe('Price Change')
+    expect(mapperLastStatus({ lastStatus: 'New' } as any)).toBe('Active')
     expect(mapperLastStatus({ lastStatus: 'Sc' } as any)).toBe(
       'Sold Conditionally'
     )
@@ -960,5 +959,32 @@ describe('audit R06 listing labels', () => {
     expect(mapperStories({ condominium: { stories: '09' } } as any)).toBe('9')
     expect(mapperStories({ condominium: { stories: '12A' } } as any)).toBe('12A')
     expect(mapperStories({ condominium: {} } as any)).toBeNull()
+  })
+})
+
+describe('audit 4 C04 year built', () => {
+  it('prefers the building year over an MLS age of "New"', () => {
+    const property = {
+      details: { yearBuilt: 'New' },
+      building: { built_year_ext: 'Built: 2014' },
+      raw: {}
+    } as any
+    expect(mapperYearBuilt(property)).toEqual({
+      label: 'pdp.fields.yearBuilt',
+      value: '2014'
+    })
+    expect(mapperConstructionYearBuilt(property)?.value).toBe('2014')
+  })
+
+  it('keeps the MLS age when the building has no year', () => {
+    const property = {
+      details: { yearBuilt: 'New' },
+      building: { built_year_ext: 'Built:' },
+      raw: {}
+    } as any
+    expect(mapperYearBuilt(property)).toEqual({
+      label: 'pdp.fields.age',
+      value: 'New'
+    })
   })
 })

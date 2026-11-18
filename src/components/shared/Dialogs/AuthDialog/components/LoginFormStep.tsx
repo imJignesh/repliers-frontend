@@ -57,7 +57,7 @@ const LoginFormStep = ({
       spacing={4}
       sx={{ display: visible ? 'flex' : 'none', width: '100%', minHeight: 310 }}
     >
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Stack spacing={4} alignItems="center">
           <Stack alignItems="center" width="100%">
             <Controller
@@ -67,8 +67,9 @@ const LoginFormStep = ({
                 <TextField
                   {...field}
                   fullWidth
-                  type="text"
+                  type="email"
                   label="Email"
+                  autoComplete="email"
                   disabled={disabled}
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
@@ -85,6 +86,8 @@ const LoginFormStep = ({
                   {...field}
                   fullWidth
                   label="Phone number"
+                  type="tel"
+                  autoComplete="tel"
                   placeholder="(555) 555-1234"
                   disabled={disabled}
                   error={!!fieldState.error}

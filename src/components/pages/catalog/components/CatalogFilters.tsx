@@ -62,6 +62,9 @@ const normalize = (str?: string) => str ? str.toLowerCase().replace(/[^a-z0-9]/g
 const formatCount = (n: number) => String(n)
 
 
+// One row of neighbourhood chips: 28 px chip + 8 px padding top and bottom.
+const CHIPS_ROW_MIN_HEIGHT = 44
+
 const CatalogFilters = ({
   count,
   city,
@@ -513,7 +516,10 @@ const CatalogFilters = ({
             </>
           ) : (
             <>
-              <Skeleton variant="rounded" sx={{ width: 257, height: 40 }} />
+              {/* TA08: same width as the controls it stands in for (toggle 178 +
+                  Filters 46 + Map 40 + gaps 24), so the count row does not
+                  reflow when they replace it. */}
+              <Skeleton variant="rounded" sx={{ width: 288, height: 40 }} />
             </>
           )}
         </Stack>
@@ -778,16 +784,35 @@ const CatalogFilters = ({
       </Stack>
 
       {/* Active Group Neighborhoods (Chips) */}
+      {/* Technical audit TA08: the chips arrive after the client fetches the
+          location tree. On phones they used to wrap into a ~600 px block that
+          pushed every listing card down (mobile CLS 0.29). They now sit in
+          one horizontally scrolling row, and city/neighbourhood pages reserve
+          that row's height from the first paint. */}
+      {!(locationTree && locationTree.children) && (city || hood) && (
+        <Box sx={{ mb: 2, minHeight: CHIPS_ROW_MIN_HEIGHT }} aria-hidden />
+      )}
       {
         locationTree && locationTree.children && (
-          <Box sx={{ mb: 2 }}>
+          <Box sx={{ mb: 2, minHeight: city || hood ? CHIPS_ROW_MIN_HEIGHT : undefined }}>
             {(() => {
               // Find active group from STATE
               const activeGroup = locationTree.children.find((g: any) => g.id === activeGroupId)
 
               if (activeGroup && activeGroup.children && activeGroup.children.length > 0) {
                 return (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, p: 1, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 2 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexWrap: { xs: 'nowrap', sm: 'wrap' },
+                      overflowX: { xs: 'auto', sm: 'visible' },
+                      scrollbarWidth: 'thin',
+                      gap: 1,
+                      p: 1,
+                      bgcolor: 'rgba(0,0,0,0.02)',
+                      borderRadius: 2
+                    }}
+                  >
                     {activeGroup.children.filter((child: any) => locationCount(child, viewMode) > 0 || isHoodActive(child)).map((child: any) => {
                       const isChildActive = isHoodActive(child)
                       // Audit 4 T08: a real link (crawlable, opens in a new tab), not a div button.
@@ -827,11 +852,11 @@ const CatalogFilters = ({
                             // Audit 4 T08: size to the full name on phones instead of clipping it.
                             height: 'auto',
                             minHeight: 28,
-                            flex: { xs: '0 1 auto', sm: 1 },
+                            flex: { xs: '0 0 auto', sm: 1 },
                             minWidth: { xs: 0, sm: 'calc(25% - 8px)' },
                             maxWidth: '100%',
                             '& .MuiChip-label': {
-                              whiteSpace: { xs: 'normal', sm: 'nowrap' },
+                              whiteSpace: 'nowrap',
                               overflow: 'visible',
                               py: 0.5
                             },

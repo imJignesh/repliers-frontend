@@ -26,6 +26,14 @@ import { DEFAULT_OG_IMAGE, getProtocolHost } from 'utils/urls'
 
 const disableSSG = process.env.DISABLE_SSG || false
 
+/** "Downtown Condos For Sale | Precondo" -> "Downtown Condos For Sale - Page 2 | Precondo" */
+export const withPageNumber = (title: string, page: number) => {
+  const i = title.lastIndexOf(' | ')
+  return i > 0
+    ? `${title.slice(0, i)} - Page ${page}${title.slice(i)}`
+    : `${title} - Page ${page}`
+}
+
 export const generateCatalogMetadata = async ({
   params,
   searchParams
@@ -174,18 +182,26 @@ export const generateCatalogMetadata = async ({
     .replace(/\s\s+/g, ' ')
     .trim()
 
+  // Technical audit TA04: listing pages 2+ are their own pages (different
+  // cards), so each canonicalises to itself, not to page 1, and gets its own
+  // title. Buildings-view pages (?type=building) keep the base canonical.
+  const pageSuffix = page > 1 && !searchParams.type ? `?page=${page}` : ''
+  const canonicalUrl =
+    host + routes.listings + (slugs?.length ? '/' + slugs.join('/') : '') + pageSuffix
+  const baseTitle = title
+    .replace(/\s\s+/g, ' ')
+    .replace(/,\s*\|/g, ' |')
+    .replace(/^, | ,$/g, '')
+    .trim()
+
   const meta: any = {
-    title: title
-      .replace(/\s\s+/g, ' ')
-      .replace(/,\s*\|/g, ' |')
-      .replace(/^, | ,$/g, '')
-      .trim(),
+    title: pageSuffix ? withPageNumber(baseTitle, page) : baseTitle,
     description: cleanDescription,
     alternates: {
-      canonical: host + routes.listings + (slugs?.length ? '/' + slugs.join('/') : '')
+      canonical: canonicalUrl
     },
     openGraph: {
-      url: host + routes.listings + (slugs?.length ? '/' + slugs.join('/') : ''),
+      url: canonicalUrl,
       images: DEFAULT_OG_IMAGE
     },
     // Audit R01: empty filtered searches render for visitors (HTTP 200) but

@@ -82,6 +82,10 @@ const LoginFormStep = ({
                 <TextField
                   {...field}
                   fullWidth
+                  // TA13: the ref must reach the <input>, not MUI's wrapper
+                  // <div> (which {...field} would give it), for setFocus.
+                  ref={undefined}
+                  inputRef={field.ref}
                   type="email"
                   label="Email"
                   autoComplete="email"

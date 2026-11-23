@@ -1,3 +1,4 @@
+import { headers } from 'next/headers'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { features } from 'features'
 
@@ -284,7 +285,7 @@ const LocationsCatalogPage = async (props: {
   const breadcrumbItems = getLocationBreadcrumbItems(
     [area, city, hood],
     rawLocationSlugs,
-    getProtocolHost()
+    getProtocolHost(await headers())
   )
 
   return (

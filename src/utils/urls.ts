@@ -7,6 +7,12 @@ import routes from '@configs/routes'
 
 import { joinNonEmpty } from 'utils/strings'
 
+/**
+ * Technical audit TA12: share image for pages that have no photo of their own
+ * (home, locations, human sitemap, buildings without a cover or listing).
+ */
+export const DEFAULT_OG_IMAGE = content.siteUrl + '/r/precondo_main_image.webp'
+
 export const getCDNPath = (fileName: string, size = 'large') => {
   if (!fileName) return ''
   if (fileName.startsWith('http')) return fileName

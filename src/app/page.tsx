@@ -13,7 +13,7 @@ import {
 import PageTemplate from 'components/templates/PageTemplate'
 
 import { fetchFeatures } from 'utils/features'
-import { getProtocolHost } from 'utils/urls'
+import { DEFAULT_OG_IMAGE, getProtocolHost } from 'utils/urls'
 
 // NOTE: Dynamically generate metadata for the Estimate Landing Page based on feature flags.
 // When manually setting rootPage with feature flags for the estimate page,
@@ -35,6 +35,7 @@ export const generateMetadata = async (props: any): Promise<Metadata> => {
       canonical: host + routes.home
     },
     openGraph: {
+      images: DEFAULT_OG_IMAGE,
       url: host + routes.home
     }
   }

@@ -67,7 +67,10 @@ export const generateMetadata = async (props: PropertyPageProps) => {
       // mock property for metadata generator to still interpolate correctly
       const mockProperty = {
         details: { description: '' },
-        images: [],
+        // Technical audit TA12: share the building's cover photo when it has one.
+        images: (property.building as any).cover_photo_url
+          ? [(property.building as any).cover_photo_url]
+          : [],
         address: {
           streetNumber: property.building.streetNumber || streetNumber,
           streetName: property.building.streetName || streetName,

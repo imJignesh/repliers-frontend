@@ -25,6 +25,14 @@ const nextConfig = {
   env: { NEXT_PUBLIC_ROOT_PAGE: rootPage },
   pageExtensions: ['tsx', 'ts', 'jsx', 'js', 'mdx', 'md'],
 
+  // Technical audit TA11 (23 Nov 2026): with streaming metadata, slow pages
+  // sent <title>, description and rel=canonical after </head> (190 of 413
+  // /r/sitemap pages). Cloudflare caches one copy for every user agent, so
+  // bots received it too, and Google ignores a canonical outside <head>.
+  // Treat every user agent as "HTML-limited" so metadata always blocks and
+  // lands in <head>.
+  htmlLimitedBots: /.*/,
+
   // Note: 'eslint' and 'typescript' ignore keys are handled differently in v16.
   // If the build still fails, these may need to move to vercel.json or 
   // be handled via the 'ignoreDuringBuilds' environment variable.

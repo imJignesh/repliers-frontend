@@ -15,6 +15,12 @@ const HistoryItemRow = ({
   price?: number | string | null
   blurred?: boolean
 }) => {
+  // Technical audit TA13: the blurred placeholder used opacity 0.7, which made
+  // the text 2.75:1 against the panel (WCAG 1.4.3 needs 4.5:1). The blur alone
+  // hides it; aria-hidden keeps screen readers from reading obscured values.
+  const blurSx = (px: number) =>
+    blurred ? { filter: `blur(${px}px)`, userSelect: 'none' as const } : {}
+
   return (
     <Stack
       direction={{ xs: 'column', sm: 'row' }}
@@ -25,7 +31,8 @@ const HistoryItemRow = ({
         color="text.hint"
         minWidth="100px"
         width="28%"
-        sx={blurred ? { filter: 'blur(4px)', userSelect: 'none', opacity: 0.7 } : {}}
+        sx={blurSx(4)}
+        aria-hidden={blurred || undefined}
       >
         <ScrubbedDate value={date} />
       </Typography>
@@ -37,7 +44,8 @@ const HistoryItemRow = ({
         fontWeight="bold"
         minWidth="90px"
         width="25%"
-        sx={blurred ? { filter: 'blur(6px)', userSelect: 'none', opacity: 0.7 } : {}}
+        sx={blurSx(6)}
+        aria-hidden={blurred || undefined}
       >
         {Number(price) > 0 ? formatEnglishPrice(price) : ''}
       </Typography>

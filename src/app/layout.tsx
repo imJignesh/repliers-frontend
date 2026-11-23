@@ -7,7 +7,6 @@ import { GlobalStyles } from '@mui/material'
 import content from '@configs/content'
 import globalStyles from '@configs/theme/global'
 import TrackingInline from '@templates/TrackingInline'
-import Script from 'next/script'
 
 import { APISearch } from 'services/API'
 import { fetchFeatureOptions } from 'utils/features'
@@ -67,13 +66,8 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
         </Providers>
         {/* Tracking scripts loaded after main content */}
         <TrackingInline />
-        {/* reCAPTCHA deferred to idle time — only needed on form submission */}
-        {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && (
-          <Script
-            src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
-            strategy="lazyOnload"
-          />
-        )}
+        {/* reCAPTCHA is loaded by the enquiry forms when they get focus
+            (utils/recaptcha preloadRecaptcha), not on every page (audit TA06). */}
       </body>
     </html>
   )

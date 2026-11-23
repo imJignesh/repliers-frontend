@@ -22,7 +22,7 @@ import { notFound } from 'next/navigation'
 import { type Params, type SearchParams } from './page'
 
 import { headers } from 'next/headers'
-import { getProtocolHost } from 'utils/urls'
+import { DEFAULT_OG_IMAGE, getProtocolHost } from 'utils/urls'
 
 const disableSSG = process.env.DISABLE_SSG || false
 
@@ -185,7 +185,8 @@ export const generateCatalogMetadata = async ({
       canonical: host + routes.listings + (slugs?.length ? '/' + slugs.join('/') : '')
     },
     openGraph: {
-      url: host + routes.listings + (slugs?.length ? '/' + slugs.join('/') : '')
+      url: host + routes.listings + (slugs?.length ? '/' + slugs.join('/') : ''),
+      images: DEFAULT_OG_IMAGE
     },
     // Audit R01: empty filtered searches render for visitors (HTTP 200) but
     // are kept out of the index, as the former 404 did.

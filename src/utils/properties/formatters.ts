@@ -7,7 +7,7 @@ import { type Property, type PropertyAddress } from 'services/API'
 import { formatEnglishPrice } from 'utils/formatters'
 
 import { capitalize, joinNonEmpty } from '../strings'
-import { getCDNPath } from '../urls'
+import { DEFAULT_OG_IMAGE, getCDNPath } from '../urls'
 
 import { sanitizeScrubbed, sanitizeStreetNumber } from './sanitizers'
 import { getSeoStatus, getSeoTitle, getSeoType, getSeoUrl } from './seo'
@@ -102,7 +102,7 @@ export const formatMetadata = (
   const { neighborhood, city } = address
 
   const openGraph = {
-    images: getCDNPath(images[0], 'small'),
+    images: getCDNPath(images?.[0], 'small') || DEFAULT_OG_IMAGE,
     url: host + getSeoUrl(property, { excludeQuery: true })
   }
 

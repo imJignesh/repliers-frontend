@@ -43,6 +43,28 @@ export const getBreadcrumbJsonLd = (items: BreadcrumbItem[]) => ({
   }))
 })
 
+/**
+ * Technical audit TA12: location pages showed breadcrumbs but had no
+ * BreadcrumbList. Names are the resolved area, city and neighbourhood; URLs
+ * are the cumulative location slugs. Returns [] when they don't line up, so a
+ * page never advertises a wrong trail.
+ */
+export const getLocationBreadcrumbItems = (
+  names: Array<string | undefined | null>,
+  slugs: string[],
+  host: string
+): BreadcrumbItem[] => {
+  const levels = names.filter((n): n is string => Boolean(n && n.trim()))
+  if (!levels.length || levels.length !== slugs.length) return []
+  return [
+    { name: 'For sale', url: host + routes.listings },
+    ...levels.map((name, i) => ({
+      name,
+      url: host + routes.listings + '/' + slugs.slice(0, i + 1).join('/')
+    }))
+  ]
+}
+
 // Use the canonical, cumulative location hierarchy. Search-result URLs are UI
 // state and must not be advertised as breadcrumb destinations to crawlers.
 /**
@@ -194,7 +216,16 @@ export const getListingJsonLd = (property: Property, host: string) => {
     '@type': 'RealEstateListing',
     '@id': url,
     url,
-    ...(mlsNumber ? { mlsNumber } : {}),
+    // Technical audit TA12: mlsNumber is not a schema.org property.
+    ...(mlsNumber
+      ? {
+          identifier: {
+            '@type': 'PropertyValue',
+            propertyID: 'MLS',
+            value: mlsNumber
+          }
+        }
+      : {}),
     name:
       streetAddress || `${details?.propertyType || 'Condo'} in ${address.city}`,
     ...(description ? { description } : {}),

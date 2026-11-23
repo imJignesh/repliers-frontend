@@ -7,7 +7,7 @@ import Grid from '@mui/material/Grid2'
 
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
-import { executeRecaptcha } from 'utils/recaptcha'
+import { executeRecaptcha, preloadRecaptcha } from 'utils/recaptcha'
 
 import { APIContact } from 'services/API'
 import { useProperty } from 'providers/PropertyProvider'
@@ -124,7 +124,7 @@ const RequestInfoForm = () => {
   }
 
   return (
-    <form ref={formRef} onSubmit={(e) => { e.preventDefault(); handleSubmit() }} noValidate>
+    <form onFocusCapture={preloadRecaptcha} ref={formRef} onSubmit={(e) => { e.preventDefault(); handleSubmit() }} noValidate>
       <input type="hidden" name="price" value={listPrice || ''} />
       <input type="hidden" name="mls_municipality" value={address?.district || address?.city || ''} />
       <input type="hidden" name="postal_code" value={address?.zip || ''} />

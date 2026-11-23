@@ -1,6 +1,10 @@
 import { jest } from '@jest/globals'
 
-import { executeRecaptcha, RECAPTCHA_LOAD_TIMEOUT_MS } from './recaptcha'
+import {
+  executeRecaptcha,
+  preloadRecaptcha,
+  RECAPTCHA_LOAD_TIMEOUT_MS
+} from './recaptcha'
 
 // Audit R09 (6 Nov 2026 retest): when the helper added the script itself and
 // neither load nor error fired, the enquiry stayed pending forever.
@@ -41,5 +45,34 @@ describe('executeRecaptcha script loading', () => {
     jest.advanceTimersByTime(RECAPTCHA_LOAD_TIMEOUT_MS)
     await expect(result).resolves.toBe('')
     expect(jest.getTimerCount()).toBe(0)
+  })
+})
+
+// Technical audit TA06 (23 Nov 2026): the script no longer loads on every
+// page; forms start loading it on first focus.
+describe('preloadRecaptcha', () => {
+  beforeEach(() => {
+    process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY = 'test-key'
+    delete (window as any).grecaptcha
+    document.querySelectorAll('script').forEach((s) => s.remove())
+    jest.useFakeTimers()
+  })
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  it('adds the script once, however often it is called', () => {
+    preloadRecaptcha()
+    preloadRecaptcha()
+    expect(
+      document.querySelectorAll('script[src*="recaptcha/api.js"]').length
+    ).toBe(1)
+    jest.advanceTimersByTime(RECAPTCHA_LOAD_TIMEOUT_MS)
+  })
+
+  it('does nothing without a site key', () => {
+    delete process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+    preloadRecaptcha()
+    expect(document.querySelector('script[src*="recaptcha/api.js"]')).toBeNull()
   })
 })

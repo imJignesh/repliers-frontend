@@ -61,6 +61,20 @@ function loadRecaptchaScript(siteKey: string): Promise<void> {
     });
 }
 
+/**
+ * Starts loading reCAPTCHA without waiting for it (technical audit TA06).
+ * The script used to load on every page (about 360 KB and 0.5-0.8 s of
+ * main-thread time on mobile). Forms call this when they first get focus,
+ * so the script is usually ready by the time the visitor submits.
+ */
+export function preloadRecaptcha(): void {
+    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+    if (!siteKey || typeof window === 'undefined') return;
+    loadRecaptchaScript(siteKey).catch(() => {
+        // executeRecaptcha retries the load on submit and handles failure.
+    });
+}
+
 export async function executeRecaptcha(action: string): Promise<string> {
     const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
     

@@ -262,6 +262,7 @@ const AuthForm = ({
               disabled={!clientSide || loading}
               onChange={setSharedFormValues}
               onSubmit={requestOtpLogin}
+              errorId={errorMessage ? 'auth-form-error' : undefined}
             />
 
             <SignupFormStep

@@ -1,3 +1,4 @@
+import { headers } from 'next/headers'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { features } from 'features'
 
@@ -14,7 +15,12 @@ import {
   APILocations
 } from 'services/API'
 import { toCardListing } from 'utils/properties/cardListing'
-import { getCDNPath } from 'utils/urls'
+import { getCDNPath, getProtocolHost } from 'utils/urls'
+import {
+  getBreadcrumbJsonLd,
+  getLocationBreadcrumbItems
+} from 'utils/structuredData'
+import JsonLd from 'components/atoms/JsonLd'
 import { parseCatalogQuery } from 'utils/catalogQuery'
 
 import { fetchCatalogAreas, validateCatalogSlugs } from './_data'
@@ -276,8 +282,17 @@ const LocationsCatalogPage = async (props: {
       ? getCDNPath(listings[0].images[0], 'small')
       : ''
 
+  const breadcrumbItems = getLocationBreadcrumbItems(
+    [area, city, hood],
+    rawLocationSlugs,
+    getProtocolHost(await headers())
+  )
+
   return (
     <PageTemplate>
+      {breadcrumbItems.length > 0 && (
+        <JsonLd data={getBreadcrumbJsonLd(breadcrumbItems)} />
+      )}
       {firstCardPhoto && (
         <link
           rel="preload"

@@ -9,6 +9,7 @@ jest.unstable_mockModule('utils/features', () => ({
 }))
 jest.unstable_mockModule('next/headers', () => ({ headers: async () => ({}) }))
 jest.unstable_mockModule('utils/urls', () => ({
+  DEFAULT_OG_IMAGE: 'https://precondo.ca/r/precondo_main_image.webp',
   getProtocolHost: () => 'https://precondo.ca'
 }))
 jest.unstable_mockModule('components/templates/PageTemplate', () => ({

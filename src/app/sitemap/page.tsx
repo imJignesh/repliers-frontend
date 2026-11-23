@@ -11,7 +11,7 @@ import routes from '@configs/routes'
 import { sanitizeUrl } from 'utils/urls'
 
 import { headers } from 'next/headers'
-import { getProtocolHost } from 'utils/urls'
+import { DEFAULT_OG_IMAGE, getProtocolHost } from 'utils/urls'
 
 export const generateMetadata = async (): Promise<Metadata> => {
     const host = getProtocolHost(await headers())
@@ -25,6 +25,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
             canonical: host + routes.sitemap
         },
         openGraph: {
+            images: DEFAULT_OG_IMAGE,
             url: host + routes.sitemap
         }
     }

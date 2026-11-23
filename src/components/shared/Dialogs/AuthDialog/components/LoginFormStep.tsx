@@ -19,7 +19,8 @@ const LoginFormStep = ({
   loading,
   defaultValues = {},
   onChange,
-  onSubmit
+  onSubmit,
+  errorId
 }: {
   visible?: boolean
   disabled?: boolean
@@ -27,10 +28,12 @@ const LoginFormStep = ({
   defaultValues?: Partial<LogInRequest>
   onChange?: (values: Partial<LogInRequest>) => void
   onSubmit: (params: LogInRequest) => void
+  /** id of the form-level error shown above (technical audit TA13) */
+  errorId?: string
 }) => {
   const { email = '', phone = '' } = defaultValues
 
-  const { control, handleSubmit, watch, setValue } = useForm<LogInRequest>({
+  const { control, handleSubmit, watch, setValue, setFocus } = useForm<LogInRequest>({
     resolver: joiResolver(loginSchema),
     mode: 'onBlur',
     defaultValues: {
@@ -52,6 +55,18 @@ const LoginFormStep = ({
     onChange?.({ email: watchedEmail, phone: watchedPhone })
   }, [watchedEmail, watchedPhone, onChange])
 
+  // Technical audit TA13: when the form-level error appears ("Either email or
+  // phone number is required."), tie it to both inputs and move focus to the
+  // email field so keyboard and screen-reader users land on the problem.
+  useEffect(() => {
+    if (errorId && visible) setFocus('email')
+  }, [errorId, visible, setFocus])
+
+  const errorInputProps = (hasFieldError: boolean) =>
+    errorId && !hasFieldError
+      ? { htmlInput: { 'aria-describedby': errorId, 'aria-invalid': true } }
+      : undefined
+
   return (
     <Stack
       spacing={4}
@@ -67,12 +82,17 @@ const LoginFormStep = ({
                 <TextField
                   {...field}
                   fullWidth
+                  // TA13: the ref must reach the <input>, not MUI's wrapper
+                  // <div> (which {...field} would give it), for setFocus.
+                  ref={undefined}
+                  inputRef={field.ref}
                   type="email"
                   label="Email"
                   autoComplete="email"
                   disabled={disabled}
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
+                  slotProps={errorInputProps(!!fieldState.error)}
                   onFocus={(event) => event.target.select()}
                 />
               )}
@@ -92,6 +112,7 @@ const LoginFormStep = ({
                   disabled={disabled}
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
+                  slotProps={errorInputProps(!!fieldState.error)}
                   onFocus={(event) => event.target.select()}
                   onChange={(e) => {
                     field.onChange(formatPhoneNumberAsYouType(e.target.value))

@@ -20,7 +20,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
-import { executeRecaptcha } from 'utils/recaptcha'
+import { executeRecaptcha, preloadRecaptcha } from 'utils/recaptcha'
 
 import { APIContact } from 'services/API'
 import { useProperty } from 'providers/PropertyProvider'
@@ -135,7 +135,7 @@ const AppointmentForm = () => {
     }
 
     return (
-        <form onSubmit={(e) => { e.preventDefault(); handleSubmit() }} autoComplete="off">
+        <form onFocusCapture={preloadRecaptcha} onSubmit={(e) => { e.preventDefault(); handleSubmit() }} autoComplete="off">
             <input type="hidden" name="price" value={listPrice || ''} />
             <input type="hidden" name="mls_municipality" value={address?.district || address?.city || ''} />
             <input type="hidden" name="postal_code" value={address?.zip || ''} />

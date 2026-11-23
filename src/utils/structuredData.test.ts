@@ -3,6 +3,7 @@ import routes from '@configs/routes'
 import { getLocationCrumbs } from './locationCrumbs'
 import {
   getBreadcrumbJsonLd,
+  getLocationBreadcrumbItems,
   getPropertyBreadcrumbItems
 } from './structuredData'
 
@@ -234,15 +235,25 @@ describe('listing structured data vocabulary (audit RT07)', () => {
 
 describe('building address and type (audit 4 T11)', () => {
   it('uses the municipality, not the Toronto district, as addressLocality', () => {
-    expect(getAddressLocality({ area: 'Toronto', city: 'Downtown' })).toBe('Toronto')
-    expect(getAddressLocality({ area: 'Toronto', city: 'Midtown | Central' })).toBe('Toronto')
-    expect(getAddressLocality({ area: 'Hamilton', city: 'Hamilton City' })).toBe('Hamilton')
-    expect(getAddressLocality({ area: 'Peel', city: 'Mississauga' })).toBe('Mississauga')
+    expect(getAddressLocality({ area: 'Toronto', city: 'Downtown' })).toBe(
+      'Toronto'
+    )
+    expect(
+      getAddressLocality({ area: 'Toronto', city: 'Midtown | Central' })
+    ).toBe('Toronto')
+    expect(
+      getAddressLocality({ area: 'Hamilton', city: 'Hamilton City' })
+    ).toBe('Hamilton')
+    expect(getAddressLocality({ area: 'Peel', city: 'Mississauga' })).toBe(
+      'Mississauga'
+    )
   })
 
   it('gives every building address a region', () => {
     const data = getBuildingJsonLd(
-      buildingResponse({ name: 'X' }, [unit({ address: { ...unit().address, state: '' } } as any)]),
+      buildingResponse({ name: 'X' }, [
+        unit({ address: { ...unit().address, state: '' } } as any)
+      ]),
       'https://precondo.ca',
       'X',
       'x'
@@ -257,9 +268,55 @@ describe('building address and type (audit 4 T11)', () => {
       count: 0,
       statistics: {}
     } as any
-    const data = getBuildingJsonLd(empty, 'https://precondo.ca', 'Gotham Lofts', 'gotham') as any
+    const data = getBuildingJsonLd(
+      empty,
+      'https://precondo.ca',
+      'Gotham Lofts',
+      'gotham'
+    ) as any
     expect(data['@type']).toBe('ApartmentComplex')
     expect(data.offers).toBeUndefined()
     expect(data.name).toBe('Gotham Lofts')
+  })
+})
+
+describe('location breadcrumbs (technical audit TA12)', () => {
+  const host = 'https://precondo.ca'
+  it('builds a cumulative trail from the resolved names and slugs', () => {
+    const items = getLocationBreadcrumbItems(
+      ['Toronto', 'Downtown', 'Niagara'],
+      ['toronto', 'downtown', 'niagara'],
+      host
+    )
+    expect(items).toEqual([
+      { name: 'For sale', url: host + routes.listings },
+      { name: 'Toronto', url: host + routes.listings + '/toronto' },
+      { name: 'Downtown', url: host + routes.listings + '/toronto/downtown' },
+      {
+        name: 'Niagara',
+        url: host + routes.listings + '/toronto/downtown/niagara'
+      }
+    ])
+  })
+  it('skips missing levels and refuses a mismatched trail', () => {
+    expect(
+      getLocationBreadcrumbItems(['Peel', null, ''], ['peel'], host)
+    ).toHaveLength(2)
+    expect(
+      getLocationBreadcrumbItems(['Peel', 'Mississauga'], ['peel'], host)
+    ).toEqual([])
+    expect(getLocationBreadcrumbItems([], [], host)).toEqual([])
+  })
+})
+
+describe('listing MLS number (technical audit TA12)', () => {
+  it('is an identifier, not the undefined mlsNumber property', () => {
+    const data = getListingJsonLd(unit(), 'https://precondo.ca') as any
+    expect(data.mlsNumber).toBeUndefined()
+    expect(data.identifier).toEqual({
+      '@type': 'PropertyValue',
+      propertyID: 'MLS',
+      value: 'C13734516'
+    })
   })
 })

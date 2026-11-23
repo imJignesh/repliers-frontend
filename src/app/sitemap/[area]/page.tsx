@@ -17,7 +17,7 @@ type Props = {
 }
 
 import { headers } from 'next/headers'
-import { getProtocolHost } from 'utils/urls'
+import { DEFAULT_OG_IMAGE, getProtocolHost } from 'utils/urls'
 
 export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
     const { area } = await params
@@ -39,6 +39,7 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
             canonical: host + `${routes.sitemap}/${area}`
         },
         openGraph: {
+            images: DEFAULT_OG_IMAGE,
             url: host + `${routes.sitemap}/${area}`
         }
     }
